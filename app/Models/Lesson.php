@@ -1,0 +1,27 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Lesson extends Model
+{
+    protected $fillable = [
+        'module_id',
+        'title',
+        'description',
+        'course_id',
+        'content_type',
+        'content_url',
+        'content_text',
+        'duration',
+        'order',
+    ];
+
+    public function module()
+    {
+        return $this->belongsTo(Module::class);
+    }
+
+
+}
