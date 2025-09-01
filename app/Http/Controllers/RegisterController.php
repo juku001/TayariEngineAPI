@@ -43,7 +43,7 @@ class RegisterController extends Controller
      *             @OA\Property(property="company_name", type="string", example="Tech Corp Ltd"),
      *             @OA\Property(property="company_website", type="string", example="https://techcorp.com"),
      *             @OA\Property(property="size_range", type="string", enum={"1-10","11-50","51-200","201+"}, example="11-50"),
-     *             @OA\Property(property="company_role", type="string", enum={"owner","hr","procurement"}, example="hr")
+     *             @OA\Property(property="company_role", type="string", enum={"owner", "hr","staff", "procurement","recruiter"}, example="hr")
      *         )
      *     ),
      *
@@ -53,25 +53,66 @@ class RegisterController extends Controller
      *         @OA\JsonContent(
      *             @OA\Property(property="status", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="User registered successfully"),
-     *             @OA\Property(property="data", type="object")
+     *             @OA\Property(property="code", type="integer", example=200),
+     *             @OA\Property(
+     *               property="data", 
+     *               type="object",
+     *               @OA\Property(
+     *                 property="id",
+     *                 type="integer",
+     *                 example=1
+     *               ),
+     *               @OA\Property(
+     *                 property="first_name",
+     *                 type="string",
+     *                 example="John"
+     *               ),
+     *               @OA\Property(
+     *                 property="last_name",
+     *                 type="string",
+     *                 example="Doe"
+     *               ),
+     *               @OA\Property(
+     *                 property="email",
+     *                 type="string",
+     *                 example="example@email.com"
+     *               ),
+     *               @OA\Property(
+     *                 property="provider",
+     *                 type="string",
+     *                 example="email"
+     *               ),
+     *               @OA\Property(
+     *                 property="created_by",
+     *                 type="integer",
+     *                 example=null
+     *               )
+     *             )
      *         )
      *     ),
      *     @OA\Response(
      *         response=422,
      *         description="Validation error",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Failed to validate fields"),
-     *             @OA\Property(property="errors", type="object")
-     *         )
+     *         ref="#/components/responses/422"
      *     ),
      *     @OA\Response(
      *         response=403,
-     *         description="Unauthorized to create admin"
+     *         description="Unauthorized to create admin",
+     *         @OA\JsonContent(
+     *           @OA\Property(property="status", type="boolean", example=false),
+     *           @OA\Property(
+     *             property="message", 
+     *             type="string", 
+     *             example="Unauthorized to create admin",
+     *             description="Only super admin can create admin"
+     *           ),
+     *           @OA\Property(property="code", type="integer", example=403),
+     *         )
      *     ),
      *     @OA\Response(
      *         response=500,
-     *         description="Internal server error"
+     *         description="Internal server error",
+     *         ref="#/components/responses/500"
      *     )
      * )
      */
@@ -129,8 +170,10 @@ class RegisterController extends Controller
                         'company_name' => 'required|string',
                         'company_website' => 'required|string',
                         'size_range' => 'required|string|in:1-10,11-50,50-200,201+',
+                        'company_role' => 'required|string|in:owner,hr,staff,procurement,recruiter'
                     ], [
-                        'size_range.in' => 'Range should be 1-10,11-50,51-200 or 201+'
+                        'size_range.in' => 'Range should be 1-10,11-50,51-200 or 201+',
+                        'company_role.in' => 'Roles allowed are owner, hr , staff, recruiter and procurement'
                     ]);
 
                     if ($validator->fails()) {
@@ -147,9 +190,9 @@ class RegisterController extends Controller
                     }
 
                     $validator = Validator::make($request->all(), [
-                        'company_role' => 'required|string|in:owner,hr,procurement'
+                        'company_role' => 'required|string|in:owner,hr,staff,procurement,recruiter'
                     ], [
-                        'company_role.in' => 'Roles allowed are owner, hr and procurement'
+                        'company_role.in' => 'Roles allowed are owner, hr , staff, recruiter and procurement'
                     ]);
 
                     if ($validator->fails()) {
@@ -178,7 +221,7 @@ class RegisterController extends Controller
         try {
             DB::beginTransaction();
 
-         
+
 
             $userData = [
                 'first_name' => $request->first_name,
@@ -195,7 +238,7 @@ class RegisterController extends Controller
             if ($role === 'employer') {
                 $companyRole = null;
                 if (!$authUser) {
-                  
+
                     $company = Company::create([
                         'name' => $request->company_name,
                         'website' => $request->company_website,
@@ -205,7 +248,7 @@ class RegisterController extends Controller
                     $companyRole = 'owner';
                 } else {
 
-                  
+
                     if (!$authUser->employer->company_id) {
                         return ResponseHelper::error([], "Authenticated employer has no company assigned", 400);
                     }
@@ -215,7 +258,7 @@ class RegisterController extends Controller
                     $companyId = $authUser->employer->company_id;
                 }
 
-               
+
                 Employer::create([
                     'user_id' => $user->id,
                     'company_id' => $companyId,
@@ -233,7 +276,7 @@ class RegisterController extends Controller
 
 
 
-          
+
             $roleModel = Role::where('name', $role)->first();
             $user->roles()->attach($roleModel->id);
 

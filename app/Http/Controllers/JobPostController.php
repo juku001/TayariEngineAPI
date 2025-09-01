@@ -184,16 +184,15 @@ class JobPostController extends Controller
      *             )
      *         )
      *     ),
-     *
+     *     @OA\Response(
+     *       response=401,
+     *       description="Unauthorized",
+     *       ref="#/components/responses/401"
+     *     ),
      *     @OA\Response(
      *         response=500,
      *         description="Unexpected server error",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Error: Database connection failed"),
-     *             @OA\Property(property="code", type="integer", example=500),
-     *             @OA\Property(property="data", type="array", @OA\Items())
-     *         )
+     *         ref="#/components/responses/500"
      *     )
      * )
      */
@@ -212,6 +211,8 @@ class JobPostController extends Controller
           
             'min_payment' => 'nullable|numeric|min:0',
             'max_payment' => 'nullable|numeric|gte:min_payment',
+        ],[
+            'job_type.in'=> 'Job type should be full-time,project,flexible-virtual-hire or internship'
         ]);
 
 

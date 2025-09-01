@@ -27,6 +27,7 @@ class AdminLogService
             5 => 'COURSE_UPDATE',
             6 => 'SYSTEM_ANALYTICS_REFRESH',
             7 => 'JOB_POSTING',
+            8 => 'COURSE_ADDED'
         ];
 
         return $actions[$code] ?? null; // null if code is invalid

@@ -13,13 +13,16 @@ namespace App\Http\Controllers;
  *     )
  * )
  *
-* @OA\Server(
- *     url="http://143.198.57.242/api",
- *     description="Live Server"
- * )
+ * 
  * @OA\Server(
  *     url="http://localhost:1234/api",
  *     description="Test Server"
+ * )
+ * 
+ * 
+* @OA\Server(
+ *     url="http://143.198.57.242/api",
+ *     description="Live Server"
  * )
  *
  * @OA\SecurityScheme(
@@ -43,12 +46,7 @@ namespace App\Http\Controllers;
  * @OA\Response(
  *     response=422,
  *     description="Unprocessable Content",
- *     @OA\JsonContent(
- *         @OA\Property(property="status", type="boolean", example=false),
- *         @OA\Property(property="message", type="string", example="Failed to validate fields"),
- *         @OA\Property(property="code", type="integer", example=422),
- *         @OA\Property(property="errors", type="object")
- *     )
+ *     @OA\JsonContent(ref="#/components/schemas/ValidationErrorResponse")
  * ),
  * @OA\Response(
  *     response=500,
@@ -89,8 +87,40 @@ namespace App\Http\Controllers;
  *   @OA\Property(property="created_at", type="string", format="date-time", example="2025-08-21T17:21:55.000000Z"),
  *   @OA\Property(property="updated_at", type="string", format="date-time", example="2025-08-21T17:26:14.000000Z")
  * ),
-
- * @OA\Tag(
+ * 
+ * @OA\Schema(
+ *     schema="ValidationErrorResponse",
+ *     type="object",
+ *     @OA\Property(
+ *         property="status",
+ *         type="boolean",
+ *         example=false
+ *     ),
+ *     @OA\Property(
+ *         property="message",
+ *         type="string",
+ *         example="Failed to validate fields"
+ *     ),
+ *     @OA\Property(
+ *         property="code",
+ *         type="integer",
+ *         example=422
+ *     ),
+ *     @OA\Property(
+ *         property="errors",
+ *         type="object",
+ *         additionalProperties=@OA\Schema(
+ *             type="array",
+ *             @OA\Items(type="string", example="The field is required.")
+ *         ),
+ *         example={
+ *             "key1": {"some field on the request might be required."},
+ *             "key2": {"The key 2 is not well formated."}
+ *         }
+ *     )
+ * ),
+ *
+* @OA\Tag(
  *     name="Authentication",
  *     description="APIs related to user authentication like login, logout, registration, password updates, etc."
  * ),

@@ -56,12 +56,14 @@ class AuthController extends Controller
      *         @OA\JsonContent(
      *             @OA\Property(property="status", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Logged out successful."),
-     *             @OA\Property(property="data", type="object", example={})
+     *             @OA\Property(property="code", type="integer", example=200),
+     *             
      *         )
      *     ),
      *     @OA\Response(
      *         response=401,
-     *         description="Unauthorized - No valid token provided"
+     *         description="Unauthorized - No valid token provided",
+     *         ref="#/components/responses/401"
      *     )
      * )
      */

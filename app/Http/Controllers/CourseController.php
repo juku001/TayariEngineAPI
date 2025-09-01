@@ -4,16 +4,28 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
 use App\Models\Course;
+use App\Models\Enrollment;
+use App\Services\AdminLogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Laravel\Sanctum\PersonalAccessToken;
 use Str;
 
 class CourseController extends Controller
 {
 
 
+
+    protected $logService;
+
+
+
+    public function __construct(AdminLogService $logService)
+    {
+        $this->logService = $logService;
+    }
 
 
 
@@ -127,28 +139,28 @@ class CourseController extends Controller
             'modules.lessons',
         ])->get()->map(function ($course) {
 
-        
+
             $lessons = $course->modules->flatMap->lessons;
 
-        
+
             $videoCount = $lessons->count();
 
-        
+
             $totalDuration = $lessons->sum('duration');
 
-         
+
             $progress = null;
             $isEnrolled = false;
 
             if (auth()->check()) {
-             
+
                 $enrollment = $course->enrollments()
                     ->where('user_id', auth()->id())
                     ->first();
 
                 if ($enrollment) {
                     $isEnrolled = true;
-                    $progress = $enrollment->progress; 
+                    $progress = $enrollment->progress;
                 }
             }
 
@@ -163,7 +175,9 @@ class CourseController extends Controller
                 'total_duration' => $totalDuration,
                 'instructor' => [
                     'id' => optional($course->instructorUser)->id,
-                    'name' => optional($course->instructorUser)->first_name . ' ' . optional($course->instructorUser)->last_name,
+                    'name' => 
+                    optional($course->instructorUser)->id != null ? 
+                    optional($course->instructorUser)->first_name . ' ' . optional($course->instructorUser)->last_name : null,
                 ],
                 'skills' => $course->skills->pluck('name'),
                 'is_enrolled' => $isEnrolled,
@@ -178,68 +192,6 @@ class CourseController extends Controller
 
         return ResponseHelper::success($courses, 'List of courses');
     }
-    // public function index()
-    // {
-    //     $authId = auth()->id(); // null if guest
-
-    //     $courses = Course::with([
-    //         'instructor',
-    //         'category',
-    //         'skills',
-    //         'modules.lessons',
-    //         'modules.quizzes'
-    //     ])->get()->map(function ($course) use ($authId) {
-
-    //         // Calculate total videos and total duration
-    //         $videosCount = $course->modules->sum(function ($module) {
-    //             return $module->lessons->count();
-    //         });
-
-    //         $totalDuration = $course->modules->sum(function ($module) {
-    //             return $module->lessons->sum('duration'); // assuming each lesson has 'duration' field
-    //         });
-
-    //         // Students enrolled
-    //         $studentsEnrolled = $course->enrollments()->count();
-
-    //         // Calculate progress if user is logged in
-    //         $progress = null;
-    //         if ($authId) {
-    //             $completedLessons = $course->modules->sum(function ($module) use ($authId) {
-    //                 return $module->lessons->where('progress.user_id', $authId)
-    //                     ->where('progress.status', 'completed')
-    //                     ->count();
-    //             });
-
-    //             $progress = $videosCount > 0 ? round(($completedLessons / $videosCount) * 100, 2) : 0;
-    //         }
-
-    //         return [
-    //             'id' => $course->id,
-    //             'name' => $course->name,
-    //             'description' => $course->description,
-    //             'instructor' => [
-    //                 'id' => $course->instructor->id,
-    //                 'name' => $course->instructor->name
-    //             ],
-    //             'videos_count' => $videosCount,
-    //             'duration' => $totalDuration,
-    //             'students_enrolled' => $studentsEnrolled,
-    //             'skills' => $course->skills->pluck('name'),
-    //             'price' => $course->price,
-    //             'category' => [
-    //                 'id' => $course->category->id,
-    //                 'name' => $course->category->name
-    //             ],
-    //             'progress' => $progress,
-    //             'rating' => $course->rating ?? null,
-    //         ];
-    //     });
-
-    //     return ResponseHelper::success($courses, 'List of all courses');
-    // }
-
-
 
 
 
@@ -248,6 +200,7 @@ class CourseController extends Controller
      *     path="/admin/courses/stats",
      *     tags={"Admin"},
      *     summary="Get course statistics",
+     *     security={{"bearerAuth":{}}},
      *     description="Returns aggregated counts of courses by status (draft, published, archived) along with total count. Useful for admin course management overview.",
      *     @OA\Response(
      *         response=200,
@@ -415,12 +368,12 @@ class CourseController extends Controller
             ], 422);
         }
 
-        
+
         $uploadedFiles = [];
 
         DB::beginTransaction();
         try {
-          
+
             $thumbnailPath = $request->file('thumbnail')->store('thumbnails', 'public');
             $uploadedFiles[] = $thumbnailPath;
 
@@ -432,14 +385,14 @@ class CourseController extends Controller
                 'status' => $request->status,
             ]);
 
-            
+
             foreach ($request->modules as $moduleData) {
                 $module = $course->modules()->create([
                     'title' => $moduleData['title'],
                     'description' => $moduleData['description'] ?? null
                 ]);
 
-              
+
                 foreach ($moduleData['lessons'] as $lessonData) {
                     $videoPath = $lessonData['video']->store('videos', 'public');
                     $uploadedFiles[] = $videoPath;
@@ -452,12 +405,12 @@ class CourseController extends Controller
                     ]);
                 }
 
-               
+
                 $quiz = $module->quizzes()->create([
                     'title' => $moduleData['quiz']['title']
                 ]);
 
-               
+
                 foreach ($moduleData['quiz']['questions'] as $qData) {
                     $quiz->questions()->create([
                         'question_text' => $qData['question_text'],
@@ -473,16 +426,20 @@ class CourseController extends Controller
 
             DB::commit();
 
+            $authId = auth()->user()->id;
+            $action = $this->logService->getActionByCode(8);
+            $this->logService->record($authId, $action, "Added " . $course->name);
             return response()->json([
                 'status' => true,
                 'message' => 'Course created successfully',
+                'code' => 201,
                 'data' => $course->load('modules.lessons', 'modules.quizzes.questions')
             ], 201);
 
         } catch (\Exception $e) {
             DB::rollBack();
 
-         
+
             foreach ($uploadedFiles as $filePath) {
                 Storage::disk('public')->delete($filePath);
             }
@@ -490,6 +447,7 @@ class CourseController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Failed to create course',
+                'code' => 500,
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -510,10 +468,11 @@ class CourseController extends Controller
 
 
     /**
-     * @OA\Put(
+     * @OA\Patch(
      *     path="/admin/courses/{id}",
      *     tags={"Admin"},
      *     summary="Update an existing course",
+     *     security={{"bearerAuth":{}}},
      *     description="Updates an existing course including its thumbnail, modules, lessons, quizzes, and questions. Supports partial updates.",
      *     @OA\Parameter(
      *         name="id",
@@ -626,10 +585,11 @@ class CourseController extends Controller
         $course = Course::with('modules.lessons', 'modules.quizzes.questions')->find($id);
 
         if (!$course) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Course not found'
-            ], 404);
+            return ResponseHelper::error(
+                [],
+                'Course not found',
+                404
+            );
         }
 
         $validator = Validator::make($request->all(), [
@@ -659,12 +619,9 @@ class CourseController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Validation errors',
-                'errors' => $validator->errors()
-            ], 422);
+            return ResponseHelper::error($validator->errors(), "Failed to validate fields", 422);
         }
+
 
         DB::beginTransaction();
         try {
@@ -772,6 +729,9 @@ class CourseController extends Controller
 
             DB::commit();
 
+            $authId = auth()->user()->id;
+            $action = $this->logService->getActionByCode(5);
+            $this->logService->record($authId, $action, "Updated " . $course->name);
             return response()->json([
                 'status' => true,
                 'message' => 'Course updated successfully',
@@ -982,12 +942,74 @@ class CourseController extends Controller
      * )
      */
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        $course = Course::with([
-            'modules.lessons',
-            'modules.quizzes'
-        ])->find($id);
+        $token = $request->bearerToken();
+        $authUser = null;
+        $showFullDetails = false;
+
+        if ($token) {
+            $accessToken = PersonalAccessToken::findToken($token);
+            if ($accessToken) {
+                $authUser = $accessToken->tokenable;
+            }
+        }
+
+        $enrollment = null;
+        if ($authUser) {
+            $enrollment = Enrollment::where('user_id', $authUser->id)
+                ->where('course_id', $id)
+                ->first();
+        }
+
+        if ($enrollment) {
+            $showFullDetails = true;
+        }
+
+        if ($showFullDetails) {
+            // Full details
+            $course = Course::with([
+                'modules.lessons',
+                'modules.quizzes'
+            ])->find($id);
+        } else {
+            // Slim version
+            $course = Course::with(['modules.lessons:id,module_id,title,duration'])->find($id);
+
+            if ($course) {
+                // Calculate totals
+                $totalModules = $course->modules->count();
+                $totalLessons = $course->modules->sum(fn($m) => $m->lessons->count());
+
+                // Transform response
+                $course = [
+                    'id' => $course->id,
+                    'title' => $course->name,
+                    'sub-title'=> $course->sub_title,
+                    'description' => $course->description,
+                    'skills'=> $course->skills->map(function ($skill){
+                        
+                          return   $skill->name;
+                                            }),
+                    'instructor'=> $course->instructorUser(),
+                    'total_modules' => $totalModules,
+                    'total_lessons' => $totalLessons,
+                    'content' => $course->modules->map(function ($module) {
+                        return [
+                            'id' => $module->id,
+                            'title' => $module->title,
+                            'lessons' => $module->lessons->map(function ($lesson) {
+                                return [
+                                    'id' => $lesson->id,
+                                    'title' => $lesson->title,
+                                    'duration' => $lesson->duration,
+                                ];
+                            }),
+                        ];
+                    }),
+                ];
+            }
+        }
 
         if (!$course) {
             return ResponseHelper::error([], 'Course details not found', 404);
@@ -1002,6 +1024,235 @@ class CourseController extends Controller
 
 
 
+
+    /**
+     * @OA\Patch(
+     *     path="/admin/courses/{id}/publish",
+     *     tags={"Admin"},
+     *     summary="Publish a course",
+     *     security={{"bearerAuth":{}}},
+     *     description="Sets the course status to published",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Course ID",
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Course published successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Course published"),
+     *             @OA\Property(property="code", type="integer", example=200),
+     * 
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Course already published",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Course already published"),
+     *             @OA\Property(property="code", type="integer", example=400),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Course not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Course not found"),
+     *             @OA\Property(property="code", type="integer", example=404),
+     *         )
+     *     )
+     * )
+     */
+    public function status(string $id)
+    {
+        $course = Course::find($id);
+
+        if (!$course) {
+            return ResponseHelper::error([], "Course not found", 404);
+        }
+
+        if ($course->status === 'published') {
+            return ResponseHelper::error([], "Course already published", 400);
+        }
+
+        $course->status = 'published';
+        $course->save();
+
+        return ResponseHelper::success([], "Course published");
+    }
+
+
+
+
+    /**
+     * @OA\Get(
+     *     path="/admin/courses",
+     *     tags={"Admin"},
+     *     summary="Get list of courses for admin with filters",
+     *     security={{"bearerAuth":{}}},
+     *     description="Returns list of courses with title, subtitle, description, instructor info, status, module count, students enrolled, and last updated. Supports search and status filter.",
+     *     @OA\Parameter(
+     *         name="status",
+     *         in="query",
+     *         description="Filter by course status (draft or published)",
+     *         required=false,
+     *         @OA\Schema(type="string", enum={"draft","published"})
+     *     ),
+     *     @OA\Parameter(
+     *         name="search",
+     *         in="query",
+     *         description="Search by course title or instructor name",
+     *         required=false,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of admin filtered courses",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="List of admin filtered courses"),
+     *             @OA\Property(property="code", type="integer", example=200),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="title", type="string", example="Organic Chemistry"),
+     *                     @OA\Property(property="subtitle", type="string", nullable=true, example=null),
+     *                     @OA\Property(property="description", type="string", example="This is the organic chemistry topic course"),
+     *                     @OA\Property(property="instructor_name", type="string", nullable=true, example="John Doe"),
+     *                     @OA\Property(property="instructor_email", type="string", nullable=true, example="john@example.com"),
+     *                     @OA\Property(property="status", type="string", example="published"),
+     *                     @OA\Property(property="module_count", type="integer", example=3),
+     *                     @OA\Property(property="students_enrolled", type="integer", example=10),
+     *                     @OA\Property(property="last_updated", type="string", format="date-time", example="2025-08-30 08:28:41")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *       response=401,
+     *       description="Unauthorized",
+     *       ref="#/components/responses/401"
+     *     )
+     * )
+     */
+
+    public function admin(Request $request)
+    {
+        // Get filters from request
+        $status = $request->query('status');
+        $search = $request->query('search');
+
+        // Query courses
+        $query = Course::with(['instructorUser', 'modules', 'enrollments']);
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhereHas('instructorUser', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $courses = $query->get()->map(function ($course) {
+            return [
+                'title' => $course->name,
+                'subtitle' => $course->subtitle ?? null,
+                'description' => $course->description,
+                'instructor_name' => $course->instructorUser->name ?? null,
+                'instructor_email' => $course->instructorUser->email ?? null,
+                'status' => $course->status,
+                'module_count' => $course->modules->count(),
+                'students_enrolled' => $course->enrollments->count(),
+                'last_updated' => $course->updated_at->toDateTimeString(),
+            ];
+        });
+
+        return ResponseHelper::success(
+            $courses,
+            "List of admin filtered courses"
+        );
+    }
+
+
+
+    /**
+     * @OA\Delete(
+     *     path="/admin/courses/{id}",
+     *     tags={"Admin"},
+     *     summary="Delete a course",
+     *     security={{ "bearerAuth":{} }},
+     *     description="Remove a course by its ID. This will delete the course, module, quiz and all the lessons of that course.  Once deleted, the course  cannot be recovered.",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID of the course to delete",
+     *         @OA\Schema(type="integer", example=3)
+     *     ),
+     *     @OA\Response(
+     *         response=204,
+     *         description="Course deleted successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Course deleted successful"),
+     *             @OA\Property(property="code", type="integer", example=204),
+     *             
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Course not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Course not found"),
+     *             @OA\Property(property="code", type="integer", example=404),
+     *             
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Error : Database connection failed"),
+     *             @OA\Property(property="code", type="integer", example=500),
+     *             
+     *         )
+     *     )
+     * )
+     */
+
+
+    public function destroy($id)
+    {
+        $course = Course::find($id);
+        if (!$course) {
+            return ResponseHelper::error([], "Course not found", 404);
+        }
+
+        $course->delete();
+
+        return ResponseHelper::success(
+            [],
+            "Course delted with all its contents.",
+            204
+        );
+
+    }
 
 
 }

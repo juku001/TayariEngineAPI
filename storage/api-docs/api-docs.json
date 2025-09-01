@@ -11,19 +11,19 @@
     },
     "servers": [
         {
-            "url": "http://143.198.57.242/api",
-            "description": "Live Server"
-        },
-        {
             "url": "http://localhost:1234/api",
             "description": "Test Server"
+        },
+        {
+            "url": "http://143.198.57.242/api",
+            "description": "Live Server"
         }
     ],
     "paths": {
         "/admin/logs": {
             "get": {
                 "tags": [
-                    "Dashboard"
+                    "Admin"
                 ],
                 "summary": "Get filtered admin logs",
                 "description": "Fetch admin logs with filters for search, action, and role. Returns paginated logs along with stats (total logs, active users, last 24h logs, and filtered count).",
@@ -95,22 +95,19 @@
                                                     "properties": {
                                                         "total": {
                                                             "type": "integer",
-                                                            "example": 1200
+                                                            "example": 1
                                                         },
                                                         "active": {
-                                                            "description": "Unique active users in last 7 days",
                                                             "type": "integer",
-                                                            "example": 45
+                                                            "example": 1
                                                         },
                                                         "last_24": {
-                                                            "description": "Logs in last 24 hours",
                                                             "type": "integer",
-                                                            "example": 120
+                                                            "example": 1
                                                         },
                                                         "filtered": {
-                                                            "description": "Logs after filters applied",
                                                             "type": "integer",
-                                                            "example": 200
+                                                            "example": 1
                                                         }
                                                     },
                                                     "type": "object"
@@ -121,29 +118,17 @@
                                                             "type": "integer",
                                                             "example": 1
                                                         },
-                                                        "last_page": {
-                                                            "type": "integer",
-                                                            "example": 10
-                                                        },
-                                                        "per_page": {
-                                                            "type": "integer",
-                                                            "example": 20
-                                                        },
-                                                        "total": {
-                                                            "type": "integer",
-                                                            "example": 200
-                                                        },
                                                         "data": {
                                                             "type": "array",
                                                             "items": {
                                                                 "properties": {
                                                                     "id": {
                                                                         "type": "integer",
-                                                                        "example": 15
+                                                                        "example": 1
                                                                     },
                                                                     "user_id": {
                                                                         "type": "integer",
-                                                                        "example": 3
+                                                                        "example": 1
                                                                     },
                                                                     "action": {
                                                                         "type": "string",
@@ -151,32 +136,100 @@
                                                                     },
                                                                     "details": {
                                                                         "type": "string",
-                                                                        "example": "User logged in from Chrome browser"
+                                                                        "example": "Super_admin dashboard access"
                                                                     },
                                                                     "ip_address": {
                                                                         "type": "string",
-                                                                        "example": "192.168.1.100"
+                                                                        "example": "127.0.0.1"
                                                                     },
                                                                     "created_at": {
                                                                         "type": "string",
                                                                         "format": "date-time",
-                                                                        "example": "2025-08-28T12:45:00Z"
+                                                                        "example": "2025-08-30T06:10:53.000000Z"
                                                                     },
                                                                     "first_name": {
                                                                         "type": "string",
-                                                                        "example": "John"
+                                                                        "example": "Tayari"
                                                                     },
                                                                     "last_name": {
                                                                         "type": "string",
-                                                                        "example": "Doe"
+                                                                        "example": "Admin"
                                                                     },
                                                                     "roles": {
                                                                         "type": "string",
-                                                                        "example": "Admin"
+                                                                        "example": "super_admin"
                                                                     }
                                                                 },
                                                                 "type": "object"
                                                             }
+                                                        },
+                                                        "first_page_url": {
+                                                            "type": "string",
+                                                            "example": "{base_url}/admin/logs?page=1"
+                                                        },
+                                                        "from": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "last_page": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "last_page_url": {
+                                                            "type": "string",
+                                                            "example": "{base_url}/api/admin/logs?page=1"
+                                                        },
+                                                        "links": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "url": {
+                                                                        "type": "string",
+                                                                        "example": null,
+                                                                        "nullable": true
+                                                                    },
+                                                                    "label": {
+                                                                        "type": "string",
+                                                                        "example": "« Previous"
+                                                                    },
+                                                                    "page": {
+                                                                        "type": "integer",
+                                                                        "example": null,
+                                                                        "nullable": true
+                                                                    },
+                                                                    "active": {
+                                                                        "type": "boolean",
+                                                                        "example": false
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "next_page_url": {
+                                                            "type": "string",
+                                                            "example": null,
+                                                            "nullable": true
+                                                        },
+                                                        "path": {
+                                                            "type": "string",
+                                                            "example": "{base_url}/api/admin/logs"
+                                                        },
+                                                        "per_page": {
+                                                            "type": "integer",
+                                                            "example": 20
+                                                        },
+                                                        "prev_page_url": {
+                                                            "type": "string",
+                                                            "example": null,
+                                                            "nullable": true
+                                                        },
+                                                        "to": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 1
                                                         }
                                                     },
                                                     "type": "object"
@@ -193,7 +246,12 @@
                     "401": {
                         "$ref": "#/components/responses/401"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/admin/communications": {
@@ -366,7 +424,12 @@
                     "401": {
                         "$ref": "#/components/responses/401"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/aptitude/start": {
@@ -717,9 +780,9 @@
                                             "type": "string",
                                             "example": "Logged out successful."
                                         },
-                                        "data": {
-                                            "type": "object",
-                                            "example": []
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
                                         }
                                     },
                                     "type": "object"
@@ -728,7 +791,7 @@
                         }
                     },
                     "401": {
-                        "description": "Unauthorized - No valid token provided"
+                        "$ref": "#/components/responses/401"
                     }
                 },
                 "security": [
@@ -1889,10 +1952,129 @@
                     "401": {
                         "$ref": "#/components/responses/401"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/admin/courses": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get list of courses for admin with filters",
+                "description": "Returns list of courses with title, subtitle, description, instructor info, status, module count, students enrolled, and last updated. Supports search and status filter.",
+                "operationId": "ba3779b3e1fe6be2fc1b5aee29d9ce3c",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by course status (draft or published)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "draft",
+                                "published"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search by course title or instructor name",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of admin filtered courses",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "List of admin filtered courses"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Organic Chemistry"
+                                                    },
+                                                    "subtitle": {
+                                                        "type": "string",
+                                                        "example": null,
+                                                        "nullable": true
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "This is the organic chemistry topic course"
+                                                    },
+                                                    "instructor_name": {
+                                                        "type": "string",
+                                                        "example": "John Doe",
+                                                        "nullable": true
+                                                    },
+                                                    "instructor_email": {
+                                                        "type": "string",
+                                                        "example": "john@example.com",
+                                                        "nullable": true
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "published"
+                                                    },
+                                                    "module_count": {
+                                                        "type": "integer",
+                                                        "example": 3
+                                                    },
+                                                    "students_enrolled": {
+                                                        "type": "integer",
+                                                        "example": 10
+                                                    },
+                                                    "last_updated": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2025-08-30 08:28:41"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
             "post": {
                 "tags": [
                     "Admin"
@@ -2129,13 +2311,112 @@
             }
         },
         "/admin/courses/{id}": {
-            "put": {
+            "delete": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Delete a course",
+                "description": "Remove a course by its ID. This will delete the course, module, quiz and all the lessons of that course.  Once deleted, the course  cannot be recovered.",
+                "operationId": "4a0c430a0b6615b9774366fffe0537e3",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the course to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 3
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Course deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Course deleted successful"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 204
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Course not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Course not found"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error : Database connection failed"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
                 "tags": [
                     "Admin"
                 ],
                 "summary": "Update an existing course",
                 "description": "Updates an existing course including its thumbnail, modules, lessons, quizzes, and questions. Supports partial updates.",
-                "operationId": "881fb6298b0c1de9a4655b2e944ad8cd",
+                "operationId": "e9907d134606550be5e11389f2fd229c",
                 "parameters": [
                     {
                         "name": "id",
@@ -2387,7 +2668,12 @@
                     "401": {
                         "$ref": "#/components/responses/401"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/courses/{id}": {
@@ -2799,6 +3085,106 @@
                 }
             }
         },
+        "/admin/courses/{id}/publish": {
+            "patch": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Publish a course",
+                "description": "Sets the course status to published",
+                "operationId": "7a69de1a630ae11aaecec548c4ad63f3",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Course ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Course published successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Course published"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Course already published",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Course already published"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Course not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Course not found"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/dashboard/admin": {
             "get": {
                 "tags": [
@@ -2814,84 +3200,101 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "users": {
-                                            "properties": {
-                                                "total": {
-                                                    "type": "integer",
-                                                    "example": 152
-                                                },
-                                                "learners": {
-                                                    "type": "integer",
-                                                    "example": 120
-                                                },
-                                                "instructors": {
-                                                    "type": "integer",
-                                                    "example": 20
-                                                },
-                                                "employers": {
-                                                    "type": "integer",
-                                                    "example": 12
-                                                }
-                                            },
-                                            "type": "object"
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
                                         },
-                                        "courses": {
-                                            "properties": {
-                                                "total": {
-                                                    "type": "integer",
-                                                    "example": 85
-                                                },
-                                                "published": {
-                                                    "type": "integer",
-                                                    "example": 60
-                                                },
-                                                "draft": {
-                                                    "type": "integer",
-                                                    "example": 25
-                                                }
-                                            },
-                                            "type": "object"
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Admin dashboard details"
                                         },
-                                        "jobs": {
+                                        "code": {
                                             "type": "integer",
-                                            "example": 34
+                                            "example": 200
                                         },
-                                        "sys_update": {
+                                        "data": {
                                             "properties": {
-                                                "status": {
-                                                    "type": "string",
-                                                    "example": "operational"
-                                                },
-                                                "uptime": {
-                                                    "type": "string",
-                                                    "example": "up 5 days, 2 hours"
-                                                },
-                                                "last_check": {
-                                                    "type": "string",
-                                                    "format": "date-time",
-                                                    "example": "2025-08-29 14:35:12"
-                                                },
-                                                "error_rate": {
-                                                    "type": "string",
-                                                    "example": "2 errors today"
-                                                },
-                                                "response_time": {
-                                                    "type": "string",
-                                                    "example": "120ms"
-                                                },
-                                                "dependencies": {
+                                                "users": {
                                                     "properties": {
-                                                        "database": {
-                                                            "type": "string",
-                                                            "example": "up"
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 152
                                                         },
-                                                        "mail": {
-                                                            "type": "string",
-                                                            "example": "up"
+                                                        "learners": {
+                                                            "type": "integer",
+                                                            "example": 120
                                                         },
-                                                        "queue": {
+                                                        "instructors": {
+                                                            "type": "integer",
+                                                            "example": 20
+                                                        },
+                                                        "employers": {
+                                                            "type": "integer",
+                                                            "example": 12
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "courses": {
+                                                    "properties": {
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "example": 85
+                                                        },
+                                                        "published": {
+                                                            "type": "integer",
+                                                            "example": 60
+                                                        },
+                                                        "draft": {
+                                                            "type": "integer",
+                                                            "example": 25
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "jobs": {
+                                                    "type": "integer",
+                                                    "example": 34
+                                                },
+                                                "sys_update": {
+                                                    "properties": {
+                                                        "status": {
                                                             "type": "string",
-                                                            "example": "up"
+                                                            "example": "operational"
+                                                        },
+                                                        "uptime": {
+                                                            "type": "string",
+                                                            "example": "up 5 days, 2 hours"
+                                                        },
+                                                        "last_check": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "example": "2025-08-29T14:35:12Z"
+                                                        },
+                                                        "error_rate": {
+                                                            "type": "string",
+                                                            "example": "2 errors today"
+                                                        },
+                                                        "response_time": {
+                                                            "type": "string",
+                                                            "example": "120ms"
+                                                        },
+                                                        "dependencies": {
+                                                            "properties": {
+                                                                "database": {
+                                                                    "type": "string",
+                                                                    "example": "up"
+                                                                },
+                                                                "mail": {
+                                                                    "type": "string",
+                                                                    "example": "up"
+                                                                },
+                                                                "queue": {
+                                                                    "type": "string",
+                                                                    "example": "up"
+                                                                }
+                                                            },
+                                                            "type": "object"
                                                         }
                                                     },
                                                     "type": "object"
@@ -2904,8 +3307,16 @@
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/dashboard/employer": {
@@ -2976,61 +3387,8 @@
                             }
                         }
                     },
-                    "404": {
-                        "description": "Employer not found for the authenticated user",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "No query results for model [Employer]"
-                                        },
-                                        "code": {
-                                            "type": "integer",
-                                            "example": 404
-                                        },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {}
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Unexpected error occurred",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Error : Database connection lost"
-                                        },
-                                        "code": {
-                                            "type": "integer",
-                                            "example": 500
-                                        },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {}
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
+                    "401": {
+                        "$ref": "#/components/responses/401"
                     }
                 },
                 "security": [
@@ -3094,28 +3452,7 @@
                         }
                     },
                     "401": {
-                        "description": "Unauthorized",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Unauthenticated."
-                                        },
-                                        "code": {
-                                            "type": "integer",
-                                            "example": 401
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
+                        "$ref": "#/components/responses/401"
                     }
                 },
                 "security": [
@@ -3338,10 +3675,6 @@
                                         "code": {
                                             "type": "integer",
                                             "example": 404
-                                        },
-                                        "data": {
-                                            "type": "object",
-                                            "example": []
                                         }
                                     },
                                     "type": "object"
@@ -3366,10 +3699,6 @@
                                         "code": {
                                             "type": "integer",
                                             "example": 409
-                                        },
-                                        "data": {
-                                            "type": "object",
-                                            "example": []
                                         }
                                     },
                                     "type": "object"
@@ -3539,10 +3868,6 @@
                                         "code": {
                                             "type": "integer",
                                             "example": 404
-                                        },
-                                        "data": {
-                                            "type": "object",
-                                            "example": []
                                         }
                                     },
                                     "type": "object"
@@ -3725,7 +4050,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/instructor/applications/{id}": {
@@ -3856,7 +4186,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             },
             "patch": {
                 "tags": [
@@ -3889,10 +4224,10 @@
                                     "status": {
                                         "type": "string",
                                         "enum": [
-                                            "approved",
-                                            "rejected"
+                                            "approve",
+                                            "reject"
                                         ],
-                                        "example": "approved"
+                                        "example": "approve"
                                     },
                                     "admin_notes": {
                                         "type": "string",
@@ -4261,8 +4596,8 @@
                             }
                         }
                     },
-                    "500": {
-                        "description": "Server error",
+                    "400": {
+                        "description": "Bad Request",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4273,21 +4608,129 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Error : SQLSTATE[23000]: Integrity constraint violation ..."
+                                            "example": "You already have a pending application. Please wait for the admin to process."
                                         },
                                         "code": {
                                             "type": "integer",
-                                            "example": 500
-                                        },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {}
+                                            "example": 400
                                         }
                                     },
                                     "type": "object"
                                 }
                             }
                         }
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/500"
+                    }
+                }
+            }
+        },
+        "/admin/courses/assign": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Assign an instructor to a course",
+                "description": "Assigns an instructor to a specific course by updating the course's instructor_id.",
+                "operationId": "eee190524aa23edd0da9e5553af05646",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "course_id",
+                                    "instructor_id"
+                                ],
+                                "properties": {
+                                    "course_id": {
+                                        "description": "ID of the course",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "instructor_id": {
+                                        "description": "ID of the instructor",
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Instructor assigned successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Instructor assigned successfully"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Organic Chemistry"
+                                                },
+                                                "instructor_id": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/422"
+                    },
+                    "404": {
+                        "description": "Course or Instructor not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Course or Instructor not found"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
                     }
                 }
             }
@@ -4648,33 +5091,11 @@
                             }
                         }
                     },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
                     "500": {
-                        "description": "Unexpected server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Error: Database connection failed"
-                                        },
-                                        "code": {
-                                            "type": "integer",
-                                            "example": 500
-                                        },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {}
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
+                        "$ref": "#/components/responses/500"
                     }
                 },
                 "security": [
@@ -4756,10 +5177,6 @@
                                         "code": {
                                             "type": "integer",
                                             "example": 404
-                                        },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {}
                                         }
                                     },
                                     "type": "object"
@@ -4816,7 +5233,7 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "success": {
+                                        "status": {
                                             "type": "boolean",
                                             "example": true
                                         },
@@ -4840,21 +5257,61 @@
                                                             "type": "integer",
                                                             "example": 1
                                                         },
-                                                        "name": {
+                                                        "first_name": {
                                                             "type": "string",
-                                                            "example": "John Doe"
+                                                            "example": "John"
+                                                        },
+                                                        "middle_name": {
+                                                            "type": "string",
+                                                            "example": null
+                                                        },
+                                                        "last_name": {
+                                                            "type": "string",
+                                                            "example": "Doe"
                                                         },
                                                         "email": {
                                                             "type": "string",
                                                             "example": "user@example.com"
                                                         },
-                                                        "user_type": {
+                                                        "mobile": {
                                                             "type": "string",
-                                                            "example": "admin"
+                                                            "example": "255712345678"
                                                         },
-                                                        "department": {
+                                                        "email_verified_at": {
                                                             "type": "string",
-                                                            "example": "Finance"
+                                                            "example": "2025-08-30T04:20:21.000000Z"
+                                                        },
+                                                        "profile_pic": {
+                                                            "type": "string",
+                                                            "example": "profile/profilepic.png"
+                                                        },
+                                                        "date_of_birth": {
+                                                            "type": "string",
+                                                            "example": "2025-08-07 07:46:00"
+                                                        },
+                                                        "provider": {
+                                                            "type": "string",
+                                                            "example": "email"
+                                                        },
+                                                        "status": {
+                                                            "type": "string",
+                                                            "example": "active"
+                                                        },
+                                                        "roles": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer",
+                                                                        "example": 1
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string",
+                                                                        "example": "learner"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
                                                         }
                                                     },
                                                     "type": "object"
@@ -4874,7 +5331,7 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "success": {
+                                        "status": {
                                             "type": "boolean",
                                             "example": false
                                         },
@@ -4885,10 +5342,6 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Invalid account credentials."
-                                        },
-                                        "errors": {
-                                            "type": "object",
-                                            "example": []
                                         }
                                     },
                                     "type": "object"
@@ -4902,7 +5355,7 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "success": {
+                                        "status": {
                                             "type": "boolean",
                                             "example": false
                                         },
@@ -4913,10 +5366,6 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Account does not exist."
-                                        },
-                                        "errors": {
-                                            "type": "object",
-                                            "example": []
                                         }
                                     },
                                     "type": "object"
@@ -4973,39 +5422,73 @@
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "token": {
-                                            "type": "string",
-                                            "example": "1|XqXhP9Y..."
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
                                         },
-                                        "user": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Successful Google login"
+                                        },
+                                        "data": {
                                             "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 12
-                                                },
-                                                "first_name": {
+                                                "token": {
                                                     "type": "string",
-                                                    "example": "John"
+                                                    "example": "1|XqXhP9Y..."
                                                 },
-                                                "last_name": {
-                                                    "type": "string",
-                                                    "example": "Doe"
-                                                },
-                                                "email": {
-                                                    "type": "string",
-                                                    "example": "johndoe@gmail.com"
-                                                },
-                                                "profile_pic": {
-                                                    "type": "string",
-                                                    "example": "https://lh3.googleusercontent.com/..."
-                                                },
-                                                "google_id": {
-                                                    "type": "string",
-                                                    "example": "10817626491827364"
-                                                },
-                                                "type": {
-                                                    "type": "string",
-                                                    "example": "learner"
+                                                "user": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 12
+                                                        },
+                                                        "first_name": {
+                                                            "type": "string",
+                                                            "example": "John"
+                                                        },
+                                                        "last_name": {
+                                                            "type": "string",
+                                                            "example": "Doe"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "example": "johndoe@gmail.com"
+                                                        },
+                                                        "mobile": {
+                                                            "type": "string",
+                                                            "example": "255712345678"
+                                                        },
+                                                        "email_verified_at": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "example": "2025-08-30T04:20:21.000000Z"
+                                                        },
+                                                        "profile_pic": {
+                                                            "type": "string",
+                                                            "example": "https://lh3.googleusercontent.com/..."
+                                                        },
+                                                        "google_id": {
+                                                            "type": "string",
+                                                            "example": "10817626491827364"
+                                                        },
+                                                        "roles": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer",
+                                                                        "example": 1
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string",
+                                                                        "example": "learner"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": "object"
                                                 }
                                             },
                                             "type": "object"
@@ -5020,7 +5503,7 @@
                         "description": "Invalid Google response"
                     },
                     "500": {
-                        "description": "Server error"
+                        "$ref": "#/components/responses/500"
                     }
                 }
             }
@@ -5356,7 +5839,9 @@
                                         "enum": [
                                             "owner",
                                             "hr",
-                                            "procurement"
+                                            "staff",
+                                            "procurement",
+                                            "recruiter"
                                         ],
                                         "example": "hr"
                                     }
@@ -5381,7 +5866,37 @@
                                             "type": "string",
                                             "example": "User registered successfully"
                                         },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
                                         "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "first_name": {
+                                                    "type": "string",
+                                                    "example": "John"
+                                                },
+                                                "last_name": {
+                                                    "type": "string",
+                                                    "example": "Doe"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "example@email.com"
+                                                },
+                                                "provider": {
+                                                    "type": "string",
+                                                    "example": "email"
+                                                },
+                                                "created_by": {
+                                                    "type": "integer",
+                                                    "example": null
+                                                }
+                                            },
                                             "type": "object"
                                         }
                                     },
@@ -5391,7 +5906,10 @@
                         }
                     },
                     "422": {
-                        "description": "Validation error",
+                        "$ref": "#/components/responses/422"
+                    },
+                    "403": {
+                        "description": "Unauthorized to create admin",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -5401,11 +5919,13 @@
                                             "example": false
                                         },
                                         "message": {
+                                            "description": "Only super admin can create admin",
                                             "type": "string",
-                                            "example": "Failed to validate fields"
+                                            "example": "Unauthorized to create admin"
                                         },
-                                        "errors": {
-                                            "type": "object"
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 403
                                         }
                                     },
                                     "type": "object"
@@ -5413,11 +5933,8 @@
                             }
                         }
                     },
-                    "403": {
-                        "description": "Unauthorized to create admin"
-                    },
                     "500": {
-                        "description": "Internal server error"
+                        "$ref": "#/components/responses/500"
                     }
                 }
             }
@@ -7469,6 +7986,49 @@
                     }
                 },
                 "type": "object"
+            },
+            "ValidationErrorResponse": {
+                "properties": {
+                    "status": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Failed to validate fields"
+                    },
+                    "code": {
+                        "type": "integer",
+                        "example": 422
+                    },
+                    "errors": {
+                        "type": "object",
+                        "example": {
+                            "key1": [
+                                "some field on the request might be required."
+                            ],
+                            "key2": [
+                                "The key 2 is not well formated."
+                            ]
+                        },
+                        "additionalProperties": {
+                            "schema": "Controller",
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "example": "The field is required."
+                            }
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "Controller": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "example": "The field is required."
+                }
             }
         },
         "responses": {
@@ -7501,24 +8061,7 @@
                 "content": {
                     "application/json": {
                         "schema": {
-                            "properties": {
-                                "status": {
-                                    "type": "boolean",
-                                    "example": false
-                                },
-                                "message": {
-                                    "type": "string",
-                                    "example": "Failed to validate fields"
-                                },
-                                "code": {
-                                    "type": "integer",
-                                    "example": 422
-                                },
-                                "errors": {
-                                    "type": "object"
-                                }
-                            },
-                            "type": "object"
+                            "$ref": "#/components/schemas/ValidationErrorResponse"
                         }
                     }
                 }

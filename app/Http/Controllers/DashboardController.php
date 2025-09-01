@@ -6,6 +6,7 @@ use App\Helpers\ResponseHelper;
 use App\Models\Certificate;
 use App\Models\Course;
 use App\Models\Employer;
+use App\Models\EmployerTeamMember;
 use App\Models\Enrollment;
 use App\Models\JobPost;
 use App\Models\JobPostApplication;
@@ -14,6 +15,7 @@ use App\Models\User;
 use App\Models\UserBadge;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
@@ -24,16 +26,25 @@ class DashboardController extends Controller
 
 
 
+
     /**
      * @OA\Get(
      *     path="/dashboard/admin",
      *     tags={"Dashboard"},
+     *      security={{"bearerAuth":{}}},
      *     summary="Get admin dashboard stats and system status",
      *     description="Provides an overview of users, courses, jobs, and system dependencies (database, mail, queue, uptime, error rate). Useful for monitoring application health and high-level admin insights.",
      *     @OA\Response(
      *         response=200,
      *         description="Admin dashboard details",
      *         @OA\JsonContent(
+     *           type="object",
+     *           @OA\Property(property="status", type="boolean", example=true),
+     *           @OA\Property(property="message", type="string", example="Admin dashboard details"),
+     *           @OA\Property(property="code", type="integer", example=200),
+     *           @OA\Property(
+     *             property="data",
+     *             type="object",
      *             @OA\Property(property="users", type="object",
      *                 @OA\Property(property="total", type="integer", example=152),
      *                 @OA\Property(property="learners", type="integer", example=120),
@@ -49,7 +60,7 @@ class DashboardController extends Controller
      *             @OA\Property(property="sys_update", type="object",
      *                 @OA\Property(property="status", type="string", example="operational"),
      *                 @OA\Property(property="uptime", type="string", example="up 5 days, 2 hours"),
-     *                 @OA\Property(property="last_check", type="string", format="date-time", example="2025-08-29 14:35:12"),
+     *                 @OA\Property(property="last_check", type="string", format="date-time", example="2025-08-29T14:35:12Z"),
      *                 @OA\Property(property="error_rate", type="string", example="2 errors today"),
      *                 @OA\Property(property="response_time", type="string", example="120ms"),
      *                 @OA\Property(property="dependencies", type="object",
@@ -58,17 +69,24 @@ class DashboardController extends Controller
      *                     @OA\Property(property="queue", type="string", example="up")
      *                 )
      *             )
+     *           )
      *         )
+     *     ),
+     *     
+     *     @OA\Response(
+     *       response=401,
+     *       description="Unauthorized",
+     *       ref="#/components/responses/401"
      *     )
      * )
      */
 
     public function admin()
     {
-       
+
         $start = microtime(true);
 
-      
+
         try {
             DB::connection()->getPdo();
             $dbStatus = "up";
@@ -76,41 +94,63 @@ class DashboardController extends Controller
             $dbStatus = "down";
         }
 
-       
+
         try {
             $queueStatus = Queue::size() >= 0 ? "up" : "down";
         } catch (\Exception $e) {
             $queueStatus = "down";
         }
 
-       
+
         try {
-            Mail::raw('Ping Test', function ($message) {
-                $message->to('noreply@example.com')->subject('Ping');
-            });
+            $transport = Mail::mailer()->getSymfonyTransport();
+            if (method_exists($transport, 'start')) {
+                $transport->start();
+                $transport->stop();
+            }
             $mailStatus = "up";
         } catch (\Exception $e) {
             $mailStatus = "down";
         }
 
-    
+
+
+
         $errorLines = @preg_grep('/ERROR/', file(storage_path('logs/laravel.log'))) ?? [];
         $errorRate = count($errorLines) . " errors today";
 
-       
+
         $uptime = @shell_exec("uptime -p") ?? "unknown";
 
-     
+
         $responseTime = round((microtime(true) - $start) * 1000) . "ms";
 
-      
+
         $status = ($dbStatus === "up" && $queueStatus === "up" && $mailStatus === "up")
             ? "operational"
             : "degraded";
 
+
+        if ($status === "operational") {
+            $description = "All systems running normally";
+        } else {
+            $downSystems = [];
+            if ($dbStatus === "down")
+                $downSystems[] = "Database";
+            if ($queueStatus === "down")
+                $downSystems[] = "Queue";
+            if ($mailStatus === "down")
+                $downSystems[] = "Mail";
+
+            $description = "Issues detected with: " . implode(", ", $downSystems);
+        }
+
+
+
         $systemStatus = [
             "status" => $status,
             "uptime" => trim($uptime),
+            "description" => $description,
             "last_check" => now()->toDateTimeString(),
             "error_rate" => $errorRate,
             "response_time" => $responseTime,
@@ -192,27 +232,11 @@ class DashboardController extends Controller
      *             )
      *         )
      *     ),
-     *
+     *     
      *     @OA\Response(
-     *         response=404,
-     *         description="Employer not found for the authenticated user",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="No query results for model [Employer]"),
-     *             @OA\Property(property="code", type="integer", example=404),
-     *             @OA\Property(property="data", type="array", @OA\Items())
-     *         )
-     *     ),
-     *
-     *     @OA\Response(
-     *         response=500,
-     *         description="Unexpected error occurred",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Error : Database connection lost"),
-     *             @OA\Property(property="code", type="integer", example=500),
-     *             @OA\Property(property="data", type="array", @OA\Items())
-     *         )
+     *       response=401,
+     *       description="Unauthroized",
+     *       ref="#/components/responses/401"
      *     )
      * )
      */
@@ -223,35 +247,51 @@ class DashboardController extends Controller
         $employer = Employer::where('user_id', $authId)->firstOrFail();
         $companyId = $employer->company_id;
 
-        // 1. Active job posts
+
         $active = JobPost::where('company_id', $companyId)
             ->where('status', 'published')
             ->count();
 
-        // 2. Applications for this company's job posts
+
         $applications = JobPostApplication::whereHas('jobPost', function ($q) use ($companyId) {
             $q->where('company_id', $companyId);
         })->count();
 
-        // 3. Team members
-        $team = User::where('company_id', $companyId)->count();
 
-        // 4. Members in training
-        $training = User::where('company_id', $companyId)
-            ->where('training_status', 'in_training') // adjust field/logic as per your schema
+        $teamMembers = DB::table('employer_team_members as etm')
+            ->join('teams as t', 'etm.team_id', '=', 't.id')
+            ->where('t.company_id', $companyId)
+            ->distinct('etm.user_id')
+            ->count('etm.user_id');
+
+
+        $training = User::query()
+            ->select('users.*')
+            ->join('enrollments as e', 'users.id', '=', 'e.user_id')
+            ->join('teams as t', 'e.team_id', '=', 't.id')
+            ->where('t.company_id', $companyId)
+            ->where('e.status', 'active')
+            ->distinct()
             ->count();
 
-        // 5. Certificates
-        $certificates = Certificate::whereHas('user', function ($q) use ($companyId) {
-            $q->where('company_id', $companyId);
-        })->count();
 
-        // Prepare response
+
+
+
+        $certificates = User::query()
+            ->whereHas('employerTeamMembers.team', function ($q) use ($companyId) {
+                $q->where('company_id', $companyId);
+            })
+            ->whereHas('certificates')
+            ->with('certificates')
+            ->count();
+
+
         $data = [
             "active" => $active,
             "applications" => $applications,
             "team_members" => [
-                "count" => $team,
+                "count" => $teamMembers,
                 "in_training" => $training
             ],
             "certificates" => $certificates
@@ -291,11 +331,7 @@ class DashboardController extends Controller
      *     @OA\Response(
      *         response=401,
      *         description="Unauthorized",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Unauthenticated."),
-     *             @OA\Property(property="code", type="integer", example=401)
-     *         )
+     *         ref="#/components/responses/401"
      *     )
      * )
      */
@@ -303,13 +339,23 @@ class DashboardController extends Controller
     public function teams()
     {
 
-        $authId = auth()->user()->id;
+        $authId = Auth::user()->id;
+
         $employer = Employer::where('user_id', $authId)->first();
+        $companyId = $employer->company_id;
+        
 
+        $teamMembers = EmployerTeamMember::query()
+            ->whereHas('team', function ($q) use ($companyId) {
+                $q->where('company_id', $companyId);
+            })
+            ->with(['team', 'user']);
+
+        $total = $teamMembers->count();
         $query = TeamInvitation::where('company_id', $employer->company_id);
-        $total = $query->count();
-        $pending = $query->where('status', 'pending')->count();
 
+        $pending = $query->where('status', 'pending')->count();
+        $pending = $query->where('status', 'accepted')->count();
 
 
         $data = [

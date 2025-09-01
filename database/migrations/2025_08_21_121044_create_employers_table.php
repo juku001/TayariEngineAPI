@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('user_id')->constrained();
             $table->foreignId('company_id')->constrained();
-            $table->enum('role', ['owner', 'hr','staff', 'procurement'])->default('staff');
+            $table->enum('role', ['owner', 'hr','staff', 'procurement','recruiter'])->default('staff');
             $table->enum('preferred_mode', ['hr', 'procurement']);
             $table->timestamps();
         });

@@ -19,6 +19,7 @@ return new class extends Migration {
                 'USER_STATUS_CHANGE',
                 'COURSE_ENROLLMENT',
                 'COURSE_UPDATE',
+                'COURSE_ADDED',
                 'SYSTEM_ANALYTICS_REFRESH',
                 'JOB_POSTING'
             ])->nullable();

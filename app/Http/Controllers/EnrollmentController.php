@@ -60,7 +60,7 @@ class EnrollmentController extends Controller
      *             @OA\Property(property="status", type="boolean", example=false),
      *             @OA\Property(property="message", type="string", example="Course not found"),
      *             @OA\Property(property="code", type="integer", example=404),
-     *             @OA\Property(property="data", type="object", example={})
+     *             
      *         )
      *     ),
      *
@@ -72,7 +72,7 @@ class EnrollmentController extends Controller
      *             @OA\Property(property="status", type="boolean", example=false),
      *             @OA\Property(property="message", type="string", example="You are already enrolled in this course"),
      *             @OA\Property(property="code", type="integer", example=409),
-     *             @OA\Property(property="data", type="object", example={})
+     *            
      *         )
      *     ),
      *
@@ -186,7 +186,7 @@ class EnrollmentController extends Controller
      *             @OA\Property(property="status", type="boolean", example=false),
      *             @OA\Property(property="message", type="string", example="Not enrolled in this course"),
      *             @OA\Property(property="code", type="integer", example=404),
-     *             @OA\Property(property="data", type="object", example={})
+     *            
      *         )
      *     ),
      *

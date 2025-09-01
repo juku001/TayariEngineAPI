@@ -220,9 +220,6 @@ class UserController extends Controller
                 $user->save();
             }
 
-            // $action = $this->logService->getActionByCode(1);
-            // $userType = ucfirst($user->roles->pluck('name')->first());
-            // $this->logService->record($user->id, $action, $userType . ' dashboard access');
             DB::commit();
             return ResponseHelper::success($user->fresh('roles'), 'User updated successfully');
 

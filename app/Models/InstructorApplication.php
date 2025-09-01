@@ -9,6 +9,7 @@ class InstructorApplication extends Model
     protected $fillable = [
         'name',
         'email',
+        'user_id',
         'phone_number',
         'experience',
         'profession',

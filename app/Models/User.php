@@ -81,6 +81,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(AdminLog::class);
     }
 
+    public function employerTeamMembers()
+    {
+        return $this->hasMany(EmployerTeamMember::class);
+    }
+
 
     public function userBadges()
     {

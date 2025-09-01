@@ -50,8 +50,7 @@ class LessonController extends Controller
      *         @OA\JsonContent(
      *             @OA\Property(property="status", type="boolean", example=false),
      *             @OA\Property(property="message", type="string", example="Lesson not found"),
-     *             @OA\Property(property="code", type="integer", example=404),
-     *             @OA\Property(property="data", type="array", @OA\Items())
+     *             @OA\Property(property="code", type="integer", example=404)
      *         )
      *     )
      * )

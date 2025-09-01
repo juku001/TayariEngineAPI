@@ -16,7 +16,8 @@ class AdminController extends Controller
     /**
      * @OA\Get(
      *     path="/admin/logs",
-     *     tags={"Dashboard"},
+     *     tags={"Admin"},
+     *      security={{"bearerAuth":{}}},
      *     summary="Get filtered admin logs",
      *     description="Fetch admin logs with filters for search, action, and role. Returns paginated logs along with stats (total logs, active users, last 24h logs, and filtered count).",
      *     @OA\Parameter(
@@ -47,7 +48,7 @@ class AdminController extends Controller
      *         description="Pagination page number",
      *         @OA\Schema(type="integer", example=1)
      *     ),
-     *     @OA\Response(
+          *     @OA\Response(
      *         response=200,
      *         description="Filtered admin logs",
      *         @OA\JsonContent(
@@ -58,34 +59,52 @@ class AdminController extends Controller
      *                 @OA\Property(
      *                     property="stats",
      *                     type="object",
-     *                     @OA\Property(property="total", type="integer", example=1200),
-     *                     @OA\Property(property="active", type="integer", example=45, description="Unique active users in last 7 days"),
-     *                     @OA\Property(property="last_24", type="integer", example=120, description="Logs in last 24 hours"),
-     *                     @OA\Property(property="filtered", type="integer", example=200, description="Logs after filters applied")
+     *                     @OA\Property(property="total", type="integer", example=1),
+     *                     @OA\Property(property="active", type="integer", example=1),
+     *                     @OA\Property(property="last_24", type="integer", example=1),
+     *                     @OA\Property(property="filtered", type="integer", example=1)
      *                 ),
      *                 @OA\Property(
      *                     property="logs",
      *                     type="object",
      *                     @OA\Property(property="current_page", type="integer", example=1),
-     *                     @OA\Property(property="last_page", type="integer", example=10),
-     *                     @OA\Property(property="per_page", type="integer", example=20),
-     *                     @OA\Property(property="total", type="integer", example=200),
      *                     @OA\Property(
      *                         property="data",
      *                         type="array",
      *                         @OA\Items(
      *                             type="object",
-     *                             @OA\Property(property="id", type="integer", example=15),
-     *                             @OA\Property(property="user_id", type="integer", example=3),
+     *                             @OA\Property(property="id", type="integer", example=1),
+     *                             @OA\Property(property="user_id", type="integer", example=1),
      *                             @OA\Property(property="action", type="string", example="LOGIN"),
-     *                             @OA\Property(property="details", type="string", example="User logged in from Chrome browser"),
-     *                             @OA\Property(property="ip_address", type="string", example="192.168.1.100"),
-     *                             @OA\Property(property="created_at", type="string", format="date-time", example="2025-08-28T12:45:00Z"),
-     *                             @OA\Property(property="first_name", type="string", example="John"),
-     *                             @OA\Property(property="last_name", type="string", example="Doe"),
-     *                             @OA\Property(property="roles", type="string", example="Admin")
+     *                             @OA\Property(property="details", type="string", example="Super_admin dashboard access"),
+     *                             @OA\Property(property="ip_address", type="string", example="127.0.0.1"),
+     *                             @OA\Property(property="created_at", type="string", format="date-time", example="2025-08-30T06:10:53.000000Z"),
+     *                             @OA\Property(property="first_name", type="string", example="Tayari"),
+     *                             @OA\Property(property="last_name", type="string", example="Admin"),
+     *                             @OA\Property(property="roles", type="string", example="super_admin")
      *                         )
-     *                     )
+     *                     ),
+     *                     @OA\Property(property="first_page_url", type="string", example="{base_url}/admin/logs?page=1"),
+     *                     @OA\Property(property="from", type="integer", example=1),
+     *                     @OA\Property(property="last_page", type="integer", example=1),
+     *                     @OA\Property(property="last_page_url", type="string", example="{base_url}/api/admin/logs?page=1"),
+     *                     @OA\Property(
+     *                         property="links",
+     *                         type="array",
+     *                         @OA\Items(
+     *                             type="object",
+     *                             @OA\Property(property="url", type="string", nullable=true, example=null),
+     *                             @OA\Property(property="label", type="string", example="« Previous"),
+     *                             @OA\Property(property="page", type="integer", nullable=true, example=null),
+     *                             @OA\Property(property="active", type="boolean", example=false)
+     *                         )
+     *                     ),
+     *                     @OA\Property(property="next_page_url", type="string", nullable=true, example=null),
+     *                     @OA\Property(property="path", type="string", example="{base_url}/api/admin/logs"),
+     *                     @OA\Property(property="per_page", type="integer", example=20),
+     *                     @OA\Property(property="prev_page_url", type="string", nullable=true, example=null),
+     *                     @OA\Property(property="to", type="integer", example=1),
+     *                     @OA\Property(property="total", type="integer", example=1)
      *                 )
      *             )
      *         )
@@ -128,7 +147,7 @@ class AdminController extends Controller
         }
 
       
-        $logs = $query->latest()->paginate(20);
+        $logs = $query->latest()->paginate(100); ///list of 100 logs
 
      
         $transformedLogs = $logs->getCollection()->map(function ($log) {
@@ -180,6 +199,7 @@ class AdminController extends Controller
      *     path="/admin/communications",
      *     tags={"Admin"},
      *     summary="Send bulk communications",
+     *     security={{"bearerAuth":{}}},
      *     description="Send a message to one or more recipients via email. Accepts comma-separated list of emails, subject, and message body. Returns a list of successfully sent emails.",
      *     @OA\RequestBody(
      *         required=true,

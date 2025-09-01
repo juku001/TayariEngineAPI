@@ -3,16 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
+use App\Mail\InstructorApplicationStatusMail;
+use App\Models\Course;
+use App\Models\Instructor;
 use App\Models\InstructorApplication;
 use App\Models\Role;
 use App\Models\User;
 use Exception;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberUtil;
+use Mail;
 use Str;
 use Illuminate\Validation\Rule;
 
@@ -26,6 +31,7 @@ class InstructorController extends Controller
      *     path="/instructor/applications",
      *     tags={"Instructor"},
      *     summary="Get all instructor applications",
+     *     security = {{ "bearerAuth":{} }},
      *     description="Retrieve a list of all instructor applications submitted by users.",
      *
      *     @OA\Response(
@@ -83,6 +89,7 @@ class InstructorController extends Controller
      * @OA\Get(
      *     path="/instructor/applications/{id}",
      *     tags={"Instructor"},
+     *     security={{"bearerAuth":{} }},
      *     summary="Get instructor application details",
      *     description="Retrieve details of a specific instructor application by its ID.",
      *
@@ -169,7 +176,7 @@ class InstructorController extends Controller
      *         required=true,
      *         @OA\JsonContent(
      *             required={"status"},
-     *             @OA\Property(property="status", type="string", enum={"approved","rejected"}, example="approved"),
+     *             @OA\Property(property="status", type="string", enum={"approve","reject"}, example="approve"),
      *             @OA\Property(property="admin_notes", type="string", nullable=true, example="Strong background, approved as instructor.")
      *         )
      *     ),
@@ -244,7 +251,7 @@ class InstructorController extends Controller
     {
 
         $validator = Validator::make($request->all(), [
-            'status' => 'required|in:approved,rejected',
+            'status' => 'required|in:approve,reject',
             'admin_notes' => 'nullable|string|max:1000'
         ], [
             'status.in' => 'Status can be approved or rejected'
@@ -261,21 +268,29 @@ class InstructorController extends Controller
             if (!$application) {
                 return ResponseHelper::error([], 'Application not found', 404);
             }
+            $status = $request->status == "approve" ? "approved" : "rejected";
 
-            $application->status = $request->status;
+            if ($status == $application->status) {
+                return ResponseHelper::success(
+                    [],
+                    "The application was already " . $status
+                );
+            }
+
+            $application->status = $status;
             $application->admin_notes = $request->admin_notes ?? null;
             $application->save();
 
-            if ($request->status === 'approved') {
-            
+            if ($status === 'approved') {
+
                 $fullNameParts = explode(' ', $application->name, 2);
                 $firstName = $fullNameParts[0] ?? '';
                 $lastName = $fullNameParts[1] ?? '';
 
-              
+
                 $password = Str::random(10);
 
-               
+
                 $user = User::create([
                     'first_name' => $firstName,
                     'last_name' => $lastName,
@@ -285,15 +300,18 @@ class InstructorController extends Controller
                     'password' => Hash::make($password),
                 ]);
 
-             
-                // $user->assignRole('instructor'); 
                 $roleModel = Role::where('name', 'instructor')->first();
                 $user->roles()->attach($roleModel->id);
 
-             
+
+
+
                 $application->user_id = $user->id;
                 $application->save();
             }
+            Mail::to($application->email)
+                ->send(new InstructorApplicationStatusMail($application, $status, $password));
+
 
             DB::commit();
 
@@ -303,9 +321,12 @@ class InstructorController extends Controller
                 200
             );
 
+        } catch (QueryException $e) {
+            DB::rollBack();
+            return ResponseHelper::error([], 'Database failed to save approval.', 500);
         } catch (Exception $e) {
             DB::rollBack();
-            return ResponseHelper::error([], "Error : {$e->getMessage()}", 500);
+            return ResponseHelper::error([], 'An unexpected error occurred.' . $e->getMessage(), 500);
         }
     }
 
@@ -370,34 +391,49 @@ class InstructorController extends Controller
      *             )
      *         )
      *     ),
+     *     
+     *     
+     *     @OA\Response(
+     *       response=400,
+     *       description="Bad Request",
+     *       @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="You already have a pending application. Please wait for the admin to process."),
+     *             @OA\Property(property="code", type="integer", example=400),
+     *       )
+     *     ),
+     *     
+     *     
      *
      *     @OA\Response(
      *         response=500,
      *         description="Server error",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Error : SQLSTATE[23000]: Integrity constraint violation ..."),
-     *             @OA\Property(property="code", type="integer", example=500),
-     *             @OA\Property(property="data", type="array", @OA\Items())
-     *         )
+     *         ref="#/components/responses/500"
      *     )
      * )
      */
 
     public function store(Request $request)
     {
+        $pendingFields = [];
+
+        if (InstructorApplication::where('email', $request->email)->where('status', 'pending')->exists()) {
+            $pendingFields[] = 'email';
+        }
+
+        if (InstructorApplication::where('phone_number', $request->phone_number)->where('status', 'pending')->exists()) {
+            $pendingFields[] = 'phone_number';
+        }
+
+        if (!empty($pendingFields)) {
+            $fieldList = implode(' and ', $pendingFields);
+            return ResponseHelper::error([], "You already have a pending application. Please wait for them to be processed.", 400);
+        }
 
 
         $validator = Validator::make($request->all(), [
             'fullname' => 'required|string|max:255',
-            'email' => [
-                'required',
-                'email',
-                Rule::unique('instructor_applications', 'email')
-                    ->where(function ($query) {
-                        return $query->where('status', 'pending');
-                    }),
-            ],
+            'email' => 'required|email',
             'current_profession' => 'required|string',
             'years_of_experience' => 'required|string|in:1-2,3-5,6-10,10+',
             'courses_of_interest' => 'required|string|max:500',
@@ -406,7 +442,7 @@ class InstructorController extends Controller
                 function ($attribute, $value, $fail) {
                     $phoneUtil = PhoneNumberUtil::getInstance();
                     try {
-                        $numberProto = $phoneUtil->parse($value, null); // null = expects full intl format
+                        $numberProto = $phoneUtil->parse($value, null); // expects full intl format
                         if (!$phoneUtil->isValidNumber($numberProto)) {
                             $fail("The $attribute is not a valid international phone number.");
                         }
@@ -414,12 +450,9 @@ class InstructorController extends Controller
                         $fail("The $attribute is not in valid format.");
                     }
                 },
-                Rule::unique('instructor_applications', 'phone_number')
-                    ->where(fn($q) => $q->where('status', 'pending')),
             ],
             'additional_info' => 'nullable|string|max:1000'
         ]);
-
 
         if ($validator->fails()) {
             return ResponseHelper::error($validator->errors(), 'Failed to validate fields', 422);
@@ -434,7 +467,7 @@ class InstructorController extends Controller
                 'interests' => $request->courses_of_interest,
                 'phone_number' => $request->phone_number,
                 'additional_info' => $request->additional_info,
-                'status' => 'pending', 
+                'status' => 'pending',
             ]);
 
             return ResponseHelper::success(
@@ -447,5 +480,88 @@ class InstructorController extends Controller
             return ResponseHelper::error([], "Error : {$e->getMessage()}", 500);
         }
     }
+
+
+
+
+    /**
+     * @OA\Post(
+     *     path="/admin/courses/assign",
+     *     tags={"Admin"},
+     *     summary="Assign an instructor to a course",
+     *     description="Assigns an instructor to a specific course by updating the course's instructor_id.",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"course_id","instructor_id"},
+     *             @OA\Property(property="course_id", type="integer", example=1, description="ID of the course"),
+     *             @OA\Property(property="instructor_id", type="integer", example=2, description="ID of the instructor")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Instructor assigned successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Instructor assigned successfully"),
+     *             @OA\Property(property="code", type="integer", example=200),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="title", type="string", example="Organic Chemistry"),
+     *                 @OA\Property(property="instructor_id", type="integer", example=2)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         ref="#/components/responses/422"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Course or Instructor not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Course or Instructor not found"),
+     *             @OA\Property(property="code", type="integer", example=404),
+     *             
+     *         )
+     *     ),
+     *      @OA\Response(
+     *         response=401,
+     *         description="Validation error",
+     *         ref="#/components/responses/401"
+     *     ),
+     * )
+     */
+    public function assign(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'course_id' => 'required|integer|exists:courses,id',
+            'instructor_id' => 'required|integer|exists:users,id'
+        ]);
+
+        if ($validator->fails()) {
+            return ResponseHelper::error(
+                $validator->errors(),
+                "Failed to validate fields",
+                422
+            );
+        }
+
+        $course = Course::find($request->course_id);
+        $instructor = User::find($request->instructor_id);
+
+        if (!$course || !$instructor) {
+            return ResponseHelper::error([], "Course or Instructor not found", 404);
+        }
+
+        // Assign the instructor
+        $course->instructor = $instructor->id; // or 'user_id' if that's your column
+        $course->save();
+
+        return ResponseHelper::success($course, "Instructor assigned successfully");
+    }
+
 
 }

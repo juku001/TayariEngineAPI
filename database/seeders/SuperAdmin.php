@@ -19,7 +19,7 @@ class SuperAdmin extends Seeder
     public function run(): void
     {
 
-        $pass = 'superAdmin001';
+        $pass = 'admin123';
         $userAdmin = [
             'first_name' => 'Tayari',
             'last_name' => 'Admin',
