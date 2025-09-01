@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->foreignId('enrollment_id')->nullable()->constrained()->cascadeOnDelete();
             $table->enum('certificate_type', ['completion', 'achievement'])->default('completion');
             $table->string('certificate_code')->unique(); // for verification
+            $table->decimal('certificate_score',10,2)->nullable();
             $table->date('issued_at');
             $table->timestamps();
         });

@@ -12,6 +12,7 @@ class Certificate extends Model
         'enrollment_id',
         'certificate_type',
         'certificate_code',
+        'certificate_score',
         'issued_at'
     ];
 

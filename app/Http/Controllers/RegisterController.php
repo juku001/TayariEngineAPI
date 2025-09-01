@@ -137,14 +137,13 @@ class RegisterController extends Controller
         $role = $request->role;
         $token = $request->bearerToken();
         $authUser = null;
-
-
         if ($token) {
             $accessToken = PersonalAccessToken::findToken($token);
             if ($accessToken) {
                 $authUser = $accessToken->tokenable;
             }
         }
+       
 
 
         switch ($role) {
@@ -202,20 +201,17 @@ class RegisterController extends Controller
                             422
                         );
                     }
-
-
-
                 }
                 break;
 
             case 'learner':
             case 'instructor':
-                // no extra checks needed
                 break;
-
             default:
                 return ResponseHelper::error([], "Invalid role", 422);
         }
+
+
 
 
         try {
@@ -273,13 +269,8 @@ class RegisterController extends Controller
                     'role' => $request->admin_type
                 ]);
             }
-
-
-
-
             $roleModel = Role::where('name', $role)->first();
             $user->roles()->attach($roleModel->id);
-
             $user->sendEmailVerificationNotification();
             DB::commit();
 

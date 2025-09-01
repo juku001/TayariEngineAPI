@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\Enrollment;
 use App\Services\AdminLogService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -131,31 +132,34 @@ class CourseController extends Controller
      * )
      */
 
-    public function index()
+    public function index(Request $request)
     {
         $courses = Course::with([
             'instructorUser',
             'skills',
             'modules.lessons',
-        ])->get()->map(function ($course) {
-
+            'enrollments'
+        ])->get()->map(function ($course) use ($request) {
 
             $lessons = $course->modules->flatMap->lessons;
 
-
             $videoCount = $lessons->count();
-
-
             $totalDuration = $lessons->sum('duration');
-
 
             $progress = null;
             $isEnrolled = false;
 
-            if (auth()->check()) {
+        
+            $authUser = null;
+            if ($token = $request->bearerToken()) {
+                if ($accessToken = PersonalAccessToken::findToken($token)) {
+                    $authUser = $accessToken->tokenable;
+                }
+            }
 
+            if ($authUser) {
                 $enrollment = $course->enrollments()
-                    ->where('user_id', auth()->id())
+                    ->where('user_id', $authUser->id)  
                     ->first();
 
                 if ($enrollment) {
@@ -175,9 +179,10 @@ class CourseController extends Controller
                 'total_duration' => $totalDuration,
                 'instructor' => [
                     'id' => optional($course->instructorUser)->id,
-                    'name' => 
-                    optional($course->instructorUser)->id != null ? 
-                    optional($course->instructorUser)->first_name . ' ' . optional($course->instructorUser)->last_name : null,
+                    'name' =>
+                        optional($course->instructorUser)->id != null
+                        ? optional($course->instructorUser)->first_name . ' ' . optional($course->instructorUser)->last_name
+                        : null,
                 ],
                 'skills' => $course->skills->pluck('name'),
                 'is_enrolled' => $isEnrolled,
@@ -185,12 +190,7 @@ class CourseController extends Controller
             ];
         });
 
-
-
-
-
-
-        return ResponseHelper::success($courses, 'List of courses');
+        return ResponseHelper::success($courses, 'Courses retrieved successfully');
     }
 
 
@@ -352,7 +352,7 @@ class CourseController extends Controller
             'modules.*.quiz.title' => 'required|string|max:255',
             'modules.*.quiz.questions' => 'required|array|min:1',
             'modules.*.quiz.questions.*.question_text' => 'required|string',
-            'modules.*.quiz.questions.*.type' => 'required|in:mcq,true_false,short_answer',
+            'modules.*.quiz.questions.*.type' => 'sometimes|in:mcq,true_false,short_answer',
             'modules.*.quiz.questions.*.option_a' => 'required|string',
             'modules.*.quiz.questions.*.option_b' => 'required|string',
             'modules.*.quiz.questions.*.option_c' => 'required|string',
@@ -414,7 +414,7 @@ class CourseController extends Controller
                 foreach ($moduleData['quiz']['questions'] as $qData) {
                     $quiz->questions()->create([
                         'question_text' => $qData['question_text'],
-                        'type' => $qData['type'],
+                        'type' => $qData['type'] ?? 'mcq',
                         'option_a' => $qData['option_a'] ?? null,
                         'option_b' => $qData['option_b'] ?? null,
                         'option_c' => $qData['option_c'] ?? null,
@@ -985,13 +985,13 @@ class CourseController extends Controller
                 $course = [
                     'id' => $course->id,
                     'title' => $course->name,
-                    'sub-title'=> $course->sub_title,
+                    'sub-title' => $course->sub_title,
                     'description' => $course->description,
-                    'skills'=> $course->skills->map(function ($skill){
-                        
-                          return   $skill->name;
-                                            }),
-                    'instructor'=> $course->instructorUser(),
+                    'skills' => $course->skills->map(function ($skill) {
+
+                        return $skill->name;
+                    }),
+                    'instructor' => $course->instructorUser(),
                     'total_modules' => $totalModules,
                     'total_lessons' => $totalLessons,
                     'content' => $course->modules->map(function ($module) {

@@ -1713,7 +1713,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/courses": {
@@ -4740,12 +4745,34 @@
                 "tags": [
                     "Employer"
                 ],
-                "summary": "Get all job posts",
-                "description": "Retrieve a list of all job posts with their type and required skills.",
+                "summary": "Get all published jobs with search and filter",
+                "description": "Returns a list of jobs. You can search by job title or company name and filter by job type (e.g. full-time, internship).",
                 "operationId": "a7b510a7df3b49aee8b863b787acbc33",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search term for job title or company name",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "developer"
+                        }
+                    },
+                    {
+                        "name": "job_type",
+                        "in": "query",
+                        "description": "Filter by job type (full-time, internship, etc.)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "full-time"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "List of all jobs",
+                        "description": "List of jobs",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4756,7 +4783,7 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "List of all jobs"
+                                            "example": "List of jobs"
                                         },
                                         "code": {
                                             "type": "integer",
@@ -4768,96 +4795,52 @@
                                                 "properties": {
                                                     "id": {
                                                         "type": "integer",
-                                                        "example": 15
+                                                        "example": 1
                                                     },
                                                     "title": {
                                                         "type": "string",
-                                                        "example": "Frontend Developer"
+                                                        "example": "Full Stack Developer"
                                                     },
                                                     "description": {
                                                         "type": "string",
-                                                        "example": "We are looking for a skilled frontend developer with React experience."
+                                                        "example": "Exciting opportunity..."
                                                     },
                                                     "city": {
                                                         "type": "string",
-                                                        "example": "Berlin"
+                                                        "example": "Dar es Salaam"
                                                     },
                                                     "country": {
                                                         "type": "string",
-                                                        "example": "Germany"
-                                                    },
-                                                    "type_id": {
-                                                        "type": "integer",
-                                                        "example": 2
-                                                    },
-                                                    "employer_id": {
-                                                        "type": "integer",
-                                                        "example": 5
-                                                    },
-                                                    "company_id": {
-                                                        "type": "integer",
-                                                        "example": 3
-                                                    },
-                                                    "category_id": {
-                                                        "type": "integer",
-                                                        "example": 1
+                                                        "example": "Tanzania"
                                                     },
                                                     "status": {
                                                         "type": "string",
                                                         "example": "published"
                                                     },
-                                                    "salary_min": {
-                                                        "type": "number",
-                                                        "example": 1000
-                                                    },
-                                                    "salary_max": {
-                                                        "type": "number",
-                                                        "example": 3000
-                                                    },
                                                     "currency": {
                                                         "type": "string",
-                                                        "example": "EUR"
+                                                        "example": "TZS"
                                                     },
-                                                    "experience_level": {
-                                                        "type": "string",
-                                                        "example": "mid"
-                                                    },
-                                                    "education_level": {
-                                                        "type": "string",
-                                                        "example": "bachelor"
-                                                    },
-                                                    "is_remote": {
-                                                        "type": "boolean",
-                                                        "example": true
-                                                    },
-                                                    "deadline": {
-                                                        "type": "string",
-                                                        "format": "date",
-                                                        "example": "2025-12-31"
-                                                    },
-                                                    "views": {
-                                                        "type": "integer",
-                                                        "example": 120
-                                                    },
-                                                    "applications_count": {
-                                                        "type": "integer",
-                                                        "example": 10
-                                                    },
-                                                    "slug": {
-                                                        "type": "string",
-                                                        "example": "frontend-developer"
+                                                    "company": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "TechCorp Ltd"
+                                                            }
+                                                        },
+                                                        "type": "object"
                                                     },
                                                     "job_post_type": {
                                                         "properties": {
                                                             "id": {
                                                                 "type": "integer",
-                                                                "example": 2
+                                                                "example": 1
                                                             },
                                                             "name": {
-                                                                "type": "string",
-                                                                "example": "Full-Time"
-                                                            },
-                                                            "slug": {
                                                                 "type": "string",
                                                                 "example": "full-time"
                                                             }
@@ -4872,13 +4855,9 @@
                                                                     "type": "integer",
                                                                     "example": 1
                                                                 },
-                                                                "job_post_id": {
-                                                                    "type": "integer",
-                                                                    "example": 15
-                                                                },
                                                                 "skill_id": {
                                                                     "type": "integer",
-                                                                    "example": 3
+                                                                    "example": 2
                                                                 }
                                                             },
                                                             "type": "object"
@@ -4887,6 +4866,34 @@
                                                 },
                                                 "type": "object"
                                             }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No jobs found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No jobs found"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {}
                                         }
                                     },
                                     "type": "object"
@@ -5103,6 +5110,295 @@
                         "bearerAuth": []
                     }
                 ]
+            }
+        },
+        "/jobs/companies/{id}": {
+            "get": {
+                "tags": [
+                    "Employer"
+                ],
+                "summary": "Get all jobs by companies",
+                "description": "Returns a list of jobs posted by a given companies (company).",
+                "operationId": "getCompanyJobs",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Company ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "List of all jobs"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 10
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Software Engineer"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Job description here"
+                                                    },
+                                                    "job_post_type": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 2
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "Full-time"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "job_skills": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer",
+                                                                    "example": 5
+                                                                },
+                                                                "name": {
+                                                                    "type": "string",
+                                                                    "example": "PHP"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Company not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Company not found"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/jobs/{id}": {
+            "get": {
+                "tags": [
+                    "Employer"
+                ],
+                "summary": "Get job details by ID",
+                "description": "Fetch job details including job type and skills.",
+                "operationId": "14da3ed056019c2868d240803bdf14d4",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Job ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Job details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Job details"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Full Stack Developer"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Get a Job for free my dear."
+                                                },
+                                                "city": {
+                                                    "type": "string",
+                                                    "example": "Dar es Salaam"
+                                                },
+                                                "country": {
+                                                    "type": "string",
+                                                    "example": "Tanzania"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "published"
+                                                },
+                                                "currency": {
+                                                    "type": "string",
+                                                    "example": "TZS"
+                                                },
+                                                "is_remote": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "deadline": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "views": {
+                                                    "type": "integer",
+                                                    "example": 0
+                                                },
+                                                "applications_count": {
+                                                    "type": "integer",
+                                                    "example": 0
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-09-01T18:06:51.000000Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-09-01T18:06:51.000000Z"
+                                                },
+                                                "job_post_type": {
+                                                    "description": "Related job post type",
+                                                    "type": "object",
+                                                    "nullable": true
+                                                },
+                                                "job_skills": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "job_post_id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "skill_id": {
+                                                                "type": "integer",
+                                                                "example": 2
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2025-09-01T18:06:51.000000Z"
+                                                            },
+                                                            "updated_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2025-09-01T18:06:51.000000Z"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Job not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Job post not found."
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/complete/lesson/{id}": {
@@ -5506,6 +5802,1229 @@
                         "$ref": "#/components/responses/500"
                     }
                 }
+            }
+        },
+        "/projects": {
+            "get": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Get list of projects with optional search",
+                "description": "Retrieve all projects. You can search by project title or company name using the 'search' query parameter.",
+                "operationId": "07f276c6e629646d087ee4b728e1234c",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Project title or company name to search for",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Projects retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Projects retrieved successfully"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Full Stack Developer"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Project description here"
+                                                    },
+                                                    "company_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "employer_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "projectSkills": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer",
+                                                                    "example": 1
+                                                                },
+                                                                "skill_id": {
+                                                                    "type": "integer",
+                                                                    "example": 2
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2025-09-01T18:39:39.000000Z"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2025-09-01T18:39:39.000000Z"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/500"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Create a new project",
+                "description": "Employer creates a project with optional skills.",
+                "operationId": "d91af95183d5934b42aec1325d5165db",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "duration_min",
+                                    "duration_unit"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Full Stack Developer"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Get a Job for free my dear."
+                                    },
+                                    "duration_min": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "duration_max": {
+                                        "type": "integer",
+                                        "example": 6,
+                                        "nullable": true
+                                    },
+                                    "duration_unit": {
+                                        "type": "string",
+                                        "enum": [
+                                            "days",
+                                            "weeks",
+                                            "months",
+                                            "years"
+                                        ],
+                                        "example": "months"
+                                    },
+                                    "salary_min": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 500
+                                    },
+                                    "salary_max": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 1200
+                                    },
+                                    "currency": {
+                                        "type": "string",
+                                        "example": "TZS"
+                                    },
+                                    "deadline": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-12-31"
+                                    },
+                                    "skills": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer",
+                                            "example": 2
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Project created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Project created successfully"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 201
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Full Stack Developer"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Get a Job for free my dear."
+                                                },
+                                                "duration_min": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "duration_max": {
+                                                    "type": "integer",
+                                                    "example": null
+                                                },
+                                                "duration_unit": {
+                                                    "type": "string",
+                                                    "example": "months"
+                                                },
+                                                "employer_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "company_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "salary_min": {
+                                                    "type": "number",
+                                                    "example": 500
+                                                },
+                                                "salary_max": {
+                                                    "type": "number",
+                                                    "example": 1200
+                                                },
+                                                "currency": {
+                                                    "type": "string",
+                                                    "example": "TZS"
+                                                },
+                                                "deadline": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2025-12-31"
+                                                },
+                                                "project_skills": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "project_id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "skill_id": {
+                                                                "type": "integer",
+                                                                "example": 2
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/422"
+                    },
+                    "404": {
+                        "description": "Employer not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Employer not found."
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "$ref": "#/components/responses/500"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/projects/{id}": {
+            "get": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Get project details",
+                "description": "Retrieve a specific project with its details and related skills",
+                "operationId": "4c45d4f68ff6ca2929032424e6da2639",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Project details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Project details"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Full Stack Developer"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Get a Job for free my dear."
+                                                },
+                                                "duration_min": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "duration_max": {
+                                                    "type": "integer",
+                                                    "example": 6
+                                                },
+                                                "duration_unit": {
+                                                    "type": "string",
+                                                    "example": "months"
+                                                },
+                                                "employer_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "company_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "active"
+                                                },
+                                                "salary_min": {
+                                                    "type": "number",
+                                                    "example": 500
+                                                },
+                                                "salary_max": {
+                                                    "type": "number",
+                                                    "example": 1500
+                                                },
+                                                "currency": {
+                                                    "type": "string",
+                                                    "example": "USD"
+                                                },
+                                                "deadline": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-09-30T23:59:59Z"
+                                                },
+                                                "views": {
+                                                    "type": "integer",
+                                                    "example": 0
+                                                },
+                                                "proposal_count": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "project_skills": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "project_id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "skill_id": {
+                                                                "type": "integer",
+                                                                "example": 2
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "format": "date-time"
+                                                            },
+                                                            "updated_at": {
+                                                                "type": "string",
+                                                                "format": "date-time"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Project not found"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/projects/companies/{id}": {
+            "get": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Get all projects for a company",
+                "description": "Retrieve all projects under a specific company, including project skills.",
+                "operationId": "f35b8e78b431f2e0109a604e19b1c24c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Company ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of projects for the company",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "List of all projects in company"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Full Stack Developer"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Project description here"
+                                                    },
+                                                    "duration_min": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "duration_max": {
+                                                        "type": "integer",
+                                                        "example": 6
+                                                    },
+                                                    "duration_unit": {
+                                                        "type": "string",
+                                                        "example": "months"
+                                                    },
+                                                    "employer_id": {
+                                                        "type": "integer",
+                                                        "example": 2
+                                                    },
+                                                    "company_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "active"
+                                                    },
+                                                    "salary_min": {
+                                                        "type": "number",
+                                                        "example": 500
+                                                    },
+                                                    "salary_max": {
+                                                        "type": "number",
+                                                        "example": 1500
+                                                    },
+                                                    "currency": {
+                                                        "type": "string",
+                                                        "example": "USD"
+                                                    },
+                                                    "deadline": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2025-10-01T23:59:59Z"
+                                                    },
+                                                    "views": {
+                                                        "type": "integer",
+                                                        "example": 20
+                                                    },
+                                                    "proposal_count": {
+                                                        "type": "integer",
+                                                        "example": 10
+                                                    },
+                                                    "project_skills": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer",
+                                                                    "example": 1
+                                                                },
+                                                                "project_id": {
+                                                                    "type": "integer",
+                                                                    "example": 1
+                                                                },
+                                                                "skill_id": {
+                                                                    "type": "integer",
+                                                                    "example": 3
+                                                                },
+                                                                "created_at": {
+                                                                    "type": "string",
+                                                                    "format": "date-time"
+                                                                },
+                                                                "updated_at": {
+                                                                    "type": "string",
+                                                                    "format": "date-time"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Company not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Company not found"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/project/proposals": {
+            "get": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Get list of proposals submitted by the logged-in freelancer",
+                "operationId": "158005abbc73fc326f5622dd9e8fe0cb",
+                "responses": {
+                    "200": {
+                        "description": "List of proposals retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "List of proposals"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "project_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "freelancer_id": {
+                                                        "type": "integer",
+                                                        "example": 7
+                                                    },
+                                                    "amount": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 500
+                                                    },
+                                                    "experience": {
+                                                        "type": "integer",
+                                                        "example": 2
+                                                    },
+                                                    "experience_unit": {
+                                                        "type": "string",
+                                                        "example": "years"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "pending"
+                                                    },
+                                                    "message": {
+                                                        "type": "string",
+                                                        "example": "Something something"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2025-09-01T22:19:27.000000Z"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2025-09-01T22:19:27.000000Z"
+                                                    },
+                                                    "project": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "Full Stack Developer"
+                                                            },
+                                                            "description": {
+                                                                "type": "string",
+                                                                "example": "Get a Job for free my dear."
+                                                            },
+                                                            "duration_min": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "duration_max": {
+                                                                "type": "integer",
+                                                                "example": null
+                                                            },
+                                                            "duration_unit": {
+                                                                "type": "string",
+                                                                "example": "months"
+                                                            },
+                                                            "employer_id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "company_id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "status": {
+                                                                "type": "string",
+                                                                "example": "in_review"
+                                                            },
+                                                            "salary_min": {
+                                                                "type": "number",
+                                                                "format": "float",
+                                                                "example": null
+                                                            },
+                                                            "salary_max": {
+                                                                "type": "number",
+                                                                "format": "float",
+                                                                "example": null
+                                                            },
+                                                            "currency": {
+                                                                "type": "string",
+                                                                "example": "TZS"
+                                                            },
+                                                            "deadline": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": null
+                                                            },
+                                                            "views": {
+                                                                "type": "integer",
+                                                                "example": 0
+                                                            },
+                                                            "proposal_count": {
+                                                                "type": "integer",
+                                                                "example": 0
+                                                            },
+                                                            "slug": {
+                                                                "type": "string",
+                                                                "example": null
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2025-09-01T21:28:31.000000Z"
+                                                            },
+                                                            "updated_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2025-09-01T21:28:31.000000Z"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Failed to fetch proposals"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Submit a proposal for a project",
+                "operationId": "dabea70f9b695ae3fba4d664fb6602be",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "project_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "experience": {
+                                        "type": "integer",
+                                        "example": 3
+                                    },
+                                    "experience_unit": {
+                                        "type": "string",
+                                        "example": "months"
+                                    },
+                                    "message": {
+                                        "type": "string",
+                                        "example": "I am interested in this project."
+                                    },
+                                    "amount": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 500
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Proposal sent successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Proposal sent successfully"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 201
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "freelancer_id": {
+                                                    "type": "integer",
+                                                    "example": 7
+                                                },
+                                                "project_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "experience": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "experience_unit": {
+                                                    "type": "string",
+                                                    "example": "years"
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Something something"
+                                                },
+                                                "amount": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": null
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "example": "2025-09-01T22:19:27.000000Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "example": "2025-09-01T22:19:27.000000Z"
+                                                },
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/422"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/500"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/project/proposals/feedback/{proposalId}": {
+            "put": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Employer feedback on a proposal (accept or deny)",
+                "operationId": "5fda62437cf80bede29b24d37c914ea3",
+                "parameters": [
+                    {
+                        "name": "proposalId",
+                        "in": "path",
+                        "description": "ID of the proposal to update",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "status": {
+                                        "description": "Proposal status update",
+                                        "type": "string",
+                                        "enum": [
+                                            "accepted",
+                                            "denied"
+                                        ],
+                                        "example": "accepted"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Proposal status updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Proposal status updated successfully"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "project_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "freelancer_id": {
+                                                    "type": "integer",
+                                                    "example": 7
+                                                },
+                                                "amount": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 500
+                                                },
+                                                "experience": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "experience_unit": {
+                                                    "type": "string",
+                                                    "example": "years"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "accepted"
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Something something"
+                                                },
+                                                "employer_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-09-01T22:19:27.000000Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-09-01T22:19:27.000000Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden: Not the employer",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "You are not allowed to perform this action"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 403
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Proposal not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Proposal not found"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/422"
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Server error"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/quiz/check/{quizId}": {
@@ -8138,6 +9657,10 @@
         {
             "name": "Employer",
             "description": "Employers related APIs. From the registration, Team Management and Course Assignments."
+        },
+        {
+            "name": "Projects",
+            "description": "Project APIs for the Employers. Viewing projects, sending proposals, accept and deny for proposals. "
         },
         {
             "name": "Admin",

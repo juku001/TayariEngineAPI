@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
 
 class User extends Authenticatable implements MustVerifyEmail
@@ -103,5 +103,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function courses()
     {
         return $this->hasMany(Course::class, 'instructor');
+    }
+
+    public function projectProposals()
+    {
+        return $this->hasMany(ProjectProposal::class, 'freelancer_id');
     }
 }

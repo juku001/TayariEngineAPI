@@ -3,11 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
+use App\Models\Certificate;
+use Carbon\Carbon;
+use Exception;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 
 use App\Models\Enrollment;
 use App\Models\Lesson;
 use App\Models\LessonProgress;
+use Illuminate\Support\Facades\DB;
+use Response;
 
 class LessonController extends Controller
 {
@@ -56,39 +62,95 @@ class LessonController extends Controller
      * )
      */
 
+
+
+    
     public function completeLesson(Request $request, $lessonId)
     {
         $userId = auth()->id();
-
-
         $lesson = Lesson::find($lessonId);
+
         if (!$lesson) {
             return ResponseHelper::error([], 'Lesson not found', 404);
         }
 
 
-      
-        LessonProgress::updateOrCreate(
-            ['user_id' => $userId, 'lesson_id' => $lessonId],
-            ['completed' => true]
-        );
+        $progress = LessonProgress::where('user_id', $userId)
+            ->where('lesson_id', $lessonId)
+            ->latest()
+            ->first();
 
-     
-        $courseId = $lesson->module->course_id;
-        $totalLessons = Lesson::whereHas('module', fn($q) => $q->where('course_id', $courseId))->count();
-        $completedLessons = LessonProgress::where('user_id', $userId)
-            ->whereIn('lesson_id', Lesson::whereHas('module', fn($q) => $q->where('course_id', $courseId))->pluck('id'))
-            ->where('completed', true)
-            ->count();
+        if ($progress && $progress->is_completed) {
+            return ResponseHelper::error([], "Lesson already completed", 400);
+        }
 
-        $progress = $totalLessons > 0 ? round(($completedLessons / $totalLessons) * 100) : 0;
+        $enrollment = Enrollment::where('user_id', $userId)
+            ->where('course_id', $lesson->course_id)
+            ->first();
 
-   
-        Enrollment::updateOrCreate(
-            ['user_id' => $userId, 'course_id' => $courseId],
-            ['progress' => $progress]
-        );
+        if (!$enrollment) {
+            return ResponseHelper::error([], "Enrollment not found", 404);
+        }
 
-        return ResponseHelper::success(['progress' => $progress], 'Lesson completed');
+        DB::beginTransaction();
+        try {
+
+            LessonProgress::updateOrCreate(
+                [
+                    'user_id' => $userId,
+                    'lesson_id' => $lessonId,
+                    'enrollment_id' => $enrollment->id,
+                ],
+                [
+                    'is_completed' => true,
+                    'completed_at' => now(),
+                ]
+            );
+
+
+            $totalLessons = Lesson::where('course_id', $lesson->course_id)->count();
+            $completedLessons = LessonProgress::where('enrollment_id', $enrollment->id)
+                ->where('is_completed', true)
+                ->count();
+
+            $progressPercent = 0;
+            if ($totalLessons > 0) {
+                $progressPercent = ($completedLessons / $totalLessons) * 100;
+            }
+            $enrollment->progress = $progressPercent;
+            $enrollment->save();
+
+            // --- Certificate Check ---
+            $alreadyHasCertificate = Certificate::where('course_id', $lesson->course_id)
+                ->where('user_id', $userId)
+                ->exists();
+
+            if ($progressPercent >= 100 && !$alreadyHasCertificate) {
+                $certificate_code = "TAYARI-" . now()->timestamp . "-STAGE-" . $lesson->course_id;
+
+                Certificate::create([
+                    'course_id' => $lesson->course_id,
+                    'user_id' => $userId,
+                    'enrollment_id' => $enrollment->id,
+                    'certificate_code' => $certificate_code,
+                    'issued_at' => Carbon::now()
+                ]);
+            }
+
+            DB::commit();
+
+            return ResponseHelper::success([
+                'progress' => $progressPercent,
+                'certificate' => $progressPercent >= 100 ? "Issued" : "Not issued",
+            ], 'Lesson completed successfully');
+
+        } catch (QueryException $qe) {
+            DB::rollBack();
+            return ResponseHelper::error([], 'DB Error : ' . $qe->getMessage(), 500);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return ResponseHelper::error([], 'Error : ' . $e->getMessage(), 500);
+        }
     }
+
 }

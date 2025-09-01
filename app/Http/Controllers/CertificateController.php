@@ -201,6 +201,7 @@ class CertificateController extends Controller
      *     operationId="getCertificate",
      *     tags={"Certificates"},
      *     summary="Get certificate details",
+     *     security={{ "bearerAuth":{} }},
      *     description="Retrieve a certificate by its ID, including user and course details.",
      *
      *     @OA\Parameter(

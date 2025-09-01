@@ -122,7 +122,7 @@ class EnrollmentController extends Controller
         // Enroll user
         $enrollment = Enrollment::create([
             'user_id' => $userId,
-            'course_id' => $id,
+            'course_id' =>(int) $id,
             'progress' => 0, // start with 0%
         ]);
 
