@@ -14,16 +14,17 @@ namespace App\Http\Controllers;
  * )
  *
  * 
+ * * @OA\Server(
+ *     url="https://api.tayari.work/api",
+ *     description="Live Server"
+ * )
+ * 
  * @OA\Server(
  *     url="http://localhost:1234/api",
  *     description="Test Server"
  * )
  * 
  * 
-* @OA\Server(
- *     url="http://143.198.57.242/api",
- *     description="Live Server"
- * )
  *
  * @OA\SecurityScheme(
  *     type="http",

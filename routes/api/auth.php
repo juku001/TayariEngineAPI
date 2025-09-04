@@ -11,7 +11,7 @@ use App\Http\Controllers\VerificationController;
 
 Route::get('/', [AuthController::class, 'unauthorized'])->name('login');
 Route::get('/is_auth', [AuthController::class, 'authorized'])->middleware('auth:sanctum');
-
+Route::post('is_verified', [AuthController::class, 'verified']);
 Route::prefix('auth')->group(function () {
 
     Route::post('/login', [LogInController::class, 'index']);
@@ -21,6 +21,7 @@ Route::prefix('auth')->group(function () {
 
     Route::get('/google', [LogInController::class, 'redirect']);
     Route::get('/google/callback', [LogInController::class, 'callback']);
+
 
 
     Route::post('/verify-email', [VerificationController::class, 'index'])->middleware('auth:sanctum');
