@@ -26,7 +26,7 @@ Route::prefix('auth')->group(function () {
 
     Route::post('/forgot_password', [PasswordController::class,'index']);
     Route::post('/verify_code', [PasswordController::class,'verify']);
-    Route::post('/reset_password', [PasswordController::class, 'st  ore']);
+    Route::post('/reset_password', [PasswordController::class, 'store']);
     Route::post('update_password', [PasswordController::class, 'update'])->middleware('auth:sanctum');
 
     Route::post('/verify-email', [VerificationController::class, 'index'])->middleware('auth:sanctum');
