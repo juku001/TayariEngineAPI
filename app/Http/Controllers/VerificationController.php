@@ -72,6 +72,14 @@ class VerificationController extends Controller
         $user->markEmailAsVerified();
         event(new Verified($user));
 
-        return redirect()->away('https://tayari.work/assessments/aptitude-test');
+
+
+        $userRole = $user->roles->pluck('name')->first();
+        if ($userRole == 'employer') {
+            return redirect()->away('https://tayari.work/dashboard/employer');
+        } else {
+            return redirect()->away('https://tayari.work/assessments/aptitude-test');
+        }
+
     }
 }
