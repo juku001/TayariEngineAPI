@@ -72,10 +72,6 @@ class VerificationController extends Controller
         $user->markEmailAsVerified();
         event(new Verified($user));
 
-        return ResponseHelper::success(
-            [],
-            "Email veriifed successful",
-            200
-        );
+        return redirect()->away('https://tayari.work/assessments/aptitude-test');
     }
 }

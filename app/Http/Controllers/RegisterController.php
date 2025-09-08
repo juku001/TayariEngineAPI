@@ -167,7 +167,7 @@ class RegisterController extends Controller
                 if (!$authUser) {
                     $validator = Validator::make($request->all(), [
                         'company_name' => 'required|string',
-                        'company_website' => 'required|string',
+                        'company_website' => 'nullable|string',
                         'size_range' => 'required|string|in:1-10,11-50,50-200,201+',
                         'company_role' => 'required|string|in:owner,hr,staff,procurement,recruiter'
                     ], [

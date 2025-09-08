@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LogInController;
+use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerificationController;
@@ -23,6 +24,10 @@ Route::prefix('auth')->group(function () {
     Route::get('/google/callback', [LogInController::class, 'callback']);
 
 
+    Route::post('/forgot_password', [PasswordController::class,'index']);
+    Route::post('/verify_code', [PasswordController::class,'verify']);
+    Route::post('/reset_password', [PasswordController::class, 'st  ore']);
+    Route::post('update_password', [PasswordController::class, 'update'])->middleware('auth:sanctum');
 
     Route::post('/verify-email', [VerificationController::class, 'index'])->middleware('auth:sanctum');
     Route::get('/email/verify/{id}/{hash}', [VerificationController::class, 'verify'])
