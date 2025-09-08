@@ -197,7 +197,7 @@ class ProposalController extends Controller
 
 
     /**
-     * @OA\Put(
+     * @OA\Patch(
      *     path="/project/proposals/feedback/{proposalId}",
      *     tags={"Projects"},
      *     summary="Employer feedback on a proposal (accept or deny)",
