@@ -4845,6 +4845,95 @@
                 }
             }
         },
+        "/jobs/matches": {
+            "get": {
+                "tags": [
+                    "Employer"
+                ],
+                "summary": "Get matching jobs for the logged-in learner",
+                "description": "Returns a list of jobs with their match status and score based on the learner's aptitude results.",
+                "operationId": "79fef7bcfcb53ef914d332af49826cc1",
+                "responses": {
+                    "200": {
+                        "description": "List of matching jobs",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Matching jobs"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "job": {
+                                                        "description": "The job post object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 12
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "Frontend Developer"
+                                                            },
+                                                            "category_id": {
+                                                                "type": "integer",
+                                                                "example": 3
+                                                            },
+                                                            "job_type": {
+                                                                "type": "string",
+                                                                "example": "remote"
+                                                            },
+                                                            "company_id": {
+                                                                "type": "integer",
+                                                                "example": 7
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "match": {
+                                                        "description": "Match results from JobMatchingHelper",
+                                                        "properties": {
+                                                            "status": {
+                                                                "type": "string",
+                                                                "example": "Great Match"
+                                                            },
+                                                            "value": {
+                                                                "type": "number",
+                                                                "format": "float",
+                                                                "example": 87.5
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/jobs": {
             "get": {
                 "tags": [
@@ -5584,6 +5673,106 @@
                                 }
                             }
                         }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/learning/progress": {
+            "get": {
+                "tags": [
+                    "Courses"
+                ],
+                "summary": "Get learner progress",
+                "description": "Returns all active enrollments with progress percentage, completed lessons, total lessons, instructor details, and next lesson name.",
+                "operationId": "getLearningProgress",
+                "responses": {
+                    "200": {
+                        "description": "List of active enrollments with progress details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Enrollment progress"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "enrollment_id": {
+                                                        "type": "integer",
+                                                        "example": 5
+                                                    },
+                                                    "course": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 12
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "Introduction to Laravel"
+                                                            },
+                                                            "instructor": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer",
+                                                                        "example": 3
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string",
+                                                                        "example": "Jane Doe"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "progress": {
+                                                        "properties": {
+                                                            "completed_lessons": {
+                                                                "type": "integer",
+                                                                "example": 4
+                                                            },
+                                                            "total_lessons": {
+                                                                "type": "integer",
+                                                                "example": 10
+                                                            },
+                                                            "percentage": {
+                                                                "type": "number",
+                                                                "format": "float",
+                                                                "example": 40
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "next_lesson": {
+                                                        "type": "string",
+                                                        "example": "Eloquent Basics"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
                     }
                 },
                 "security": [

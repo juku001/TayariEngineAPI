@@ -18,6 +18,8 @@ Route::middleware(['auth:sanctum', 'user.type:learner'])->group(function () {
     Route::post('/quiz/submit/{id}',[QuizController::class, 'storeAttempt']);
     Route::post('/quiz/check/{id}',[QuizController::class, 'checkAnswer']);
     Route::post('/complete/lesson/{id}',[LessonController::class, 'completeLesson']);
+    Route::get('/learning/progress',[LessonController::class, 'progress']);
+ 
 });
 
 

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\JobMatchController;
 use App\Http\Controllers\JobPostController;
 use App\Http\Controllers\ProjectActivityController;
 use App\Http\Controllers\ProjectController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\TeamController;
 Route::middleware(['auth:sanctum', 'user.type:employer'])->group(function () {
     Route::get('/dashboard/employer', [DashboardController::class, 'employer']);
     Route::post('jobs', [JobPostController::class, 'store']);
+
     Route::post('projects', [ProjectController::class, 'store']);
 
     Route::get('/jobs/companies/{id}', [JobPostController::class, 'companies']);
@@ -40,13 +42,16 @@ Route::middleware(['auth:sanctum', 'user.type:learner'])->group(function () {
         Route::get('/', [ProposalController::class, 'index']);
         Route::post('/', [ProposalController::class, 'store']);
     });
-        Route::post('/projects/{id}/start', [ProjectActivityController::class, 'learnerStart']);
+    Route::post('/projects/{id}/start', [ProjectActivityController::class, 'learnerStart']);
     Route::post('/projects/{id}/complete', [ProjectActivityController::class, 'learnerComplete']);
 });
 
 Route::post('team/invite/accept/{token}', [TeamController::class, 'accept']);
 Route::get('jobs', [JobPostController::class, 'index']);
-Route::get('jobs/{id}', [JobPostController::class, 'show']);
+Route::get('jobs/{id}', [JobPostController::class, 'show'])->whereNumber('id');
 Route::get('projects', [ProjectController::class, 'index']);
 Route::get('/projects/{id}', [ProjectController::class, 'show']);
 
+
+
+Route::get('/jobs/matches', [JobMatchController::class, 'index'])->middleware('auth:sanctum');

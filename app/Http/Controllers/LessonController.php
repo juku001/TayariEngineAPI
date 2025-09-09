@@ -64,7 +64,7 @@ class LessonController extends Controller
 
 
 
-    
+
     public function completeLesson(Request $request, $lessonId)
     {
         $userId = auth()->id();
@@ -152,5 +152,131 @@ class LessonController extends Controller
             return ResponseHelper::error([], 'Error : ' . $e->getMessage(), 500);
         }
     }
+
+
+
+
+
+
+
+    /**
+     * @OA\Get(
+     *     path="/learning/progress",
+     *     summary="Get learner progress",
+     *     description="Returns all active enrollments with progress percentage, completed lessons, total lessons, instructor details, and next lesson name.",
+     *     operationId="getLearningProgress",
+     *     tags={"Courses"},
+     *     security={{"bearerAuth":{}}},
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of active enrollments with progress details",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Enrollment progress"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="enrollment_id", type="integer", example=5),
+     *                     @OA\Property(
+     *                         property="course",
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=12),
+     *                         @OA\Property(property="title", type="string", example="Introduction to Laravel"),
+     *                         @OA\Property(
+     *                             property="instructor",
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer", example=3),
+     *                             @OA\Property(property="name", type="string", example="Jane Doe")
+     *                         )
+     *                     ),
+     *                     @OA\Property(
+     *                         property="progress",
+     *                         type="object",
+     *                         @OA\Property(property="completed_lessons", type="integer", example=4),
+     *                         @OA\Property(property="total_lessons", type="integer", example=10),
+     *                         @OA\Property(property="percentage", type="number", format="float", example=40.0)
+     *                     ),
+     *                     @OA\Property(property="next_lesson", type="string", example="Eloquent Basics")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized - missing or invalid token",
+     *         ref="#/components/responses/401"
+     *     )
+     * )
+     */
+
+    public function progress()
+    {
+        $authId = auth()->id();
+
+        $enrollments = Enrollment::where('user_id', $authId)
+            ->where('status', 'active')
+            ->with(['course.lessons', 'course.instructorUser']) // <-- singular
+            ->get();
+
+        $data = $enrollments->map(function ($enrollment) use ($authId) {
+            $course = $enrollment->course; // <-- singular
+
+            if (!$course) {
+                return null; // or skip this enrollment
+            }
+
+            $lessons = $course->lessons;
+            $totalLessons = $lessons->count();
+
+            $completedLessonIds = LessonProgress::where('enrollment_id', $enrollment->id)
+                ->where('user_id', $authId)
+                ->pluck('lesson_id')
+                ->toArray();
+
+            $completedCount = count($completedLessonIds);
+
+            // calculate progress
+            $progressPercent = $totalLessons > 0
+                ? round(($completedCount / $totalLessons) * 100, 2)
+                : 0;
+
+            // update enrollment progress in DB
+            if ($enrollment->progress != $progressPercent) {
+                $enrollment->progress = $progressPercent;
+                $enrollment->save();
+            }
+
+            // next lesson
+            $nextLesson = $lessons->whereNotIn('id', $completedLessonIds)->first();
+            $nextLessonName = $nextLesson ? $nextLesson->title : null;
+
+            return [
+                'enrollment_id' => $enrollment->id,
+                'course' => [
+                    'id' => $course->id,
+                    'title' => $course->name,
+                    'instructor' => [
+                        'id' => $course->instructorUser->id ?? null,
+                        'name' => $course->instructorUser->name ?? null,
+                    ],
+                ],
+                'progress' => [
+                    'completed_lessons' => $completedCount,
+                    'total_lessons' => $totalLessons,
+                    'percentage' => $progressPercent,
+                ],
+                'next_lesson' => $nextLessonName,
+            ];
+        })->filter(); // filter out nulls
+
+
+        return ResponseHelper::success($data, "Enrollment progress");
+    }
+
 
 }
