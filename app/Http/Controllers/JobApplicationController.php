@@ -231,7 +231,7 @@ class JobApplicationController extends Controller
     /**
      * @OA\Get(
      *     path="/jobs/applications",
-     *     tags={"Jobs"},
+     *     tags={"Employer"},
      *     summary="Get list of job applications",
      *     description="Returns all applications for jobs, including applicant details, job details, certificate count, and match score.",
      *     security={{"bearerAuth":{}}},
