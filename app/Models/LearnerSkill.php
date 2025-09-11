@@ -4,19 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class JobPostApplication extends Model
+class LearnerSkill extends Model
 {
-
     protected $fillable = [
-        'job_post_id',
         'user_id',
-        'status',
-        'cover_letter',
-        'resume_path',
-        'notes',
-
+        'skill_id'
     ];
-
 
     public function user()
     {
@@ -24,8 +17,8 @@ class JobPostApplication extends Model
     }
 
 
-    public function jobPost()
+    public function skill()
     {
-        return $this->belongsTo(JobPost::class);
+        return $this->belongsTo(Skill::class);
     }
 }

@@ -23,4 +23,12 @@ class Skill extends Model
     {
         return $this->hasMany(CourseSkill::class);
     }
+
+
+    public function learners()
+    {
+        return $this->hasMany(LearnerSkill::class, );
+    }
+
+
 }

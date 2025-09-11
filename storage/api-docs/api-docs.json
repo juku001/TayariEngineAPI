@@ -4845,6 +4845,418 @@
                 }
             }
         },
+        "/jobs/recent": {
+            "get": {
+                "tags": [
+                    "Employer"
+                ],
+                "summary": "Get recent jobs for the authenticated employer",
+                "description": "Returns the 5 most recent jobs posted by the employer, including status, number of applications, and time ago since posted.",
+                "operationId": "getRecentJobs",
+                "responses": {
+                    "200": {
+                        "description": "List of recent jobs",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Recent Job postings"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 12
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Frontend Developer"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "active"
+                                                    },
+                                                    "applications_count": {
+                                                        "type": "integer",
+                                                        "example": 8
+                                                    },
+                                                    "posted_time_ago": {
+                                                        "type": "string",
+                                                        "example": "2 days ago"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/jobs/candidates": {
+            "get": {
+                "tags": [
+                    "Employer"
+                ],
+                "summary": "Get list of matching candidates for employer's jobs",
+                "description": "Returns candidates (learners) that match the employer's posted jobs, including skills, points, certificates, and match score.",
+                "operationId": "14299178e73f6e93798ed6343dafed03",
+                "responses": {
+                    "200": {
+                        "description": "List of matching candidates",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "List of matching candidates"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "job_post": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "Software Engineer"
+                                                            },
+                                                            "category_id": {
+                                                                "type": "integer",
+                                                                "example": 3
+                                                            },
+                                                            "job_type": {
+                                                                "type": "string",
+                                                                "example": "full_time"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "user": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 12
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "John Doe"
+                                                            },
+                                                            "email": {
+                                                                "type": "string",
+                                                                "example": "johndoe@example.com"
+                                                            },
+                                                            "skills": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "string",
+                                                                    "example": "PHP"
+                                                                }
+                                                            },
+                                                            "points": {
+                                                                "type": "integer",
+                                                                "example": 120
+                                                            },
+                                                            "certificate_count": {
+                                                                "type": "integer",
+                                                                "example": 3
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "match": {
+                                                        "properties": {
+                                                            "status": {
+                                                                "type": "string",
+                                                                "example": "Great Match"
+                                                            },
+                                                            "value": {
+                                                                "type": "number",
+                                                                "format": "float",
+                                                                "example": 87.5
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Employer not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Employer not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/jobs/applications": {
+            "get": {
+                "tags": [
+                    "Jobs"
+                ],
+                "summary": "Get list of job applications",
+                "description": "Returns all applications for jobs, including applicant details, job details, certificate count, and match score.",
+                "operationId": "0fa18afdd34035dd473cbb97d1b6ae99",
+                "responses": {
+                    "200": {
+                        "description": "List of job applications",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "List of applicants"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "application_id": {
+                                                        "type": "integer",
+                                                        "example": 15
+                                                    },
+                                                    "user": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 5
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "Jane Doe"
+                                                            },
+                                                            "email": {
+                                                                "type": "string",
+                                                                "example": "jane@example.com"
+                                                            },
+                                                            "certificate_count": {
+                                                                "type": "integer",
+                                                                "example": 2
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "job_post": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 101
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "Frontend Developer"
+                                                            },
+                                                            "description": {
+                                                                "type": "string",
+                                                                "example": "Job description here..."
+                                                            },
+                                                            "city": {
+                                                                "type": "string",
+                                                                "example": "Nairobi"
+                                                            },
+                                                            "country": {
+                                                                "type": "string",
+                                                                "example": "Kenya"
+                                                            },
+                                                            "type_id": {
+                                                                "type": "integer",
+                                                                "example": 2
+                                                            },
+                                                            "employer_id": {
+                                                                "type": "integer",
+                                                                "example": 8
+                                                            },
+                                                            "company_id": {
+                                                                "type": "integer",
+                                                                "example": 3
+                                                            },
+                                                            "category_id": {
+                                                                "type": "integer",
+                                                                "example": 6
+                                                            },
+                                                            "status": {
+                                                                "type": "string",
+                                                                "example": "active"
+                                                            },
+                                                            "salary_min": {
+                                                                "type": "number",
+                                                                "example": 500
+                                                            },
+                                                            "salary_max": {
+                                                                "type": "number",
+                                                                "example": 1200
+                                                            },
+                                                            "currency": {
+                                                                "type": "string",
+                                                                "example": "USD"
+                                                            },
+                                                            "experience_level": {
+                                                                "type": "string",
+                                                                "example": "mid"
+                                                            },
+                                                            "education_level": {
+                                                                "type": "string",
+                                                                "example": "bachelor"
+                                                            },
+                                                            "is_remote": {
+                                                                "type": "boolean",
+                                                                "example": true
+                                                            },
+                                                            "deadline": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2025-09-30T23:59:59Z"
+                                                            },
+                                                            "views": {
+                                                                "type": "integer",
+                                                                "example": 120
+                                                            },
+                                                            "applications_count": {
+                                                                "type": "integer",
+                                                                "example": 45
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "match": {
+                                                        "properties": {
+                                                            "status": {
+                                                                "type": "string",
+                                                                "example": "Good Match"
+                                                            },
+                                                            "value": {
+                                                                "type": "number",
+                                                                "format": "float",
+                                                                "example": 72.5
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Employer not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Employer not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/jobs/matches": {
             "get": {
                 "tags": [
@@ -10734,6 +11146,10 @@
         {
             "name": "Miscellaneous",
             "description": "Endpoints that don't fit into a specific module or category. This tag groups together utility, helper, and general-purpose APIs."
+        },
+        {
+            "name": "Jobs",
+            "description": "Jobs"
         }
     ]
 }

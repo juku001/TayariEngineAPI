@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\JobMatchController;
 use App\Http\Controllers\JobPostController;
 use App\Http\Controllers\ProjectActivityController;
@@ -16,6 +17,10 @@ Route::middleware(['auth:sanctum', 'user.type:employer'])->group(function () {
     Route::post('projects', [ProjectController::class, 'store']);
 
     Route::get('/jobs/companies/{id}', [JobPostController::class, 'companies']);
+
+    Route::get('/jobs/recent', [JobApplicationController::class, 'recent']);
+    Route::get('/jobs/candidates', [JobApplicationController::class, 'candidates']);
+    Route::get('/jobs/applications', [JobApplicationController::class, 'applications']);
 
     Route::get('/projects/companies/{id}', [ProjectController::class, 'companies']);
 

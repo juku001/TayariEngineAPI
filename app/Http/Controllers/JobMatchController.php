@@ -72,7 +72,6 @@ class JobMatchController extends Controller
             $jobMatchingHelper = new JobMatchingHelper($jobPost, $user);
             $matchScore = $jobMatchingHelper->getMatchingStatus(); // assuming you have this method
 
-            // Append job details + match score
             return [
                 'job' => $jobPost,
                 'match_score' => $matchScore,
