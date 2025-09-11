@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
 use App\Models\Certificate;
+use App\Services\PointService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\QueryException;
@@ -139,6 +140,8 @@ class LessonController extends Controller
 
             DB::commit();
 
+            $pointService = new PointService(auth()->user());
+            $pointService->lessonCompleted();
             return ResponseHelper::success([
                 'progress' => $progressPercent,
                 'certificate' => $progressPercent >= 100 ? "Issued" : "Not issued",

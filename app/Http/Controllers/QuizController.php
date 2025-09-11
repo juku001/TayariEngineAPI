@@ -6,6 +6,7 @@ use App\Helpers\ResponseHelper;
 use App\Models\Enrollment;
 use App\Models\Quiz;
 use App\Models\QuizAttempt;
+use App\Services\PointService;
 use Illuminate\Http\Request;
 
 class QuizController extends Controller
@@ -178,7 +179,7 @@ class QuizController extends Controller
             return ResponseHelper::error([], 'Quiz not found', 404);
         }
 
-      
+
         $courseId = $quiz->module->course_id;
         $enrollment = Enrollment::where('user_id', $userId)
             ->where('course_id', $courseId)
@@ -189,6 +190,11 @@ class QuizController extends Controller
         }
 
         $isCorrect = $request->answer === $quiz->correct_option;
+
+        if ($isCorrect) {
+            $pointService = new PointService(auth()->user());
+            $pointService->quizCorrect();
+        }
 
 
         $score = $isCorrect ? 1 : 0;

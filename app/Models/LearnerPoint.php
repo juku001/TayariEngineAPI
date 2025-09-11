@@ -8,7 +8,8 @@ class LearnerPoint extends Model
 {
     protected $fillable = [
         'user_id',
-        'points'
+        'points',
+        'reason'
     ];
 
     public function user()

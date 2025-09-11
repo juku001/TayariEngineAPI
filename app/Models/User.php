@@ -39,6 +39,8 @@ class User extends Authenticatable implements MustVerifyEmail
 
 
 
+
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -121,4 +123,17 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(LearnerPoint::class, 'user_id');
     }
+
+
+    protected $appends = ['learner_points'];
+
+    public function getLearnerPointsAttribute()
+    {
+        if ($this->roles->pluck('name')->contains('learner')) {
+            return $this->points()->sum('points');
+        }
+        return null;
+    }
+
+
 }
