@@ -33,7 +33,6 @@ class LearnerSkillController extends Controller
      *                     type="object",
      *                     @OA\Property(property="id", type="integer", example=1),
      *                     @OA\Property(property="name", type="string", example="PHP"),
-     *                     @OA\Property(property="level", type="string", example="Intermediate")
      *                 )
      *             )
      *         )
@@ -88,6 +87,7 @@ class LearnerSkillController extends Controller
      *                         type="object",
      *                         @OA\Property(property="id", type="integer", example=1),
      *                         @OA\Property(property="points", type="integer", example=10),
+     *                         @OA\Property(property="reason", type="string", example="Completed lesson"),
      *                         @OA\Property(property="created_at", type="string", format="date-time", example="2025-09-11T15:45:00Z")
      *                     )
      *                 )

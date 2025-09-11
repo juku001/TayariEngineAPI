@@ -5063,7 +5063,7 @@
         "/jobs/applications": {
             "get": {
                 "tags": [
-                    "Jobs"
+                    "Employer"
                 ],
                 "summary": "Get list of job applications",
                 "description": "Returns all applications for jobs, including applicant details, job details, certificate count, and match score.",
@@ -6005,6 +6005,138 @@
                         }
                     }
                 }
+            }
+        },
+        "/learner/skills": {
+            "get": {
+                "tags": [
+                    "Courses"
+                ],
+                "summary": "Get skills for authenticated learner",
+                "description": "Returns all skills associated with the authenticated learner.",
+                "operationId": "76ad17bbcfa6e4f576dcabc1657ef33d",
+                "responses": {
+                    "200": {
+                        "description": "List of learner skills",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "List of learner skills"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "PHP"
+                                                    },
+                                                    "level": {
+                                                        "type": "string",
+                                                        "example": "Intermediate"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/learner/points": {
+            "get": {
+                "tags": [
+                    "Courses"
+                ],
+                "summary": "Get total points and point history for the authenticated learner",
+                "description": "Returns the total points and a list of point transactions (history) for the authenticated learner.",
+                "operationId": "91ca3bc3e1349040f94ec0afbd09e235",
+                "responses": {
+                    "200": {
+                        "description": "Learner points and history retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Learner points and history"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "total_points": {
+                                                    "type": "integer",
+                                                    "example": 45
+                                                },
+                                                "history": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "points": {
+                                                                "type": "integer",
+                                                                "example": 10
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2025-09-11T15:45:00Z"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/complete/lesson/{id}": {
@@ -11146,10 +11278,6 @@
         {
             "name": "Miscellaneous",
             "description": "Endpoints that don't fit into a specific module or category. This tag groups together utility, helper, and general-purpose APIs."
-        },
-        {
-            "name": "Jobs",
-            "description": "Jobs"
         }
     ]
 }
