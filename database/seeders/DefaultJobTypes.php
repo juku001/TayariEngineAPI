@@ -30,6 +30,10 @@ class DefaultJobTypes extends Seeder
             [
                 'name' => 'Flexible Virtual Hire',
                 'desc' => 'For online virtual projects'
+            ],
+            [
+                'name' => 'Part Time',
+                'desc' => 'Short time Employment'
             ]
         ];
 

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
 use App\Models\Certificate;
+use App\Models\Course;
+use App\Models\LearnerSkill;
 use App\Services\PointService;
 use Carbon\Carbon;
 use Exception;
@@ -121,12 +123,30 @@ class LessonController extends Controller
             $enrollment->progress = $progressPercent;
             $enrollment->save();
 
-            // --- Certificate Check ---
+
             $alreadyHasCertificate = Certificate::where('course_id', $lesson->course_id)
                 ->where('user_id', $userId)
                 ->exists();
 
             if ($progressPercent >= 100 && !$alreadyHasCertificate) {
+                $course = Course::with('skills')->find($lesson->course_id);
+
+                if ($course && $course->skills->count() > 0) {
+                    foreach ($course->skills as $skill) {
+
+                        $hasSkill = LearnerSkill::where('user_id', $userId)
+                            ->where('skill_id', $skill->id)
+                            ->exists();
+
+                        if (!$hasSkill) {
+                            LearnerSkill::create([
+                                'user_id' => $userId,
+                                'skill_id' => $skill->id,
+                            ]);
+                        }
+                    }
+                }
+
                 $certificate_code = "TAYARI-" . now()->timestamp . "-STAGE-" . $lesson->course_id;
 
                 Certificate::create([
@@ -137,6 +157,7 @@ class LessonController extends Controller
                     'issued_at' => Carbon::now()
                 ]);
             }
+
 
             DB::commit();
 
