@@ -163,6 +163,10 @@ namespace App\Http\Controllers;
  *     description="Project APIs for the Employers. Viewing projects, sending proposals, accept and deny for proposals. "
  * ),
  * @OA\Tag(
+ *     name="Training",
+ *     description="This API si for the Employers to manage Training for their teams. View analysis, Training progress and Course Performance. "
+ * ),  
+ * @OA\Tag(
  *     name="Admin",
  *     description="Endpoints for managing administrative actions such as approving/rejecting instructor applications, overseeing users, and handling system-level operations."
  * ),

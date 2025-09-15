@@ -28,5 +28,10 @@ class Certificate extends Model
     }
 
 
+    public function enrollment()
+    {
+        return $this->belongsTo(Enrollment::class);
+    }
+
 
 }

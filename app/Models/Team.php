@@ -15,4 +15,15 @@ class Team extends Model
     {
         return $this->hasMany(TeamInvitation::class);
     }
+
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
+
+    public function enrollments()
+    {
+        return $this->hasMany(Enrollment::class);
+    }
 }

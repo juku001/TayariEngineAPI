@@ -6045,10 +6045,6 @@
                                                     "name": {
                                                         "type": "string",
                                                         "example": "PHP"
-                                                    },
-                                                    "level": {
-                                                        "type": "string",
-                                                        "example": "Intermediate"
                                                     }
                                                 },
                                                 "type": "object"
@@ -6112,6 +6108,10 @@
                                                             "points": {
                                                                 "type": "integer",
                                                                 "example": 10
+                                                            },
+                                                            "reason": {
+                                                                "type": "string",
+                                                                "example": "Completed lesson"
                                                             },
                                                             "created_at": {
                                                                 "type": "string",
@@ -10666,6 +10666,320 @@
                 ]
             }
         },
+        "/employee/progress": {
+            "get": {
+                "tags": [
+                    "Training"
+                ],
+                "summary": "Get learner progress overview for employer’s company",
+                "description": "Returns progress statistics for all learners enrolled in courses under the authenticated employer's company teams.",
+                "operationId": "ab7d40147aaaa0eb621879ac5a0cbf42",
+                "responses": {
+                    "200": {
+                        "description": "Progress data retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Learner progress overview"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "user": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 5
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "Mike Johnson"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "courses": {
+                                                        "description": "Completed / total courses",
+                                                        "type": "string",
+                                                        "example": "2/3 courses"
+                                                    },
+                                                    "points": {
+                                                        "description": "Total points earned",
+                                                        "type": "integer",
+                                                        "example": 750
+                                                    },
+                                                    "certificates": {
+                                                        "description": "Certificates earned",
+                                                        "type": "integer",
+                                                        "example": 2
+                                                    },
+                                                    "last_active": {
+                                                        "description": "Last active time from lesson progress",
+                                                        "type": "string",
+                                                        "example": "2 days ago"
+                                                    },
+                                                    "progress_percent": {
+                                                        "description": "Average course progress percent",
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 67.5
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Employer not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Employer not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/dashboard/training": {
+            "get": {
+                "tags": [
+                    "Training"
+                ],
+                "summary": "Get employer training dashboard statistics",
+                "description": "Returns training performance metrics for the authenticated employer's company (enrollments, completed courses, earned certificates, and average completion time).",
+                "operationId": "7d1390f7a358c4fc395efdda54be63aa",
+                "responses": {
+                    "200": {
+                        "description": "Dashboard data retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Employer dashboard data"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "total_enrollment": {
+                                                    "description": "Total number of enrollments in company teams",
+                                                    "type": "integer",
+                                                    "example": 120
+                                                },
+                                                "course_completed": {
+                                                    "description": "Number of completed enrollments",
+                                                    "type": "integer",
+                                                    "example": 85
+                                                },
+                                                "certificates_earned": {
+                                                    "description": "Number of certificates earned",
+                                                    "type": "integer",
+                                                    "example": 60
+                                                },
+                                                "avg_completion_time": {
+                                                    "description": "Average time to complete a course (in weeks/days depending on your system)",
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 4.75
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Employer not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Employer not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/courses/performance": {
+            "get": {
+                "tags": [
+                    "Training"
+                ],
+                "summary": "Get course performance overview for employer's company",
+                "description": "Returns aggregated course statistics (completion %, enrolled learners, completions, rating, average completion time) for all courses under the employer's company teams.",
+                "operationId": "41a21ca639803a262313803e8ccafbb5",
+                "responses": {
+                    "200": {
+                        "description": "Successful response with course performance data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Course performance overview"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "course": {
+                                                        "type": "string",
+                                                        "example": "React Fundamentals"
+                                                    },
+                                                    "completion_percent": {
+                                                        "description": "Average completion percentage",
+                                                        "type": "number",
+                                                        "example": 75
+                                                    },
+                                                    "enrolled": {
+                                                        "description": "Total learners enrolled",
+                                                        "type": "integer",
+                                                        "example": 8
+                                                    },
+                                                    "completed": {
+                                                        "description": "Learners who completed the course",
+                                                        "type": "integer",
+                                                        "example": 6
+                                                    },
+                                                    "rating": {
+                                                        "description": "Average rating of the course",
+                                                        "type": "string",
+                                                        "example": "4.5/5"
+                                                    },
+                                                    "avg_time": {
+                                                        "description": "Average time to complete the course",
+                                                        "type": "string",
+                                                        "example": "4 weeks"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Employer not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Employer not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/users": {
             "get": {
                 "tags": [
@@ -11262,6 +11576,10 @@
         {
             "name": "Projects",
             "description": "Project APIs for the Employers. Viewing projects, sending proposals, accept and deny for proposals. "
+        },
+        {
+            "name": "Training",
+            "description": "This API si for the Employers to manage Training for their teams. View analysis, Training progress and Course Performance. "
         },
         {
             "name": "Admin",

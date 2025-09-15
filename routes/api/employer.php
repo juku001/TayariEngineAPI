@@ -8,6 +8,7 @@ use App\Http\Controllers\ProjectActivityController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProposalController;
 use App\Http\Controllers\TeamController;
+use App\Http\Controllers\TrainingController;
 
 
 Route::middleware(['auth:sanctum', 'user.type:employer'])->group(function () {
@@ -60,3 +61,9 @@ Route::get('/projects/{id}', [ProjectController::class, 'show']);
 
 
 Route::get('/jobs/matches', [JobMatchController::class, 'index'])->middleware('auth:sanctum');
+
+Route::middleware(['auth:sanctum', 'user.type:employer'])->group(function () {
+    Route::get('/employee/progress', [TrainingController::class, 'progress']);
+    Route::get('/dashboard/training', [TrainingController::class, 'dashboard']);
+    Route::get('/courses/performance', [TrainingController::class, 'courses']);
+});

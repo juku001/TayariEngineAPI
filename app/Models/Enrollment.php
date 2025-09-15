@@ -20,4 +20,19 @@ class Enrollment extends Model
     {
         return $this->belongsTo(Course::class);
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function team()
+    {
+        return $this->belongsTo(Team::class);
+    }
+
+    public function progresses()
+    {
+        return $this->hasMany(LessonProgress::class);
+    }
 }
