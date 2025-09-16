@@ -30,6 +30,17 @@ class JobPost extends Model
         'slug'
     ];
 
+    public function employer()
+    {
+        return $this->belongsTo(Employer::class);
+    }
+
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
+
 
     public function jobPostType()
     {

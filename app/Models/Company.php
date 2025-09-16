@@ -13,8 +13,14 @@ class Company extends Model
         'size_range'
     ];
 
-    public function employers(){
+    public function employers()
+    {
         return $this->hasMany(Employer::class);
     }
-    
+
+
+    public function jobPosts()
+    {
+        return $this->hasMany(JobPost::class, 'company_id');
+    }
 }
