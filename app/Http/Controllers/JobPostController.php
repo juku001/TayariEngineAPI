@@ -12,6 +12,7 @@ use App\Services\AdminLogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Response;
+use Str;
 use Validator;
 
 class JobPostController extends Controller
@@ -314,11 +315,7 @@ class JobPostController extends Controller
      *             @OA\Property(property="status", type="boolean", example=false),
      *             @OA\Property(property="message", type="string", example="Failed to validate fields"),
      *             @OA\Property(property="code", type="integer", example=422),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="object",
-     *                 @OA\Property(property="title", type="array", @OA\Items(type="string", example="The title field is required."))
-     *             )
+     *             ref="#/components/responses/422"
      *         )
      *     ),
      *     @OA\Response(
@@ -343,22 +340,21 @@ class JobPostController extends Controller
             'country' => 'required|string|max:100',
             'job_type' => 'required|in:full-time,project,flexible-virtual-hire,internship',
             'skills' => 'required|array|min:1',
-            'skills.*' => 'int|max:100',
-
+            'skills.*' => 'integer|exists:skills,id',
 
             'min_payment' => 'nullable|numeric|min:0',
             'max_payment' => 'nullable|numeric|gte:min_payment',
-        ], [
-            'job_type.in' => 'Job type should be full-time,project,flexible-virtual-hire or internship'
+
+            'currency' => 'nullable|string|size:3',
+            'experience_level' => 'nullable|string|max:100',
+            'education_level' => 'nullable|string|max:100',
+            'is_remote' => 'boolean',
+            'deadline' => 'nullable|date',
+            'category_id' => 'nullable|integer|exists:categories,id',
         ]);
 
-
         if ($validator->fails()) {
-            return ResponseHelper::error(
-                $validator->errors(),
-                'Failed to validate fields',
-                422
-            );
+            return ResponseHelper::error($validator->errors(), 'Failed to validate fields', 422);
         }
 
         try {
@@ -367,16 +363,17 @@ class JobPostController extends Controller
             $authId = auth()->user()->id;
             $employer = Employer::where('user_id', $authId)->first();
 
-
-            $typeId = null;
-            if (isset($request->job_type)) {
-                $type = JobPostType::where('slug', $request->job_type)->first();
-                if ($type) {
-                    $type = $type->id;
-                }
+            if (!$employer) {
+                return ResponseHelper::error([], 'Employer not found', 404);
             }
 
-
+            $typeId = null;
+            if ($request->has('job_type')) {
+                $type = JobPostType::where('slug', $request->job_type)->first();
+                if ($type) {
+                    $typeId = $type->id;
+                }
+            }
 
             $job = JobPost::create([
                 'title' => $request->title,
@@ -384,40 +381,209 @@ class JobPostController extends Controller
                 'city' => $request->city,
                 'country' => $request->country,
                 'type_id' => $typeId,
-                'min_salary' => $request->min_payment,
-                'max_salary' => $request->max_payment,
                 'employer_id' => $employer->id,
-                'company_id' => $employer->company_id
+                'company_id' => $employer->company_id,
+                'category_id' => $request->category_id,
+                'status' => 'published',
+                'salary_min' => $request->min_payment,
+                'salary_max' => $request->max_payment,
+                'currency' => $request->currency ?? 'TZS',
+                'experience_level' => $request->experience_level,
+                'education_level' => $request->education_level,
+                'is_remote' => $request->is_remote ?? false,
+                'deadline' => $request->deadline,
+                'slug' => Str::slug($request->title) . '-' . uniqid(),
             ]);
-
 
             if ($request->has('skills')) {
                 foreach ($request->skills as $skill) {
                     JobSkill::create([
                         'job_post_id' => $job->id,
-                        'skill_id' => $skill
+                        'skill_id' => $skill,
                     ]);
                 }
             }
 
             DB::commit();
 
-
-            $action = $this->logService->getActionByCode(7);
-            $this->logService->record($authId, $action, "Posted new job: " . $job->title);
-            return ResponseHelper::success(
-                $job->load('jobSkills'),
-                'Job created successfully.',
-                201
-            );
+            return ResponseHelper::success($job->load('jobSkills'), 'Job created successfully.', 201);
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return ResponseHelper::error(
-                [],
-                "Error: {$e->getMessage()}",
-                500
-            );
+            return ResponseHelper::error([], "Error: {$e->getMessage()}", 500);
+        }
+    }
+
+
+
+
+
+
+    /**
+     * @OA\Put(
+     *     path="/jobs/{id}",
+     *     tags={"Employer"},
+     *     summary="Update a job post",
+     *     description="Allows an employer to update an existing job post.",
+     *     @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer"), description="Job ID"),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="title", type="string", example="Updated Job Title"),
+     *             @OA\Property(property="description", type="string", example="Updated job description"),
+     *             @OA\Property(property="city", type="string", example="Arusha"),
+     *             @OA\Property(property="country", type="string", example="Tanzania"),
+     *             @OA\Property(property="job_type", type="string", enum={"full-time","project","flexible-virtual-hire","internship"}, example="project"),
+     *             @OA\Property(property="skills", type="array", @OA\Items(type="integer", example=3)),
+     *             @OA\Property(property="min_payment", type="number", example=700),
+     *             @OA\Property(property="max_payment", type="number", example=2000),
+     *             @OA\Property(property="currency", type="string", example="USD"),
+     *             @OA\Property(property="experience_level", type="string", example="Senior"),
+     *             @OA\Property(property="education_level", type="string", example="Masters"),
+     *             @OA\Property(property="is_remote", type="boolean", example=false),
+     *             @OA\Property(property="deadline", type="string", format="date", example="2026-01-15"),
+     *             @OA\Property(property="category_id", type="integer", example=2),
+     *             @OA\Property(property="status", type="string", enum={"draft","published","closed","expired"}, example="closed")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *       response=200, 
+     *       description="Job updated successfully",
+     *       @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Job created successfully."),
+     *             @OA\Property(property="code", type="integer", example=201),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=12),
+     *                 @OA\Property(property="title", type="string", example="Frontend Developer"),
+     *                 @OA\Property(property="description", type="string", example="We are looking for a skilled frontend developer with React experience."),
+     *                 @OA\Property(property="city", type="string", example="Berlin"),
+     *                 @OA\Property(property="country", type="string", example="Germany"),
+     *                 @OA\Property(property="type_id", type="integer", example=2),
+     *                 @OA\Property(property="min_salary", type="number", example=1000),
+     *                 @OA\Property(property="max_salary", type="number", example=3000),
+     *                 @OA\Property(property="employer_id", type="integer", example=5),
+     *                 @OA\Property(property="company_id", type="integer", example=2),
+     *                 @OA\Property(
+     *                     property="job_skills",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="job_post_id", type="integer", example=12),
+     *                         @OA\Property(property="skill_id", type="integer", example=3)
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation failed",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Failed to validate fields"),
+     *             @OA\Property(property="code", type="integer", example=422),
+     *             ref="#/components/responses/422"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *       response=401,
+     *       description="Unauthorized",
+     *       ref="#/components/responses/401"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Unexpected server error",
+     *         ref="#/components/responses/500"
+     *     )
+     * )
+     */
+
+    public function update(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'title' => 'sometimes|required|string|max:255',
+            'description' => 'sometimes|required|string',
+            'city' => 'sometimes|required|string|max:100',
+            'country' => 'sometimes|required|string|max:100',
+            'job_type' => 'sometimes|required|in:full-time,project,flexible-virtual-hire,internship',
+            'skills' => 'sometimes|array|min:1',
+            'skills.*' => 'integer|exists:skills,id',
+
+            'min_payment' => 'nullable|numeric|min:0',
+            'max_payment' => 'nullable|numeric|gte:min_payment',
+            'currency' => 'nullable|string|size:3',
+            'experience_level' => 'nullable|string|max:100',
+            'education_level' => 'nullable|string|max:100',
+            'is_remote' => 'boolean',
+            'deadline' => 'nullable|date',
+            'category_id' => 'nullable|integer|exists:categories,id',
+            'status' => 'nullable|in:draft,published,closed,expired',
+        ]);
+
+        if ($validator->fails()) {
+            return ResponseHelper::error($validator->errors(), 'Failed to validate fields', 422);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $authId = auth()->id();
+            $employer = Employer::where('user_id', $authId)->first();
+
+            $job = JobPost::where('id', $id)
+                ->where('company_id', $employer->company_id)
+                ->first();
+
+            if (!$job) {
+                return ResponseHelper::error([], 'Job not found', 404);
+            }
+
+            $typeId = $job->type_id;
+            if ($request->has('job_type')) {
+                $type = JobPostType::where('slug', $request->job_type)->first();
+                if ($type) {
+                    $typeId = $type->id;
+                }
+            }
+
+            $job->update([
+                'title' => $request->title ?? $job->title,
+                'description' => $request->description ?? $job->description,
+                'city' => $request->city ?? $job->city,
+                'country' => $request->country ?? $job->country,
+                'type_id' => $typeId,
+                'salary_min' => $request->min_payment ?? $job->salary_min,
+                'salary_max' => $request->max_payment ?? $job->salary_max,
+                'currency' => $request->currency ?? $job->currency,
+                'experience_level' => $request->experience_level ?? $job->experience_level,
+                'education_level' => $request->education_level ?? $job->education_level,
+                'is_remote' => $request->is_remote ?? $job->is_remote,
+                'deadline' => $request->deadline ?? $job->deadline,
+                'category_id' => $request->category_id ?? $job->category_id,
+                'status' => $request->status ?? $job->status,
+            ]);
+
+            if ($request->has('skills')) {
+                JobSkill::where('job_post_id', $job->id)->delete();
+                foreach ($request->skills as $skill) {
+                    JobSkill::create([
+                        'job_post_id' => $job->id,
+                        'skill_id' => $skill,
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return ResponseHelper::success($job->load('jobSkills'), 'Job updated successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return ResponseHelper::error([], "Error: {$e->getMessage()}", 500);
         }
     }
 

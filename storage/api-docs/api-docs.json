@@ -5879,33 +5879,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Failed to validate fields"
-                                        },
-                                        "code": {
-                                            "type": "integer",
-                                            "example": 422
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "title": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string",
-                                                        "example": "The title field is required."
-                                                    }
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
+                                    "$ref": "#/components/responses/422"
                                 }
                             }
                         }
@@ -6209,6 +6183,220 @@
                                 }
                             }
                         }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Employer"
+                ],
+                "summary": "Update a job post",
+                "description": "Allows an employer to update an existing job post.",
+                "operationId": "6e90340813f5b839cee5bb630be76e43",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Job ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Updated Job Title"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Updated job description"
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "example": "Arusha"
+                                    },
+                                    "country": {
+                                        "type": "string",
+                                        "example": "Tanzania"
+                                    },
+                                    "job_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "full-time",
+                                            "project",
+                                            "flexible-virtual-hire",
+                                            "internship"
+                                        ],
+                                        "example": "project"
+                                    },
+                                    "skills": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer",
+                                            "example": 3
+                                        }
+                                    },
+                                    "min_payment": {
+                                        "type": "number",
+                                        "example": 700
+                                    },
+                                    "max_payment": {
+                                        "type": "number",
+                                        "example": 2000
+                                    },
+                                    "currency": {
+                                        "type": "string",
+                                        "example": "USD"
+                                    },
+                                    "experience_level": {
+                                        "type": "string",
+                                        "example": "Senior"
+                                    },
+                                    "education_level": {
+                                        "type": "string",
+                                        "example": "Masters"
+                                    },
+                                    "is_remote": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "deadline": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-01-15"
+                                    },
+                                    "category_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "draft",
+                                            "published",
+                                            "closed",
+                                            "expired"
+                                        ],
+                                        "example": "closed"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Job updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Job created successfully."
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 201
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 12
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Frontend Developer"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "We are looking for a skilled frontend developer with React experience."
+                                                },
+                                                "city": {
+                                                    "type": "string",
+                                                    "example": "Berlin"
+                                                },
+                                                "country": {
+                                                    "type": "string",
+                                                    "example": "Germany"
+                                                },
+                                                "type_id": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "min_salary": {
+                                                    "type": "number",
+                                                    "example": 1000
+                                                },
+                                                "max_salary": {
+                                                    "type": "number",
+                                                    "example": 3000
+                                                },
+                                                "employer_id": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "company_id": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "job_skills": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "job_post_id": {
+                                                                "type": "integer",
+                                                                "example": 12
+                                                            },
+                                                            "skill_id": {
+                                                                "type": "integer",
+                                                                "example": 3
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/responses/422"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/500"
                     }
                 }
             }
