@@ -14,7 +14,7 @@ use App\Http\Controllers\TrainingController;
 Route::middleware(['auth:sanctum', 'user.type:employer'])->group(function () {
     Route::get('/dashboard/employer', [DashboardController::class, 'employer']);
     Route::post('jobs', [JobPostController::class, 'store']);
-    Route::put('jobs', [JobPostController::class, 'update']);
+    Route::put('jobs/{id}', [JobPostController::class, 'update']);
 
     Route::post('projects', [ProjectController::class, 'store']);
 
