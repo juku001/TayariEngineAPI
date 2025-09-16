@@ -68,6 +68,7 @@ class LogInController extends Controller
      *                     @OA\Property(property="date_of_birth", type="string", example="2025-08-07 07:46:00"),
      *                     @OA\Property(property="provider", type="string", example="email"),
      *                     @OA\Property(property="status", type="string", example="active"),
+     *                     @OA\Property(property="learner_points", type="integer", example=0),
      *                     @OA\Property(
      *                             property="roles",
      *                             type="array",

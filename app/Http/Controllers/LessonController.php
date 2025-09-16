@@ -95,6 +95,11 @@ class LessonController extends Controller
             return ResponseHelper::error([], "Enrollment not found", 404);
         }
 
+        if ($enrollment->status == 'dropped') {
+            return ResponseHelper::error([], 'This course was already dropped', 400);
+        }
+
+
         DB::beginTransaction();
         try {
 
@@ -121,7 +126,7 @@ class LessonController extends Controller
                 $progressPercent = ($completedLessons / $totalLessons) * 100;
             }
             $enrollment->progress = $progressPercent;
-            $enrollment->save();
+
 
 
             $alreadyHasCertificate = Certificate::where('course_id', $lesson->course_id)
@@ -147,6 +152,7 @@ class LessonController extends Controller
                     }
                 }
 
+
                 $certificate_code = "TAYARI-" . now()->timestamp . "-STAGE-" . $lesson->course_id;
 
                 Certificate::create([
@@ -156,13 +162,15 @@ class LessonController extends Controller
                     'certificate_code' => $certificate_code,
                     'issued_at' => Carbon::now()
                 ]);
+                $enrollment->status = 'completed';
             }
-
+            $enrollment->save();
 
             DB::commit();
 
             $pointService = new PointService(auth()->user());
             $pointService->lessonCompleted();
+
             return ResponseHelper::success([
                 'progress' => $progressPercent,
                 'certificate' => $progressPercent >= 100 ? "Issued" : "Not issued",

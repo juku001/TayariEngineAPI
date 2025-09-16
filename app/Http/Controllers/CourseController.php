@@ -382,6 +382,7 @@ class CourseController extends Controller
                 'slug' => Str::slug($request->title),
                 'description' => $request->description,
                 'cover_image' => $thumbnailPath,
+                'created_by' => auth()->user()->id,
                 'status' => $request->status,
             ]);
 

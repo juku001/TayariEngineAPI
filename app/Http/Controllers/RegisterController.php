@@ -86,6 +86,28 @@ class RegisterController extends Controller
      *                 property="created_by",
      *                 type="integer",
      *                 example=null
+     *               ),
+     *               @OA\Property(
+     *                 property="created_at",
+     *                 type="string",
+     *                 example="2025-09-16T13:14:41.000000Z"
+     *               ),
+     *               @OA\Property(property="updated_at", type="string", example="2025-09-16T13:14:41.000000Z"),
+     *               @OA\Property(property="learner_point", type="integer", example=0),
+     *               @OA\Property(
+     *                 property="roles",
+     *                 type="array",
+     *                 @OA\Items(
+     *               @OA\Property(property="id", type="string", example=1),
+     *                 @OA\Property(property="name", type="string", example="learner"),
+     *                 @OA\Property(
+     *                   property="pivot",
+     *                   type="object",
+     *                   @OA\Property(property="user_id", type="integer", example=2),
+     *                   @OA\Property(property="role_id", type="integer", example=1)
+     *                 )
+     *                   
+     *                 )
      *               )
      *             )
      *         )
@@ -143,7 +165,7 @@ class RegisterController extends Controller
                 $authUser = $accessToken->tokenable;
             }
         }
-       
+
 
 
         switch ($role) {

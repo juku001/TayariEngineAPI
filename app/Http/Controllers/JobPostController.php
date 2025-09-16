@@ -126,6 +126,10 @@ class JobPostController extends Controller
         $query = JobPost::with('jobPostType', 'jobSkills', 'company')
             ->where('status', 'published');
 
+        // Trending: latest 4 jobs
+        if ($request->has('trending') && $request->trending) {
+            $query->latest()->take(4);
+        }
 
         if ($request->has('search') && !empty($request->search)) {
             $search = $request->search;
@@ -136,7 +140,6 @@ class JobPostController extends Controller
                     });
             });
         }
-
 
         if ($request->has('job_type') && !empty($request->job_type)) {
             $jobType = $request->job_type;
@@ -149,9 +152,10 @@ class JobPostController extends Controller
 
         return ResponseHelper::success(
             $jobs,
-            "List of jobs"
+            $request->has('trending') ? "Trending jobs" : "List of jobs"
         );
     }
+
 
 
 

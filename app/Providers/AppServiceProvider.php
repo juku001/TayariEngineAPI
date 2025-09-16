@@ -2,6 +2,12 @@
 
 namespace App\Providers;
 
+use App\Events\CertificateShared;
+use App\Events\CourseCompleted;
+use App\Events\LessonCompleted;
+use App\Events\QuizAttempted;
+use App\Listeners\AwardBadges;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -11,7 +17,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        Event::listen(
+            [LessonCompleted::class, CourseCompleted::class, CertificateShared::class, QuizAttempted::class],
+            AwardBadges::class
+        );
     }
 
     /**

@@ -34,4 +34,10 @@ class Certificate extends Model
     }
 
 
+
+    public function certificateShares()
+    {
+        return $this->hasMany(CertificateShare::class);
+    }
+
 }

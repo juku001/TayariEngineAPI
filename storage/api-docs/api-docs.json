@@ -1826,6 +1826,90 @@
                 ]
             }
         },
+        "/certificates/share": {
+            "post": {
+                "tags": [
+                    "Certificates"
+                ],
+                "summary": "Share a certificate on LinkedIn",
+                "operationId": "81e7ceb382c23b2576252757663d0419",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "certificate_id"
+                                ],
+                                "properties": {
+                                    "certificate_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Certificate shared successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Certificate shared successfully!"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "user_id": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "certificate_id": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "platform": {
+                                                    "type": "string",
+                                                    "example": "linkedin"
+                                                },
+                                                "share_url": {
+                                                    "type": "string",
+                                                    "example": "https://www.linkedin.com/feed/update/..."
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/courses": {
             "get": {
                 "tags": [
@@ -6825,6 +6909,10 @@
                                                             "type": "string",
                                                             "example": "active"
                                                         },
+                                                        "learner_points": {
+                                                            "type": "integer",
+                                                            "example": 0
+                                                        },
                                                         "roles": {
                                                             "type": "array",
                                                             "items": {
@@ -9219,10 +9307,30 @@
                                         "code": {
                                             "type": "integer",
                                             "example": 403
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Course was already dropped",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
                                         },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {}
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Course was already dropped"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 400
                                         }
                                     },
                                     "type": "object"
@@ -9247,10 +9355,6 @@
                                         "code": {
                                             "type": "integer",
                                             "example": 404
-                                        },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {}
                                         }
                                     },
                                     "type": "object"
@@ -9409,6 +9513,47 @@
                                                 "created_by": {
                                                     "type": "integer",
                                                     "example": null
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "example": "2025-09-16T13:14:41.000000Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "example": "2025-09-16T13:14:41.000000Z"
+                                                },
+                                                "learner_point": {
+                                                    "type": "integer",
+                                                    "example": 0
+                                                },
+                                                "roles": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "example": 1
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "learner"
+                                                            },
+                                                            "pivot": {
+                                                                "properties": {
+                                                                    "user_id": {
+                                                                        "type": "integer",
+                                                                        "example": 2
+                                                                    },
+                                                                    "role_id": {
+                                                                        "type": "integer",
+                                                                        "example": 1
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
                                                 }
                                             },
                                             "type": "object"

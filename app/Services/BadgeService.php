@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Badge;
+use App\Models\QuizAttempt;
 use App\Models\User;
 use App\Models\UserBadge;
 use Carbon\Carbon;
@@ -18,7 +19,7 @@ class BadgeService
             ->whereDate('created_at', Carbon::today())
             ->count();
         if ($lessonsToday >= 3) {
-            $this->awardBadge($user, 'quick_learner');
+            $this->awardBadge($user, 'quick-learner');
             $badgesAwarded[] = 'Quick Learner';
         }
 
@@ -37,25 +38,30 @@ class BadgeService
         }
 
 
-        $perfectQuizzes = $user->quizAttempts()
+
+        $perfectQuizzes = QuizAttempt::whereHas('enrollment', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        })
             ->where('score', 100)
             ->count();
+
+
         if ($perfectQuizzes >= 5) {
-            $this->awardBadge($user, 'quiz_master');
+            $this->awardBadge($user, 'quiz-master');
             $badgesAwarded[] = 'Quiz Master';
         }
 
 
         $shares = $user->certificateShares()->count();
         if ($shares >= 3) {
-            $this->awardBadge($user, 'social_learner');
+            $this->awardBadge($user, 'social-learner');
             $badgesAwarded[] = 'Social Learner';
         }
 
 
         $longCourse = $user->enrollments()
             ->whereHas('course', fn($q) => $q->where('duration', '>=', 1200)) // 1200 mins = 20 hours
-            ->where('is_completed', true)
+            ->where('status', 'completed')
             ->exists();
         if ($longCourse) {
             $this->awardBadge($user, 'marathon');
@@ -67,7 +73,7 @@ class BadgeService
 
     protected function awardBadge(User $user, string $badgeCode)
     {
-        $badge = Badge::where('code', $badgeCode)->first();
+        $badge = Badge::where('slug', $badgeCode)->first();
         if (!$badge) {
             return;
         }

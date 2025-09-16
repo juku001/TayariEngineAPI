@@ -148,10 +148,19 @@ class QuizController extends Controller
      *             @OA\Property(property="status", type="boolean", example=false),
      *             @OA\Property(property="message", type="string", example="You are not enrolled in this course"),
      *             @OA\Property(property="code", type="integer", example=403),
-     *             @OA\Property(property="data", type="array", @OA\Items())
+     *             
      *         )
      *     ),
-     *
+     *     @OA\Response(
+     *         response=400,
+     *         description="Course was already dropped",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Course was already dropped"),
+     *             @OA\Property(property="code", type="integer", example=400),
+     *             
+     *         )
+     *     ), 
      *     @OA\Response(
      *         response=404,
      *         description="Quiz not found",
@@ -159,7 +168,7 @@ class QuizController extends Controller
      *             @OA\Property(property="status", type="boolean", example=false),
      *             @OA\Property(property="message", type="string", example="Quiz not found"),
      *             @OA\Property(property="code", type="integer", example=404),
-     *             @OA\Property(property="data", type="array", @OA\Items())
+     *             
      *         )
      *     )
      * )
@@ -187,6 +196,10 @@ class QuizController extends Controller
 
         if (!$enrollment) {
             return ResponseHelper::error([], 'You are not enrolled in this course', 403);
+        }
+
+        if ($enrollment->status == 'dropped') {
+            return ResponseHelper::error([], 'This course was already dropped', 400);
         }
 
         $isCorrect = $request->answer === $quiz->correct_option;

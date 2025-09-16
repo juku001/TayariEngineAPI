@@ -124,6 +124,26 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(LearnerPoint::class, 'user_id');
     }
 
+    public function lessonProgress()
+    {
+        return $this->hasMany(LessonProgress::class);
+    }
+
+
+
+    public function enrollments()
+    {
+        return $this->hasMany(Enrollment::class);
+    }
+
+
+
+
+    public function certificateShares()
+    {
+        return $this->hasMany(CertificateShare::class);
+    }
+
 
     protected $appends = ['learner_points'];
 

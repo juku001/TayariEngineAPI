@@ -14,6 +14,17 @@ class LessonProgress extends Model
         'completed_at'
     ];
 
+
+    protected static function booted()
+    {
+        static::created(function ($progress) {
+            event(new \App\Events\LessonCompleted($progress->user));
+        });
+    }
+
+
+
+    
     public function user()
     {
         return $this->belongsTo(User::class);

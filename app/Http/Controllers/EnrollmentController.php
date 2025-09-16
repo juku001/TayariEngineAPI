@@ -110,9 +110,9 @@ class EnrollmentController extends Controller
             return ResponseHelper::error([], 'Course not found', 404);
         }
 
-        // Check if already enrolled
         $alreadyEnrolled = Enrollment::where('user_id', $userId)
             ->where('course_id', $id)
+            ->whereIn('status', ['active', 'completed']) // only block these
             ->exists();
 
         if ($alreadyEnrolled) {
@@ -122,7 +122,7 @@ class EnrollmentController extends Controller
         // Enroll user
         $enrollment = Enrollment::create([
             'user_id' => $userId,
-            'course_id' =>(int) $id,
+            'course_id' => (int) $id,
             'progress' => 0, // start with 0%
         ]);
 
@@ -218,7 +218,7 @@ class EnrollmentController extends Controller
     {
         $user = auth()->user();
 
-       
+
         $enrollment = Enrollment::with(['course.modules.lessons', 'course.modules.quizzes'])
             ->where('user_id', $user->id)
             ->where('course_id', $id)
@@ -230,24 +230,24 @@ class EnrollmentController extends Controller
 
         $course = $enrollment->course;
 
-        
+
         $totalLessons = $course->modules->flatMap->lessons->count();
 
-       
+
         $completedLessons = $user->lessonProgress()
             ->whereIn('lesson_id', $course->modules->flatMap->lessons->pluck('id'))
             ->count();
 
-       
+
         $totalQuizzes = $course->modules->flatMap->quizzes->count();
 
-      
+
         $passedQuizzes = $user->quizAttempts()
             ->whereIn('quiz_id', $course->modules->flatMap->quizzes->pluck('id'))
             ->where('score', '>=', 50)
             ->count();
 
-       
+
         $totalItems = $totalLessons + $totalQuizzes;
         $completedItems = $completedLessons + $passedQuizzes;
 
@@ -268,6 +268,80 @@ class EnrollmentController extends Controller
                 'total' => $totalQuizzes
             ]
         ], 'Course progress calculated successfully');
+    }
+
+
+
+
+    /**
+     * @OA\Post(
+     *     path="/courses/{id}/drop",
+     *     tags={"Courses"},
+     *     summary="Drop an active course enrollment",
+     *     description="Allows a learner to drop an active enrollment. Only active enrollments can be dropped.",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID of the course enrollment to drop",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Enrollment dropped successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Enrollment dropped successfully."),
+     *             @OA\Property(property="code", type="integer", example=200),
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="course_id", type="integer", example=2),
+     *                 @OA\Property(property="user_id", type="integer", example=5),
+     *                 @OA\Property(property="status", type="string", example="dropped"),
+     *                 @OA\Property(property="progress", type="number", example=40),
+     *                 @OA\Property(property="created_at", type="string", format="date-time", example="2025-09-16T12:00:00Z"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time", example="2025-09-16T12:10:00Z")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Active enrollment not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Active enrollment not found."),
+     *             @OA\Property(property="code", type="integer", example=404)
+     *         )
+     *     )
+     * )
+     */
+
+
+    public function destroy($id)
+    {
+        $userId = auth()->id();
+
+        $enrollment = Enrollment::where('id', $id)
+            ->where('user_id', $userId)
+            ->where('status', 'active')
+            ->first();
+
+        if (!$enrollment) {
+            return ResponseHelper::error(
+                null,
+                'Active enrollment not found.',
+                404
+            );
+        }
+
+        // Mark as dropped
+        $enrollment->status = 'dropped';
+        $enrollment->save();
+
+        return ResponseHelper::success(
+            $enrollment,
+            'Enrollment dropped successfully.'
+        );
     }
 
 
