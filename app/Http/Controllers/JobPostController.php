@@ -35,7 +35,7 @@ class JobPostController extends Controller
      *     path="/jobs",
      *     tags={"Employer"},
      *     summary="Get all published jobs with search and filter",
-     *     description="Returns a list of published jobs. You can search by job title or company name and filter by job type (e.g. full-time, internship).",
+     *     description="Returns a list of published jobs. You can search by job title or company name and filter by job type (e.g. full-time, internship). Use trending to get the latest 4 jobs.",
      *     @OA\Parameter(
      *         name="search",
      *         in="query",
@@ -49,6 +49,13 @@ class JobPostController extends Controller
      *         description="Filter by job type (full-time, internship, etc.)",
      *         required=false,
      *         @OA\Schema(type="string", example="full-time")
+     *     ),
+     *     @OA\Parameter(
+     *         name="trending",
+     *         in="query",
+     *         description="If true, returns only the latest 4 published jobs",
+     *         required=false,
+     *         @OA\Schema(type="boolean", example=true)
      *     ),
      *     @OA\Response(
      *         response=200,
