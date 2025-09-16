@@ -48,6 +48,12 @@ Route::middleware(['auth:sanctum', 'user.type:learner'])->group(function () {
         Route::get('/', [ProposalController::class, 'index']);
         Route::post('/', [ProposalController::class, 'store']);
     });
+
+
+    Route::post('/jobs/apply', [JobApplicationController::class, 'apply']);
+
+
+
     Route::post('/projects/{id}/start', [ProjectActivityController::class, 'learnerStart']);
     Route::post('/projects/{id}/complete', [ProjectActivityController::class, 'learnerComplete']);
 });

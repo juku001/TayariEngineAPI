@@ -358,4 +358,113 @@ class JobApplicationController extends Controller
 
         return ResponseHelper::success($data, 'List of applicants');
     }
+
+
+
+
+    /**
+     * @OA\Post(
+     *     path="/jobs/apply",
+     *     tags={"Employer"},
+     *     summary="Apply for a job",
+     *     description="Learner applies for a job by submitting resume and cover letter files.",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 required={"job_post_id", "resume", "cover_letter"},
+     *                 @OA\Property(
+     *                     property="job_post_id",
+     *                     type="integer",
+     *                     example=12,
+     *                     description="ID of the job post to apply for"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="resume",
+     *                     type="string",
+     *                     format="binary",
+     *                     description="Resume file (PDF/DOC/DOCX)"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="cover_letter",
+     *                     type="string",
+     *                     format="binary",
+     *                     description="Cover letter file (PDF/DOC/DOCX)"
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Application submitted successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Application submitted successfully"),
+     *             @OA\Property(property="code", type="integer", example=200),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="application_id", type="integer", example=45),
+     *                 @OA\Property(property="job_post_id", type="integer", example=12),
+     *                 @OA\Property(property="user_id", type="integer", example=5),
+     *                 @OA\Property(property="resume_path", type="string", example="resumes/123456_resume.pdf"),
+     *                 @OA\Property(property="cover_letter", type="string", example="cover_letters/123456_cover.docx"),
+     *                 @OA\Property(property="status", type="string", example="pending")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=400,
+     *         description="Bad request - Already applied or validation error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="You already applied for this job"),
+     *             @OA\Property(property="code", type="integer", example=400),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized - Invalid or missing token",
+     *         ref="#/components/responses/401"
+     *     )
+     * )
+     */
+
+    public function apply(Request $request)
+    {
+        $authId = auth()->id();
+
+        $validated = $request->validate([
+            'job_post_id' => 'required|exists:job_posts,id',
+            'resume' => 'required|file|mimes:pdf,doc,docx|max:2048',
+            'cover_letter' => 'required|file|mimes:pdf,doc,docx|max:2048',
+        ]);
+
+        $alreadyApplied = JobPostApplication::where('job_post_id', $validated['job_post_id'])
+            ->where('user_id', $authId)
+            ->exists();
+
+        if ($alreadyApplied) {
+            return ResponseHelper::error([], "You already applied for this job", 400);
+        }
+
+        $resumePath = $request->file('resume')->store('resumes', 'public');
+        $coverLetterPath = $request->file('cover_letter')->store('cover_letters', 'public');
+
+        $application = JobPostApplication::create([
+            'job_post_id' => $validated['job_post_id'],
+            'user_id' => $authId,
+            'status' => 'pending',
+            'resume_path' => $resumePath,
+            'cover_letter' => $coverLetterPath,
+            'updated_by' => $authId,
+        ]);
+
+        return ResponseHelper::success($application, "Application submitted successfully");
+    }
+
+
+
 }

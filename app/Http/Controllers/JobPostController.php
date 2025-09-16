@@ -34,7 +34,7 @@ class JobPostController extends Controller
      *     path="/jobs",
      *     tags={"Employer"},
      *     summary="Get all published jobs with search and filter",
-     *     description="Returns a list of jobs. You can search by job title or company name and filter by job type (e.g. full-time, internship).",
+     *     description="Returns a list of published jobs. You can search by job title or company name and filter by job type (e.g. full-time, internship).",
      *     @OA\Parameter(
      *         name="search",
      *         in="query",
@@ -61,16 +61,23 @@ class JobPostController extends Controller
      *                 type="array",
      *                 @OA\Items(
      *                     @OA\Property(property="id", type="integer", example=1),
-     *                     @OA\Property(property="title", type="string", example="Full Stack Developer"),
-     *                     @OA\Property(property="description", type="string", example="Exciting opportunity..."),
-     *                     @OA\Property(property="city", type="string", example="Dar es Salaam"),
-     *                     @OA\Property(property="country", type="string", example="Tanzania"),
+     *                     @OA\Property(property="title", type="string", example="Frontend Developer"),
+     *                     @OA\Property(property="description", type="string", example="We are looking for a skilled frontend developer with React experience."),
+     *                     @OA\Property(property="city", type="string", example="Berlin"),
+     *                     @OA\Property(property="country", type="string", example="Germany"),
      *                     @OA\Property(property="status", type="string", example="published"),
+     *                     @OA\Property(property="salary_min", type="number", format="float", example=1000),
+     *                     @OA\Property(property="salary_max", type="number", format="float", example=3000),
      *                     @OA\Property(property="currency", type="string", example="TZS"),
-     *                     @OA\Property(property="company", type="object",
-     *                         @OA\Property(property="id", type="integer", example=1),
-     *                         @OA\Property(property="name", type="string", example="TechCorp Ltd")
-     *                     ),
+     *                     @OA\Property(property="experience_level", type="string", example="mid-level"),
+     *                     @OA\Property(property="education_level", type="string", example="bachelor"),
+     *                     @OA\Property(property="is_remote", type="boolean", example=false),
+     *                     @OA\Property(property="deadline", type="string", format="date", example="2025-12-31"),
+     *                     @OA\Property(property="views", type="integer", example=120),
+     *                     @OA\Property(property="applications_count", type="integer", example=15),
+     *                     @OA\Property(property="slug", type="string", example="frontend-developer"),
+     *                     @OA\Property(property="created_at", type="string", format="date-time", example="2025-09-11T12:24:38.000000Z"),
+     *                     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-09-11T12:24:38.000000Z"),
      *                     @OA\Property(property="job_post_type", type="object",
      *                         @OA\Property(property="id", type="integer", example=1),
      *                         @OA\Property(property="name", type="string", example="full-time")
@@ -80,8 +87,20 @@ class JobPostController extends Controller
      *                         type="array",
      *                         @OA\Items(
      *                             @OA\Property(property="id", type="integer", example=1),
-     *                             @OA\Property(property="skill_id", type="integer", example=2)
+     *                             @OA\Property(property="job_post_id", type="integer", example=1),
+     *                             @OA\Property(property="skill_id", type="integer", example=3),
+     *                             @OA\Property(property="created_at", type="string", format="date-time"),
+     *                             @OA\Property(property="updated_at", type="string", format="date-time")
      *                         )
+     *                     ),
+     *                     @OA\Property(property="company", type="object",
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="name", type="string", example="Oneway Africa Technologies"),
+     *                         @OA\Property(property="website", type="string", example="https://bilaza.com"),
+     *                         @OA\Property(property="industry", type="string", example="Software"),
+     *                         @OA\Property(property="size_range", type="string", example="11-50"),
+     *                         @OA\Property(property="created_at", type="string", format="date-time"),
+     *                         @OA\Property(property="updated_at", type="string", format="date-time")
      *                     )
      *                 )
      *             )
@@ -94,11 +113,11 @@ class JobPostController extends Controller
      *             @OA\Property(property="status", type="boolean", example=false),
      *             @OA\Property(property="message", type="string", example="No jobs found"),
      *             @OA\Property(property="code", type="integer", example=404),
-     *             @OA\Property(property="data", type="array", @OA\Items())
      *         )
      *     )
      * )
      */
+
 
 
     public function index(Request $request)

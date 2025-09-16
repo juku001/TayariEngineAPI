@@ -5257,6 +5257,135 @@
                 ]
             }
         },
+        "/jobs/apply": {
+            "post": {
+                "tags": [
+                    "Employer"
+                ],
+                "summary": "Apply for a job",
+                "description": "Learner applies for a job by submitting resume and cover letter files.",
+                "operationId": "2cceb218a859f613ee4982202cdcadc0",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "job_post_id",
+                                    "resume",
+                                    "cover_letter"
+                                ],
+                                "properties": {
+                                    "job_post_id": {
+                                        "description": "ID of the job post to apply for",
+                                        "type": "integer",
+                                        "example": 12
+                                    },
+                                    "resume": {
+                                        "description": "Resume file (PDF/DOC/DOCX)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "cover_letter": {
+                                        "description": "Cover letter file (PDF/DOC/DOCX)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Application submitted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Application submitted successfully"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "application_id": {
+                                                    "type": "integer",
+                                                    "example": 45
+                                                },
+                                                "job_post_id": {
+                                                    "type": "integer",
+                                                    "example": 12
+                                                },
+                                                "user_id": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "resume_path": {
+                                                    "type": "string",
+                                                    "example": "resumes/123456_resume.pdf"
+                                                },
+                                                "cover_letter": {
+                                                    "type": "string",
+                                                    "example": "cover_letters/123456_cover.docx"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "pending"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Already applied or validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "You already applied for this job"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/jobs/matches": {
             "get": {
                 "tags": [
@@ -5352,7 +5481,7 @@
                     "Employer"
                 ],
                 "summary": "Get all published jobs with search and filter",
-                "description": "Returns a list of jobs. You can search by job title or company name and filter by job type (e.g. full-time, internship).",
+                "description": "Returns a list of published jobs. You can search by job title or company name and filter by job type (e.g. full-time, internship).",
                 "operationId": "a7b510a7df3b49aee8b863b787acbc33",
                 "parameters": [
                     {
@@ -5405,40 +5534,76 @@
                                                     },
                                                     "title": {
                                                         "type": "string",
-                                                        "example": "Full Stack Developer"
+                                                        "example": "Frontend Developer"
                                                     },
                                                     "description": {
                                                         "type": "string",
-                                                        "example": "Exciting opportunity..."
+                                                        "example": "We are looking for a skilled frontend developer with React experience."
                                                     },
                                                     "city": {
                                                         "type": "string",
-                                                        "example": "Dar es Salaam"
+                                                        "example": "Berlin"
                                                     },
                                                     "country": {
                                                         "type": "string",
-                                                        "example": "Tanzania"
+                                                        "example": "Germany"
                                                     },
                                                     "status": {
                                                         "type": "string",
                                                         "example": "published"
                                                     },
+                                                    "salary_min": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 1000
+                                                    },
+                                                    "salary_max": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 3000
+                                                    },
                                                     "currency": {
                                                         "type": "string",
                                                         "example": "TZS"
                                                     },
-                                                    "company": {
-                                                        "properties": {
-                                                            "id": {
-                                                                "type": "integer",
-                                                                "example": 1
-                                                            },
-                                                            "name": {
-                                                                "type": "string",
-                                                                "example": "TechCorp Ltd"
-                                                            }
-                                                        },
-                                                        "type": "object"
+                                                    "experience_level": {
+                                                        "type": "string",
+                                                        "example": "mid-level"
+                                                    },
+                                                    "education_level": {
+                                                        "type": "string",
+                                                        "example": "bachelor"
+                                                    },
+                                                    "is_remote": {
+                                                        "type": "boolean",
+                                                        "example": false
+                                                    },
+                                                    "deadline": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2025-12-31"
+                                                    },
+                                                    "views": {
+                                                        "type": "integer",
+                                                        "example": 120
+                                                    },
+                                                    "applications_count": {
+                                                        "type": "integer",
+                                                        "example": 15
+                                                    },
+                                                    "slug": {
+                                                        "type": "string",
+                                                        "example": "frontend-developer"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2025-09-11T12:24:38.000000Z"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2025-09-11T12:24:38.000000Z"
                                                     },
                                                     "job_post_type": {
                                                         "properties": {
@@ -5461,13 +5626,58 @@
                                                                     "type": "integer",
                                                                     "example": 1
                                                                 },
+                                                                "job_post_id": {
+                                                                    "type": "integer",
+                                                                    "example": 1
+                                                                },
                                                                 "skill_id": {
                                                                     "type": "integer",
-                                                                    "example": 2
+                                                                    "example": 3
+                                                                },
+                                                                "created_at": {
+                                                                    "type": "string",
+                                                                    "format": "date-time"
+                                                                },
+                                                                "updated_at": {
+                                                                    "type": "string",
+                                                                    "format": "date-time"
                                                                 }
                                                             },
                                                             "type": "object"
                                                         }
+                                                    },
+                                                    "company": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "Oneway Africa Technologies"
+                                                            },
+                                                            "website": {
+                                                                "type": "string",
+                                                                "example": "https://bilaza.com"
+                                                            },
+                                                            "industry": {
+                                                                "type": "string",
+                                                                "example": "Software"
+                                                            },
+                                                            "size_range": {
+                                                                "type": "string",
+                                                                "example": "11-50"
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "format": "date-time"
+                                                            },
+                                                            "updated_at": {
+                                                                "type": "string",
+                                                                "format": "date-time"
+                                                            }
+                                                        },
+                                                        "type": "object"
                                                     }
                                                 },
                                                 "type": "object"
@@ -5496,10 +5706,6 @@
                                         "code": {
                                             "type": "integer",
                                             "example": 404
-                                        },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {}
                                         }
                                     },
                                     "type": "object"
