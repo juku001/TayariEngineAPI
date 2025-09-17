@@ -172,7 +172,7 @@ class JobApplicationController extends Controller
 
         // Get all jobs posted by employer
         $jobs = JobPost::where('employer_id', $employer->id)
-            ->with('skills') // make sure this relation exists
+            ->with('jobSkills') // make sure this relation exists
             ->get();
 
         if ($jobs->isEmpty()) {
@@ -196,7 +196,7 @@ class JobApplicationController extends Controller
 
                 // Compare skills
                 $userSkillNames = $user->skills->pluck('name')->toArray();
-                $jobSkillNames = $jobPost->skills->pluck('name')->toArray();
+                $jobSkillNames = $jobPost->jobskills->pluck('name')->toArray();
                 $hasSkillMatch = count(array_intersect($userSkillNames, $jobSkillNames)) > 0;
 
                 // Points logic
