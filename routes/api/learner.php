@@ -5,10 +5,12 @@ use App\Http\Controllers\BadgeController;
 use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\CertificateShareController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\CourseRatingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\LearnerSkillController;
 use App\Http\Controllers\LessonController;
+use App\Http\Controllers\PopularController;
 use App\Http\Controllers\QuizController;
 
 Route::middleware(['auth:sanctum', 'user.type:learner'])->group(function () {
@@ -24,6 +26,7 @@ Route::middleware(['auth:sanctum', 'user.type:learner'])->group(function () {
     Route::get('/learning/progress', [LessonController::class, 'progress']);
     Route::get('/learner/skills', [LearnerSkillController::class, 'index']);
     Route::get('/learner/points', [LearnerSkillController::class, 'points']);
+    
 
 });
 
@@ -35,7 +38,13 @@ Route::prefix('courses')->group(function () {
     Route::get('/{id}', [CourseController::class, 'show']);
     Route::middleware(['auth:sanctum', 'user.type:learner'])->group(function () {
         Route::post('/{id}/enroll', [EnrollmentController::class, 'store']);
-        Route::post('/{id}/drop',[EnrollmentController::class, 'destroy']);
+        Route::post('/{id}/drop', [EnrollmentController::class, 'destroy']);
         Route::get('/{id}/progress', [EnrollmentController::class, 'progress']);
+        Route::get('/{id}/ratings',[CourseRatingController::class, 'index']);
+        Route::post('/{id}/ratings',[CourseRatingController::class, 'store']);
     });
 });
+
+Route::get('/popular/categories', [PopularController::class, 'category']);
+Route::get('/popular/courses', [PopularController::class, 'courses']);
+

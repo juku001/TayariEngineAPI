@@ -44,7 +44,7 @@ class JobPost extends Model
 
     public function jobPostType()
     {
-        return $this->belongsTo(JobPostType::class);
+        return $this->belongsTo(JobPostType::class, 'type_id');
     }
 
 

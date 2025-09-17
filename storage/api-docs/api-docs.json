@@ -1918,6 +1918,28 @@
                 "summary": "Fetch all courses",
                 "description": "Public endpoint. Returns a list of courses with instructor details, skills, lesson counts, total duration, and enrollment status.",
                 "operationId": "getCourses",
+                "parameters": [
+                    {
+                        "name": "category_id",
+                        "in": "query",
+                        "description": "Filter courses by category ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 3
+                        }
+                    },
+                    {
+                        "name": "category_name",
+                        "in": "query",
+                        "description": "Filter courses by category name (partial match allowed)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "Programming"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Successful response",
@@ -3379,6 +3401,298 @@
                 ]
             }
         },
+        "/courses/{id}/ratings": {
+            "get": {
+                "tags": [
+                    "Courses"
+                ],
+                "summary": "Get course ratings",
+                "description": "Fetch all ratings for a specific course including reviewer details, average rating, and total reviews.",
+                "operationId": "843c183e93356c57d34574efb1412ce7",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the course",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Ratings retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Course ratings retrieved successfully"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "course_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "course_name": {
+                                                    "type": "string",
+                                                    "example": "Intro to Programming"
+                                                },
+                                                "average_rating": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 4.5
+                                                },
+                                                "total_reviews": {
+                                                    "type": "integer",
+                                                    "example": 12
+                                                },
+                                                "ratings": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "user": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer",
+                                                                        "example": 5
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string",
+                                                                        "example": "John Doe"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            },
+                                                            "rating": {
+                                                                "type": "integer",
+                                                                "example": 5
+                                                            },
+                                                            "review": {
+                                                                "type": "string",
+                                                                "example": "Great course!"
+                                                            },
+                                                            "date": {
+                                                                "type": "string",
+                                                                "format": "date",
+                                                                "example": "2025-09-17"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Course not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Course not found"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Courses"
+                ],
+                "summary": "Add or update a course rating",
+                "description": "Allows a logged-in user to rate a course and optionally leave a review. If the user has already rated the course, it updates the existing rating.",
+                "operationId": "9305dab506363788d9aaf61f41a502ad",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the course to rate",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "rating": {
+                                        "description": "Rating from 1 to 5",
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "review": {
+                                        "description": "Optional review text",
+                                        "type": "string",
+                                        "example": "Great course!"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Rating saved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Rating saved successfully"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 201
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "user_id": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "course_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "rating": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "review": {
+                                                    "type": "string",
+                                                    "example": "Great course!"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 422
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Course not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Course not found"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/dashboard/admin": {
             "get": {
                 "tags": [
@@ -3519,11 +3833,11 @@
                     "Dashboard"
                 ],
                 "summary": "Get employer dashboard statistics",
-                "description": "Returns dashboard statistics for the authenticated employer, including active job posts, applications, team members, training status, and certificates.",
+                "description": "Returns a summary of active jobs, applications, team members, users in training, certificates, and their changes over time.",
                 "operationId": "89c99e1d7a134f23c6db638be1f23f30",
                 "responses": {
                     "200": {
-                        "description": "Employer dashboard statistics retrieved successfully",
+                        "description": "Dashboard stats retrieved successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3545,12 +3859,22 @@
                                                 "active": {
                                                     "description": "Number of active job posts",
                                                     "type": "integer",
-                                                    "example": 8
+                                                    "example": 12
+                                                },
+                                                "active_change": {
+                                                    "description": "Change in active jobs compared to last week",
+                                                    "type": "integer",
+                                                    "example": 2
                                                 },
                                                 "applications": {
-                                                    "description": "Number of job applications received",
+                                                    "description": "Total job applications received",
                                                     "type": "integer",
-                                                    "example": 152
+                                                    "example": 35
+                                                },
+                                                "applications_change": {
+                                                    "description": "Change in applications compared to last week",
+                                                    "type": "integer",
+                                                    "example": -1
                                                 },
                                                 "team_members": {
                                                     "properties": {
@@ -3560,17 +3884,22 @@
                                                             "example": 25
                                                         },
                                                         "in_training": {
-                                                            "description": "Number of team members currently in training",
+                                                            "description": "Number of users currently in training",
                                                             "type": "integer",
-                                                            "example": 7
+                                                            "example": 10
                                                         }
                                                     },
                                                     "type": "object"
                                                 },
                                                 "certificates": {
-                                                    "description": "Number of certificates earned by company members",
+                                                    "description": "Total certificates awarded",
                                                     "type": "integer",
-                                                    "example": 40
+                                                    "example": 15
+                                                },
+                                                "certificates_change": {
+                                                    "description": "Change in certificates compared to last month",
+                                                    "type": "integer",
+                                                    "example": 3
                                                 }
                                             },
                                             "type": "object"
@@ -3582,7 +3911,52 @@
                         }
                     },
                     "401": {
-                        "$ref": "#/components/responses/401"
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error: Something went wrong"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -4123,6 +4497,113 @@
                         "bearerAuth": []
                     }
                 ]
+            }
+        },
+        "/courses/{id}/drop": {
+            "post": {
+                "tags": [
+                    "Courses"
+                ],
+                "summary": "Drop an active course enrollment",
+                "description": "Allows a learner to drop an active enrollment. Only active enrollments can be dropped.",
+                "operationId": "33aefedd515f9b5bdbcb542b88b2eeff",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the course enrollment to drop",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Enrollment dropped successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Enrollment dropped successfully."
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "course_id": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "user_id": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "dropped"
+                                                },
+                                                "progress": {
+                                                    "type": "number",
+                                                    "example": 40
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-09-16T12:00:00Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-09-16T12:10:00Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Active enrollment not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Active enrollment not found."
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/instructor/applications": {
@@ -5185,9 +5666,13 @@
                                                                 "type": "integer",
                                                                 "example": 5
                                                             },
-                                                            "name": {
+                                                            "first_name": {
                                                                 "type": "string",
-                                                                "example": "Jane Doe"
+                                                                "example": "Jane"
+                                                            },
+                                                            "last_name": {
+                                                                "type": "string",
+                                                                "example": "Doe"
                                                             },
                                                             "email": {
                                                                 "type": "string",
@@ -5565,7 +6050,7 @@
                     "Employer"
                 ],
                 "summary": "Get all published jobs with search and filter",
-                "description": "Returns a list of published jobs. You can search by job title or company name and filter by job type (e.g. full-time, internship).",
+                "description": "Returns a list of published jobs. You can search by job title or company name and filter by job type (e.g. full-time, internship). Use trending to get the latest 4 jobs.",
                 "operationId": "a7b510a7df3b49aee8b863b787acbc33",
                 "parameters": [
                     {
@@ -5584,8 +6069,18 @@
                         "description": "Filter by job type (full-time, internship, etc.)",
                         "required": false,
                         "schema": {
-                            "type": "string",
-                            "example": "full-time"
+                            "type": "id",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "trending",
+                        "in": "query",
+                        "description": "If true, returns only the latest 4 published jobs",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "example": true
                         }
                     }
                 ],
@@ -6485,6 +6980,387 @@
                 }
             }
         },
+        "/job-types": {
+            "get": {
+                "tags": [
+                    "Job Types"
+                ],
+                "summary": "Get list of all job types",
+                "operationId": "508f7a832568009c2caaabd4850f5451",
+                "responses": {
+                    "200": {
+                        "description": "Job type list",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Job Type list"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Full-time"
+                                                    },
+                                                    "slug": {
+                                                        "type": "string",
+                                                        "example": "full-time"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Full-time employment"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Job Types"
+                ],
+                "summary": "Create a new job type",
+                "operationId": "5d456e318a9fa3a422c68cd525d7d580",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Internship"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Temporary work for interns"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Job type created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Job Type added successful"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 201
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Internship"
+                                                },
+                                                "slug": {
+                                                    "type": "string",
+                                                    "example": "internship"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Temporary work for interns"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/job-types/{id}": {
+            "get": {
+                "tags": [
+                    "Job Types"
+                ],
+                "summary": "Get details of a specific job type",
+                "operationId": "86062c2c2ab103757c0b432597b8fd4b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the job type",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Job type details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Job Type details"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Full-time"
+                                                },
+                                                "slug": {
+                                                    "type": "string",
+                                                    "example": "full-time"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Full-time employment"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Job type not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Job Type not found."
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Job Types"
+                ],
+                "summary": "Update an existing job type",
+                "operationId": "66be07fd9b173dae28ac1a9e9e98a2b1",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the job type",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Part-time"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Flexible part-time employment"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Job type updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Job Type updated successfully"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Part-time"
+                                                },
+                                                "slug": {
+                                                    "type": "string",
+                                                    "example": "part-time"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Flexible part-time employment"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Job type not found"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Job Types"
+                ],
+                "summary": "Delete a job type",
+                "operationId": "d2c6beb52963b32accc373c609eff75b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the job type",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Job type deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Job Type deleted successfully"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Job type not found"
+                    }
+                }
+            }
+        },
         "/learner/skills": {
             "get": {
                 "tags": [
@@ -7124,6 +8000,404 @@
                 }
             }
         },
+        "/applications/{id}/view": {
+            "post": {
+                "tags": [
+                    "Employer"
+                ],
+                "summary": "Mark application as reviewed and get applicant details",
+                "description": "Marks a specific job application as reviewed and returns details about the applicant, including certificates, skills, points, cover letter, and resume.",
+                "operationId": "e1d0e2ddcb36465fc051751c27f83818",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the job application",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Application details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Application marked as reviewed and details retrieved."
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "application": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "status": {
+                                                            "type": "string",
+                                                            "example": "reviewed"
+                                                        },
+                                                        "cover_letter": {
+                                                            "type": "string",
+                                                            "example": "https://storage.example.com/cover_letters/123.pdf"
+                                                        },
+                                                        "resume": {
+                                                            "type": "string",
+                                                            "example": "https://storage.example.com/resumes/123.pdf"
+                                                        },
+                                                        "created_at": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "example": "2025-09-17T12:00:00Z"
+                                                        },
+                                                        "updated_at": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "example": "2025-09-17T12:10:00Z"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "user": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 5
+                                                        },
+                                                        "first_name": {
+                                                            "type": "string",
+                                                            "example": "John"
+                                                        },
+                                                        "last_name": {
+                                                            "type": "string",
+                                                            "example": "John"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "example": "john@example.com"
+                                                        },
+                                                        "points": {
+                                                            "type": "integer",
+                                                            "example": 120
+                                                        },
+                                                        "cover_letter": {
+                                                            "type": "string",
+                                                            "example": "https://storage.example.com/cover_letters/123.pdf"
+                                                        },
+                                                        "resume": {
+                                                            "type": "string",
+                                                            "example": "https://storage.example.com/resumes/123.pdf"
+                                                        },
+                                                        "certificates": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "integer",
+                                                                        "example": 1
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string",
+                                                                        "example": "Laravel Mastery"
+                                                                    },
+                                                                    "issued_at": {
+                                                                        "type": "string",
+                                                                        "format": "date",
+                                                                        "example": "2025-05-20"
+                                                                    },
+                                                                    "file_path": {
+                                                                        "type": "string",
+                                                                        "example": "https://storage.example.com/certificates/123.pdf"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "skills": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "string",
+                                                                "example": "PHP"
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Application not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Application not found"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/applications/{id}/reject": {
+            "post": {
+                "tags": [
+                    "Employer"
+                ],
+                "summary": "Reject a job application",
+                "description": "Change the status of a job application to rejected.",
+                "operationId": "62347d037e074ed659e3ec1da3d62147",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the job application",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Application rejected successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Application rejected successfully"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Application not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Application not found"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/applications/{id}/invite": {
+            "post": {
+                "tags": [
+                    "Employer"
+                ],
+                "summary": "Shortlist a job applicant",
+                "description": "Change the status of a job application to shortlisted and send an email notification to the applicant.",
+                "operationId": "ee07fc59a0a04f4afffc374f3b9c1a0c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the job application",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Applicant shortlisted and notified",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Applicant shortlisted and notified via email"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Application not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Application not found"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/applications/{id}/accept": {
+            "post": {
+                "tags": [
+                    "Employer"
+                ],
+                "summary": "Accept a job applicant",
+                "description": "Change the status of a job application to accepted and send an email notification to the applicant.",
+                "operationId": "81682e95e0b82ec5b7b3ed9eaf0bac4b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the job application",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Applicant accepted and notified",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Applicant accepted and notified via email"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {}
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Application not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Application not found"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/auth/forgot_password": {
             "post": {
                 "tags": [
@@ -7444,6 +8718,212 @@
                         "bearerAuth": []
                     }
                 ]
+            }
+        },
+        "/popular/categories": {
+            "get": {
+                "tags": [
+                    "Miscellaneous"
+                ],
+                "summary": "Get top 5 popular categories",
+                "description": "Returns the 5 categories with the highest number of courses.",
+                "operationId": "1fa43ad238b2b0bcea186eec49bdb732",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Top 5 popular categories with course count"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Programming"
+                                                    },
+                                                    "count": {
+                                                        "description": "Number of courses in this category",
+                                                        "type": "integer",
+                                                        "example": 25
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/popular/courses": {
+            "get": {
+                "tags": [
+                    "Miscellaneous"
+                ],
+                "summary": "Get top 3 popular courses",
+                "description": "Fetches the top 3 courses ranked by number of enrollments, with their names, enrollment counts, and average ratings.",
+                "operationId": "104718aa0ff92ecd99205088ba4fe7ac",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Top 3 popular courses"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Intro to Programming"
+                                                    },
+                                                    "enrollments": {
+                                                        "type": "integer",
+                                                        "example": 150
+                                                    },
+                                                    "avg_rating": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 4.5
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/jobs/trending": {
+            "get": {
+                "tags": [
+                    "Employer"
+                ],
+                "summary": "Get trending jobs",
+                "description": "Returns the latest 4 trending jobs with status, location, salary range, and positions available.",
+                "operationId": "e747e1f8baf03d03eab5d17e397fbc2a",
+                "responses": {
+                    "200": {
+                        "description": "List of trending jobs",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Trending jobs"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Software Developer"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "Hot"
+                                                    },
+                                                    "location": {
+                                                        "type": "string",
+                                                        "example": "Remote"
+                                                    },
+                                                    "salary": {
+                                                        "type": "string",
+                                                        "example": "TZS 40,000,000 - TZS 80,000,000"
+                                                    },
+                                                    "positions_available": {
+                                                        "type": "integer",
+                                                        "example": 25
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error: Something went wrong"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/projects/{id}/review/start": {
@@ -12107,6 +13587,10 @@
         {
             "name": "Instructor",
             "description": "The API endpoint related to Instructor, from applications to getting approved/rejectd."
+        },
+        {
+            "name": "Job Types",
+            "description": "This API for the types of jobs. Eg Full time, Intership etc"
         },
         {
             "name": "Employer",

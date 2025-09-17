@@ -12,8 +12,8 @@ class Category extends Model
         'description'
     ];
 
-    public function course()
+    public function courses()
     {
-        return $this->hasOne(Course::class);
+        return $this->hasMany(Course::class);
     }
 }

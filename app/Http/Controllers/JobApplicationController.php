@@ -8,7 +8,10 @@ use App\Models\Employer;
 use App\Models\JobPost;
 use App\Models\JobPostApplication;
 use App\Models\User;
+use DB;
+use Exception;
 use Illuminate\Http\Request;
+use Validator;
 
 class JobApplicationController extends Controller
 {
@@ -253,7 +256,8 @@ class JobApplicationController extends Controller
      *                         property="user",
      *                         type="object",
      *                         @OA\Property(property="id", type="integer", example=5),
-     *                         @OA\Property(property="name", type="string", example="Jane Doe"),
+     *                         @OA\Property(property="first_name", type="string", example="Jane"),
+     *                         @OA\Property(property="last_name", type="string", example="Doe"),
      *                         @OA\Property(property="email", type="string", example="jane@example.com"),
      *                         @OA\Property(property="certificate_count", type="integer", example=2)
      *                     ),
@@ -327,7 +331,8 @@ class JobApplicationController extends Controller
                 'application_id' => $application->id,
                 'user' => [
                     'id' => $user->id,
-                    'name' => $user->name,
+                    'first_name' => $user->first_name,
+                    'last_name' => $user->last_name,
                     'email' => $user->email,
                     'certificate_count' => $certificateCount,
                 ],
@@ -436,11 +441,17 @@ class JobApplicationController extends Controller
     {
         $authId = auth()->id();
 
-        $validated = $request->validate([
+
+        $validator = Validator::make($request->all(), [
             'job_post_id' => 'required|exists:job_posts,id',
             'resume' => 'required|file|mimes:pdf,doc,docx|max:2048',
             'cover_letter' => 'required|file|mimes:pdf,doc,docx|max:2048',
         ]);
+
+        if ($validator->fails()) {
+            return ResponseHelper::error($validator->errors(), 'Failed to validate', 422);
+        }
+        $validated = $validator->validated();
 
         $alreadyApplied = JobPostApplication::where('job_post_id', $validated['job_post_id'])
             ->where('user_id', $authId)
@@ -450,19 +461,35 @@ class JobApplicationController extends Controller
             return ResponseHelper::error([], "You already applied for this job", 400);
         }
 
-        $resumePath = $request->file('resume')->store('resumes', 'public');
-        $coverLetterPath = $request->file('cover_letter')->store('cover_letters', 'public');
+        DB::beginTransaction();
+        try {
 
-        $application = JobPostApplication::create([
-            'job_post_id' => $validated['job_post_id'],
-            'user_id' => $authId,
-            'status' => 'pending',
-            'resume_path' => $resumePath,
-            'cover_letter' => $coverLetterPath,
-            'updated_by' => $authId,
-        ]);
+            $resumePath = $request->file('resume')->store('resumes', 'public');
+            $coverLetterPath = $request->file('cover_letter')->store('cover_letters', 'public');
 
-        return ResponseHelper::success($application, "Application submitted successfully");
+            $application = JobPostApplication::create([
+                'job_post_id' => $validated['job_post_id'],
+                'user_id' => $authId,
+                'status' => 'pending',
+                'resume_path' => $resumePath,
+                'cover_letter' => $coverLetterPath,
+                'updated_by' => $authId,
+            ]);
+
+            // $jobPost = JobPost::find($validated['job_post_id']);
+            // $applicationCount = $jobPost->applications_count;
+            // $jobPost->applications_count = $applicationCount + 1;
+            // $jobPost->save();
+
+
+            DB::commit();
+
+            return ResponseHelper::success($application, "Application submitted successfully");
+
+        } catch (Exception $e) {
+            DB::rollBack();
+            return ResponseHelper::error([], 'Error : ' . $e->getMessage());
+        }
     }
 
 

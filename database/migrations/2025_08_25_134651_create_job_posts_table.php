@@ -33,6 +33,7 @@ return new class extends Migration {
             $table->boolean('is_remote')->default(false);
             $table->date('deadline')->nullable();
 
+            $table->boolean('is_hot')->default(false);
             // Analytics
             $table->unsignedInteger('views')->default(0);
             $table->unsignedInteger('applications_count')->default(0);

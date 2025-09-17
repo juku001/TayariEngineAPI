@@ -38,7 +38,20 @@ class CourseController extends Controller
      *     tags={"Courses"},
      *     summary="Fetch all courses",
      *     description="Public endpoint. Returns a list of courses with instructor details, skills, lesson counts, total duration, and enrollment status.",
-     *
+     **     @OA\Parameter(
+     *         name="category_id",
+     *         in="query",
+     *         required=false,
+     *         description="Filter courses by category ID",
+     *         @OA\Schema(type="integer", example=3)
+     *     ),
+     *     @OA\Parameter(
+     *         name="category_name",
+     *         in="query",
+     *         required=false,
+     *         description="Filter courses by category name (partial match allowed)",
+     *         @OA\Schema(type="string", example="Programming")
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Successful response",
@@ -134,22 +147,32 @@ class CourseController extends Controller
 
     public function index(Request $request)
     {
-        $courses = Course::with([
+        $query = Course::with([
             'instructorUser',
             'skills',
             'modules.lessons',
-            'enrollments'
-        ])->get()->map(function ($course) use ($request) {
+            'enrollments',
+            'category'
+        ]);
 
+        if ($request->has('category_id') && !empty($request->category_id)) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        if ($request->has('category_name') && !empty($request->category_name)) {
+            $query->whereHas('category', function ($q) use ($request) {
+                $q->where('name', 'LIKE', "%{$request->category_name}%");
+            });
+        }
+
+        $courses = $query->get()->map(function ($course) use ($request) {
             $lessons = $course->modules->flatMap->lessons;
-
             $videoCount = $lessons->count();
             $totalDuration = $lessons->sum('duration');
 
             $progress = null;
             $isEnrolled = false;
 
-        
             $authUser = null;
             if ($token = $request->bearerToken()) {
                 if ($accessToken = PersonalAccessToken::findToken($token)) {
@@ -159,7 +182,7 @@ class CourseController extends Controller
 
             if ($authUser) {
                 $enrollment = $course->enrollments()
-                    ->where('user_id', $authUser->id)  
+                    ->where('user_id', $authUser->id)
                     ->first();
 
                 if ($enrollment) {
@@ -179,19 +202,23 @@ class CourseController extends Controller
                 'total_duration' => $totalDuration,
                 'instructor' => [
                     'id' => optional($course->instructorUser)->id,
-                    'name' =>
-                        optional($course->instructorUser)->id != null
+                    'name' => optional($course->instructorUser)->id != null
                         ? optional($course->instructorUser)->first_name . ' ' . optional($course->instructorUser)->last_name
                         : null,
                 ],
                 'skills' => $course->skills->pluck('name'),
                 'is_enrolled' => $isEnrolled,
                 'progress' => $progress,
+                'category' => [
+                    'id' => optional($course->category)->id,
+                    'name' => optional($course->category)->name,
+                ],
             ];
         });
 
         return ResponseHelper::success($courses, 'Courses retrieved successfully');
     }
+
 
 
 

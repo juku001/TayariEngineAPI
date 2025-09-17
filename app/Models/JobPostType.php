@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use PhpParser\Builder\Function_;
+use Illuminate\Support\Str;
 
 class JobPostType extends Model
 {
@@ -13,8 +13,25 @@ class JobPostType extends Model
         'description'
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
 
-    public function jobPost(){
+        static::creating(function ($model) {
+            if (empty($model->slug)) {
+                $model->slug = Str::slug($model->name);
+            }
+        });
+
+        static::updating(function ($model) {
+            if ($model->isDirty('name')) {
+                $model->slug = Str::slug($model->name);
+            }
+        });
+    }
+
+    public function jobPost()
+    {
         return $this->hasMany(JobPost::class);
     }
 }

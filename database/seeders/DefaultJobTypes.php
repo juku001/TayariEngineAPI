@@ -40,7 +40,6 @@ class DefaultJobTypes extends Seeder
         foreach ($jobPostTypes as $jbT) {
             JobPostType::create([
                 'name' => $jbT['name'],
-                'slug' => Str::slug($jbT['name']),
                 'description' => $jbT['desc']
             ]);
         }

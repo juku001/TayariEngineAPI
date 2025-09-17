@@ -145,6 +145,13 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
 
+
+    public function courseRatings()
+    {
+        return $this->hasMany(CourseRating::class);
+    }
+
+
     protected $appends = ['learner_points'];
 
     public function getLearnerPointsAttribute()

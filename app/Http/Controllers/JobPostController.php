@@ -48,7 +48,7 @@ class JobPostController extends Controller
      *         in="query",
      *         description="Filter by job type (full-time, internship, etc.)",
      *         required=false,
-     *         @OA\Schema(type="string", example="full-time")
+     *         @OA\Schema(type="id", example=1)
      *     ),
      *     @OA\Parameter(
      *         name="trending",
@@ -151,7 +151,7 @@ class JobPostController extends Controller
         if ($request->has('job_type') && !empty($request->job_type)) {
             $jobType = $request->job_type;
             $query->whereHas('jobPostType', function ($q) use ($jobType) {
-                $q->where('name', $jobType);
+                $q->where('id', $jobType);
             });
         }
 
@@ -349,7 +349,7 @@ class JobPostController extends Controller
             'description' => 'required|string',
             'city' => 'required|string|max:100',
             'country' => 'required|string|max:100',
-            'job_type' => 'required|in:full-time,project,flexible-virtual-hire,internship',
+            'job_type' => 'required|numeric|exists:job_post_types,id',
             'skills' => 'required|array|min:1',
             'skills.*' => 'integer|exists:skills,id',
 
@@ -361,7 +361,10 @@ class JobPostController extends Controller
             'education_level' => 'nullable|string|max:100',
             'is_remote' => 'boolean',
             'deadline' => 'nullable|date',
+            'no_of_vacancy' => 'nullable|numeric|min:0',
             'category_id' => 'nullable|integer|exists:categories,id',
+        ], [
+            'job_type.numeric' => 'Use the job type id'
         ]);
 
         if ($validator->fails()) {
@@ -378,13 +381,14 @@ class JobPostController extends Controller
                 return ResponseHelper::error([], 'Employer not found', 404);
             }
 
-            $typeId = null;
-            if ($request->has('job_type')) {
-                $type = JobPostType::where('slug', $request->job_type)->first();
-                if ($type) {
-                    $typeId = $type->id;
-                }
-            }
+            // $typeId = null;
+            // if ($request->has('job_type')) {
+            //     $type = JobPostType::where('slug', $request->job_type)->first();
+            //     if ($type) {
+            //         $typeId = $type->id;
+            //     }
+            // }
+            $typeId = $request->job_type;
 
             $job = JobPost::create([
                 'title' => $request->title,
@@ -403,6 +407,7 @@ class JobPostController extends Controller
                 'education_level' => $request->education_level,
                 'is_remote' => $request->is_remote ?? false,
                 'deadline' => $request->deadline,
+                'applications_count' => $request->no_of_vacancy,
                 'slug' => Str::slug($request->title) . '-' . uniqid(),
             ]);
 
@@ -520,7 +525,7 @@ class JobPostController extends Controller
             'description' => 'sometimes|required|string',
             'city' => 'sometimes|required|string|max:100',
             'country' => 'sometimes|required|string|max:100',
-            'job_type' => 'sometimes|required|in:full-time,project,flexible-virtual-hire,internship',
+            'job_type' => 'sometimes|required|exists:job_post_types,id',
             'skills' => 'sometimes|array|min:1',
             'skills.*' => 'integer|exists:skills,id',
 
@@ -533,6 +538,7 @@ class JobPostController extends Controller
             'deadline' => 'nullable|date',
             'category_id' => 'nullable|integer|exists:categories,id',
             'status' => 'nullable|in:draft,published,closed,expired',
+            'no_of_vacancy' => 'nullable|numeric|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -555,10 +561,10 @@ class JobPostController extends Controller
 
             $typeId = $job->type_id;
             if ($request->has('job_type')) {
-                $type = JobPostType::where('slug', $request->job_type)->first();
-                if ($type) {
-                    $typeId = $type->id;
-                }
+                //     $type = JobPostType::where('slug', $request->job_type)->first();
+                //     if ($type) {
+                $typeId = $request->job_type;
+                //     }
             }
 
             $job->update([
@@ -575,6 +581,7 @@ class JobPostController extends Controller
                 'is_remote' => $request->is_remote ?? $job->is_remote,
                 'deadline' => $request->deadline ?? $job->deadline,
                 'category_id' => $request->category_id ?? $job->category_id,
+                'applications_count' => $request->no_of_vacancy ?? $job->applications_count,
                 'status' => $request->status ?? $job->status,
             ]);
 

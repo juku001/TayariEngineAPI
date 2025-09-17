@@ -154,6 +154,10 @@ namespace App\Http\Controllers;
  *     description="The API endpoint related to Instructor, from applications to getting approved/rejectd."
  * ),
    * @OA\Tag(
+ *     name="Job Types",
+ *     description="This API for the types of jobs. Eg Full time, Intership etc"
+ * ),
+   * @OA\Tag(
  *     name="Employer",
  *     description="Employers related APIs. From the registration, Team Management and Course Assignments."
  * ),

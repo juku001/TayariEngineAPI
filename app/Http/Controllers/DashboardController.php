@@ -207,39 +207,58 @@ class DashboardController extends Controller
      *     path="/dashboard/employer",
      *     tags={"Dashboard"},
      *     summary="Get employer dashboard statistics",
-     *     description="Returns dashboard statistics for the authenticated employer, including active job posts, applications, team members, training status, and certificates.",
+     *     description="Returns a summary of active jobs, applications, team members, users in training, certificates, and their changes over time.",
      *     security={{"bearerAuth":{}}},
      *
      *     @OA\Response(
      *         response=200,
-     *         description="Employer dashboard statistics retrieved successfully",
+     *         description="Dashboard stats retrieved successfully",
      *         @OA\JsonContent(
+     *             type="object",
      *             @OA\Property(property="status", type="boolean", example=true),
      *             @OA\Property(property="message", type="string", example="Employer stats dashboard"),
      *             @OA\Property(property="code", type="integer", example=200),
      *             @OA\Property(
      *                 property="data",
      *                 type="object",
-     *                 @OA\Property(property="active", type="integer", example=8, description="Number of active job posts"),
-     *                 @OA\Property(property="applications", type="integer", example=152, description="Number of job applications received"),
+     *                 @OA\Property(property="active", type="integer", example=12, description="Number of active job posts"),
+     *                 @OA\Property(property="active_change", type="integer", example=2, description="Change in active jobs compared to last week"),
+     *                 @OA\Property(property="applications", type="integer", example=35, description="Total job applications received"),
+     *                 @OA\Property(property="applications_change", type="integer", example=-1, description="Change in applications compared to last week"),
      *                 @OA\Property(
      *                     property="team_members",
      *                     type="object",
      *                     @OA\Property(property="count", type="integer", example=25, description="Total team members"),
-     *                     @OA\Property(property="in_training", type="integer", example=7, description="Number of team members currently in training")
+     *                     @OA\Property(property="in_training", type="integer", example=10, description="Number of users currently in training")
      *                 ),
-     *                 @OA\Property(property="certificates", type="integer", example=40, description="Number of certificates earned by company members")
+     *                 @OA\Property(property="certificates", type="integer", example=15, description="Total certificates awarded"),
+     *                 @OA\Property(property="certificates_change", type="integer", example=3, description="Change in certificates compared to last month")
      *             )
      *         )
      *     ),
-     *     
      *     @OA\Response(
-     *       response=401,
-     *       description="Unauthroized",
-     *       ref="#/components/responses/401"
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Unauthorized"),
+     *             @OA\Property(property="code", type="integer", example=401)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Error: Something went wrong"),
+     *             @OA\Property(property="code", type="integer", example=500)
+     *         )
      *     )
      * )
      */
+
 
     public function employer()
     {
@@ -247,24 +266,42 @@ class DashboardController extends Controller
         $employer = Employer::where('user_id', $authId)->firstOrFail();
         $companyId = $employer->company_id;
 
+        $now = now();
+        $lastWeek = $now->copy()->subWeek();
+        $lastMonth = $now->copy()->subMonth();
 
+        // Active jobs
         $active = JobPost::where('company_id', $companyId)
             ->where('status', 'published')
             ->count();
 
+        $activeLastWeek = JobPost::where('company_id', $companyId)
+            ->where('status', 'published')
+            ->whereBetween('created_at', [$lastWeek, $now])
+            ->count();
 
+        $activeChange = $active - $activeLastWeek;
+
+        // Applications
         $applications = JobPostApplication::whereHas('jobPost', function ($q) use ($companyId) {
             $q->where('company_id', $companyId);
         })->count();
 
+        $applicationsLastWeek = JobPostApplication::whereHas('jobPost', function ($q) use ($companyId, $lastWeek, $now) {
+            $q->where('company_id', $companyId)
+                ->whereBetween('created_at', [$lastWeek, $now]);
+        })->count();
 
+        $applicationsChange = $applications - $applicationsLastWeek;
+
+        // Team members
         $teamMembers = DB::table('employer_team_members as etm')
             ->join('teams as t', 'etm.team_id', '=', 't.id')
             ->where('t.company_id', $companyId)
             ->distinct('etm.user_id')
             ->count('etm.user_id');
 
-
+        // Users in training
         $training = User::query()
             ->select('users.*')
             ->join('enrollments as e', 'users.id', '=', 'e.user_id')
@@ -274,10 +311,7 @@ class DashboardController extends Controller
             ->distinct()
             ->count();
 
-
-
-
-
+        // Certificates
         $certificates = User::query()
             ->whereHas('employerTeamMembers.team', function ($q) use ($companyId) {
                 $q->where('company_id', $companyId);
@@ -286,15 +320,28 @@ class DashboardController extends Controller
             ->with('certificates')
             ->count();
 
+        $certificatesLastMonth = User::query()
+            ->whereHas('employerTeamMembers.team', function ($q) use ($companyId) {
+                $q->where('company_id', $companyId);
+            })
+            ->whereHas('certificates', function ($q) use ($lastMonth, $now) {
+                $q->whereBetween('created_at', [$lastMonth, $now]);
+            })
+            ->count();
+
+        $certificatesChange = $certificates - $certificatesLastMonth;
 
         $data = [
             "active" => $active,
+            'active_change' => $activeChange,
             "applications" => $applications,
+            'applications_change' => $applicationsChange,
             "team_members" => [
                 "count" => $teamMembers,
                 "in_training" => $training
             ],
-            "certificates" => $certificates
+            "certificates" => $certificates,
+            "certificates_change" => $certificatesChange,
         ];
 
         return ResponseHelper::success($data, 'Employer stats dashboard');
@@ -343,7 +390,7 @@ class DashboardController extends Controller
 
         $employer = Employer::where('user_id', $authId)->first();
         $companyId = $employer->company_id;
-        
+
 
         $teamMembers = EmployerTeamMember::query()
             ->whereHas('team', function ($q) use ($companyId) {

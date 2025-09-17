@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class   Course extends Model
+class Course extends Model
 {
     protected $fillable = [
         'name',
@@ -66,5 +66,11 @@ class   Course extends Model
     public function skills()
     {
         return $this->belongsToMany(Skill::class, 'course_skills', 'course_id', 'skill_id');
+    }
+
+
+    public function ratings()
+    {
+        return $this->hasMany(CourseRating::class);
     }
 }
