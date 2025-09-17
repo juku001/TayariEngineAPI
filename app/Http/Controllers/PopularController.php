@@ -32,6 +32,7 @@ class PopularController extends Controller
      *                     type="object",
      *                     @OA\Property(property="id", type="integer", example=1),
      *                     @OA\Property(property="name", type="string", example="Programming"),
+     *                     @OA\Property(property="slug", type="string", example="programming"),
      *                     @OA\Property(property="count", type="integer", example=25, description="Number of courses in this category")
      *                 )
      *             )
@@ -51,6 +52,7 @@ class PopularController extends Controller
             return [
                 'id' => $category->id,
                 'name' => $category->name,
+                'slug' => $category->slug,
                 'count' => $category->courses_count,
             ];
         });

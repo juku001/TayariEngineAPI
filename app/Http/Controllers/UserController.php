@@ -310,14 +310,14 @@ class UserController extends Controller
             ];
 
             $user->first_name = 'Deleted User';
-            $user->last_name = null;
+            $user->last_name = 'Deleted Last';
             $user->email = 'deleted_' . $user->id . '_' . uniqid() . '@tayari.local';
             $user->mobile = null;
             $user->status = 'deleted';
             $user->deleted_by = $request->user()->id ?? null;
 
             $user->save();
-            $user->delete(); // SoftDeletes
+            // $user->delete(); // SoftDeletes
 
             DB::commit();
             return ResponseHelper::success(['id' => $user->id], 'User deleted successfully');

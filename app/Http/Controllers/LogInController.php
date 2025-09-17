@@ -128,6 +128,12 @@ class LogInController extends Controller
             return
                 ResponseHelper::error([], 'Account does not exist.', 404);
         }
+
+        if ($user->status !== 'active') {
+            return ResponseHelper::error([], "Your account is " . ucfirst($user->status), 400);
+        }
+
+
         if (!Hash::check($request->password, $user->password)) {
             return ResponseHelper::error(
                 [],
