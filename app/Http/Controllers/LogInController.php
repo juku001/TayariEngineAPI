@@ -152,7 +152,7 @@ class LogInController extends Controller
 
 
     /**
-     * @OA\Get(
+     * @OA\Post(
      *     path="/auth/google",
      *     summary="Redirect to Google OAuth",
      *     description="Starts the Google OAuth flow by redirecting the user to Google's login/consent screen.",
