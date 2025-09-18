@@ -15,7 +15,7 @@ class ProposalController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/project/proposals",
+     *     path="/projects/proposals",
      *     tags={"Projects"},
      *     summary="Get list of proposals submitted by the logged-in freelancer",
      *     security={{"bearerAuth":{}}},
@@ -116,7 +116,7 @@ class ProposalController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/project/proposals",
+     *     path="/projects/proposals",
      *     tags={"Projects"},
      *     summary="Submit a proposal for a project",
      *     security={{"bearerAuth":{}}},
@@ -198,7 +198,7 @@ class ProposalController extends Controller
 
     /**
      * @OA\Patch(
-     *     path="/project/proposals/feedback/{proposalId}",
+     *     path="/projects/proposals/feedback/{proposalId}",
      *     tags={"Projects"},
      *     summary="Employer feedback on a proposal (accept or deny)",
      *     security={{"bearerAuth":{}}},

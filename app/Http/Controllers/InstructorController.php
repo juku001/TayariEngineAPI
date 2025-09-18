@@ -413,6 +413,7 @@ class InstructorController extends Controller
      * )
      */
 
+
     public function store(Request $request)
     {
         $pendingFields = [];
@@ -426,10 +427,8 @@ class InstructorController extends Controller
         }
 
         if (!empty($pendingFields)) {
-            $fieldList = implode(' and ', $pendingFields);
             return ResponseHelper::error([], "You already have a pending application. Please wait for them to be processed.", 400);
         }
-
 
         $validator = Validator::make($request->all(), [
             'fullname' => 'required|string|max:255',
@@ -470,6 +469,22 @@ class InstructorController extends Controller
                 'status' => 'pending',
             ]);
 
+            // Send raw email to admin
+            Mail::raw(
+                "A new instructor application has been submitted.\n\n" .
+                "Name: {$application->name}\n" .
+                "Email: {$application->email}\n" .
+                "Phone: {$application->phone_number}\n" .
+                "Profession: {$application->profession}\n" .
+                "Experience: {$application->experience}\n" .
+                "Interests: {$application->interests}\n" .
+                "Additional Info: {$application->additional_info}",
+                function ($message) {
+                    $message->to('info@tayari.work')
+                        ->subject('New Instructor Application');
+                }
+            );
+
             return ResponseHelper::success(
                 $application,
                 'Application submitted successfully. Please wait for admin review.',
@@ -480,6 +495,7 @@ class InstructorController extends Controller
             return ResponseHelper::error([], "Error : {$e->getMessage()}", 500);
         }
     }
+
 
 
 
