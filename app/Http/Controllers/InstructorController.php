@@ -480,7 +480,7 @@ class InstructorController extends Controller
                 "Interests: {$application->interests}\n" .
                 "Additional Info: {$application->additional_info}",
                 function ($message) {
-                    $message->to('info@tayari.work')
+                    $message->to('ideas@smartlab.co.tz')
                         ->subject('New Instructor Application');
                 }
             );
