@@ -163,4 +163,9 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
 
+    public function savedJobs()
+    {
+        return $this->hasMany(SavedJob::class, 'user_id');
+    }
+
 }

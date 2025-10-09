@@ -161,7 +161,10 @@ namespace App\Http\Controllers;
  *     name="Employer",
  *     description="Employers related APIs. From the registration, Team Management and Course Assignments."
  * ),
- * 
+ * @OA\Tag(
+ *     name="Saved Jobs",
+ *     description="Endpoints for managing user saved jobs"
+ * ),
  * @OA\Tag(
  *     name="Projects",
  *     description="Project APIs for the Employers. Viewing projects, sending proposals, accept and deny for proposals. "

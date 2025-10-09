@@ -6184,6 +6184,10 @@
                                                         "format": "date-time",
                                                         "example": "2025-09-11T12:24:38.000000Z"
                                                     },
+                                                    "is_saved": {
+                                                        "type": "boolean",
+                                                        "example": false
+                                                    },
                                                     "job_post_type": {
                                                         "properties": {
                                                             "id": {
@@ -6667,6 +6671,10 @@
                                                     "type": "boolean",
                                                     "example": false
                                                 },
+                                                "is_saved": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
                                                 "deadline": {
                                                     "type": "string",
                                                     "format": "date-time",
@@ -6843,6 +6851,10 @@
                                         "example": "Masters"
                                     },
                                     "is_remote": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "is_saved": {
                                         "type": "boolean",
                                         "example": false
                                     },
@@ -7872,7 +7884,7 @@
             }
         },
         "/auth/google": {
-            "get": {
+            "post": {
                 "tags": [
                     "Authentication"
                 ],
@@ -8758,6 +8770,10 @@
                                                     "name": {
                                                         "type": "string",
                                                         "example": "Programming"
+                                                    },
+                                                    "slug": {
+                                                        "type": "string",
+                                                        "example": "programming"
                                                     },
                                                     "count": {
                                                         "description": "Number of courses in this category",
@@ -10023,13 +10039,13 @@
                 }
             }
         },
-        "/project/proposals": {
+        "/projects/proposals": {
             "get": {
                 "tags": [
                     "Projects"
                 ],
                 "summary": "Get list of proposals submitted by the logged-in freelancer",
-                "operationId": "158005abbc73fc326f5622dd9e8fe0cb",
+                "operationId": "334889ba83ed42701c19a454f4251c20",
                 "responses": {
                     "200": {
                         "description": "List of proposals retrieved successfully",
@@ -10248,7 +10264,7 @@
                     "Projects"
                 ],
                 "summary": "Submit a proposal for a project",
-                "operationId": "dabea70f9b695ae3fba4d664fb6602be",
+                "operationId": "244654283402bec61d6444e28726c67a",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -10366,13 +10382,13 @@
                 ]
             }
         },
-        "/project/proposals/feedback/{proposalId}": {
+        "/projects/proposals/feedback/{proposalId}": {
             "patch": {
                 "tags": [
                     "Projects"
                 ],
                 "summary": "Employer feedback on a proposal (accept or deny)",
-                "operationId": "a693f7906bc7b6fe5ba6832a5ec7f96e",
+                "operationId": "493fa77c5d3e66be2028ed6c6b663931",
                 "parameters": [
                     {
                         "name": "proposalId",
@@ -11076,6 +11092,253 @@
                         "$ref": "#/components/responses/500"
                     }
                 }
+            }
+        },
+        "/saved-jobs": {
+            "get": {
+                "tags": [
+                    "Saved Jobs"
+                ],
+                "summary": "Get all saved jobs for the authenticated user",
+                "operationId": "ae931aec7632191704c8ad7f2ef3504e",
+                "responses": {
+                    "200": {
+                        "description": "List of all saved jobs",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "List of all saved jobs."
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "user_id": {
+                                                        "type": "integer",
+                                                        "example": 2
+                                                    },
+                                                    "job_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "example": "2025-10-09T07:45:53.000000Z"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "example": "2025-10-09T07:45:53.000000Z"
+                                                    },
+                                                    "job": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "Full Stack Developer"
+                                                            },
+                                                            "description": {
+                                                                "type": "string",
+                                                                "example": "Get a Job for free my dear."
+                                                            },
+                                                            "city": {
+                                                                "type": "string",
+                                                                "example": "Dar es Salaam"
+                                                            },
+                                                            "country": {
+                                                                "type": "string",
+                                                                "example": "Tanzania"
+                                                            },
+                                                            "type_id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "employer_id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "company_id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "category_id": {
+                                                                "type": "integer",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            },
+                                                            "status": {
+                                                                "type": "string",
+                                                                "example": "published"
+                                                            },
+                                                            "salary_min": {
+                                                                "type": "number",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            },
+                                                            "salary_max": {
+                                                                "type": "number",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            },
+                                                            "currency": {
+                                                                "type": "string",
+                                                                "example": "TZS"
+                                                            },
+                                                            "experience_level": {
+                                                                "type": "string",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            },
+                                                            "education_level": {
+                                                                "type": "string",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            },
+                                                            "is_remote": {
+                                                                "type": "boolean",
+                                                                "example": false
+                                                            },
+                                                            "deadline": {
+                                                                "type": "string",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            },
+                                                            "views": {
+                                                                "type": "integer",
+                                                                "example": 0
+                                                            },
+                                                            "applications_count": {
+                                                                "type": "integer",
+                                                                "example": 0
+                                                            },
+                                                            "slug": {
+                                                                "type": "string",
+                                                                "example": "full-stack-developer-68c9c6c198d8c"
+                                                            },
+                                                            "deleted_at": {
+                                                                "type": "string",
+                                                                "example": null,
+                                                                "nullable": true
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "example": "2025-09-16T20:21:21.000000Z"
+                                                            },
+                                                            "updated_at": {
+                                                                "type": "string",
+                                                                "example": "2025-09-17T04:36:58.000000Z"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Saved Jobs"
+                ],
+                "summary": "Save or remove a job (toggle)",
+                "operationId": "d84a8ef7e7ef541f0f764d46a888583b",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "job_id"
+                                ],
+                                "properties": {
+                                    "job_id": {
+                                        "type": "integer",
+                                        "example": 5
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Saved post updated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Saved post updated."
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "action": {
+                                                    "type": "string",
+                                                    "example": "added"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/422"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/skills": {
@@ -13595,6 +13858,10 @@
         {
             "name": "Employer",
             "description": "Employers related APIs. From the registration, Team Management and Course Assignments."
+        },
+        {
+            "name": "Saved Jobs",
+            "description": "Endpoints for managing user saved jobs"
         },
         {
             "name": "Projects",

@@ -10,6 +10,7 @@ use App\Http\Controllers\PopularController;
 use App\Http\Controllers\ProjectActivityController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProposalController;
+use App\Http\Controllers\SavedJobsController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TrainingController;
 
@@ -69,7 +70,8 @@ Route::middleware(['auth:sanctum', 'user.type:learner'])->group(function () {
 
     Route::post('/jobs/apply', [JobApplicationController::class, 'apply']);
 
-
+    Route::get('/saved-jobs', [SavedJobsController::class, 'index']);
+    Route::post('/saved-jobs',[SavedJobsController::class, 'store']);
 
     Route::post('/projects/{id}/start', [ProjectActivityController::class, 'learnerStart']);
     Route::post('/projects/{id}/complete', [ProjectActivityController::class, 'learnerComplete']);
@@ -95,3 +97,4 @@ Route::resource('/job-types', JobTypeController::class);
 
 
 Route::get('/jobs/trending', [PopularController::class, 'trending']);
+

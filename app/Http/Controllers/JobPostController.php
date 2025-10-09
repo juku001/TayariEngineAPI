@@ -86,6 +86,7 @@ class JobPostController extends Controller
      *                     @OA\Property(property="slug", type="string", example="frontend-developer"),
      *                     @OA\Property(property="created_at", type="string", format="date-time", example="2025-09-11T12:24:38.000000Z"),
      *                     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-09-11T12:24:38.000000Z"),
+     *                     @OA\Property(property="is_saved", type="boolean", example=false),
      *                     @OA\Property(property="job_post_type", type="object",
      *                         @OA\Property(property="id", type="integer", example=1),
      *                         @OA\Property(property="name", type="string", example="full-time")
@@ -457,6 +458,7 @@ class JobPostController extends Controller
      *             @OA\Property(property="experience_level", type="string", example="Senior"),
      *             @OA\Property(property="education_level", type="string", example="Masters"),
      *             @OA\Property(property="is_remote", type="boolean", example=false),
+     *             @OA\Property(property="is_saved", type="boolean", example=false),
      *             @OA\Property(property="deadline", type="string", format="date", example="2026-01-15"),
      *             @OA\Property(property="category_id", type="integer", example=2),
      *             @OA\Property(property="status", type="string", enum={"draft","published","closed","expired"}, example="closed")
@@ -641,6 +643,7 @@ class JobPostController extends Controller
      *                 @OA\Property(property="status", type="string", example="published"),
      *                 @OA\Property(property="currency", type="string", example="TZS"),
      *                 @OA\Property(property="is_remote", type="boolean", example=false),
+     *                 @OA\Property(property="is_saved", type="boolean", example=false),
      *                 @OA\Property(property="deadline", type="string", format="date-time", nullable=true, example=null),
      *                 @OA\Property(property="views", type="integer", example=0),
      *                 @OA\Property(property="applications_count", type="integer", example=0),
