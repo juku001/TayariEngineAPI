@@ -20,11 +20,14 @@ class Project extends Model
         'currency',
         'deadline',
         'views',
-        'proposal_count',
         'slug',
     ];
 
+    protected $appends = ['proposal_count'];
 
+    /**
+     * Relationships
+     */
     public function projectSkills()
     {
         return $this->hasMany(ProjectSkill::class);
@@ -43,5 +46,14 @@ class Project extends Model
     public function company()
     {
         return $this->belongsTo(Company::class);
+    }
+
+    public function getProposalCountAttribute()
+    {
+        if ($this->relationLoaded('projectProposals')) {
+            return $this->projectProposals->count();
+        }
+
+        return $this->projectProposals()->count();
     }
 }

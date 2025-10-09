@@ -8,6 +8,7 @@ use App\Models\Employer;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class ProjectController extends Controller
 {
@@ -321,13 +322,42 @@ class ProjectController extends Controller
      * )
      */
 
+
+
     public function show($id)
     {
         try {
-            $project = Project::with('projectSkills')->find($id);
+            $project = Project::with(['projectSkills'])->find($id);
 
             if (!$project) {
                 return ResponseHelper::error([], "Project not found", 404);
+            }
+
+            $user = null;
+            $token = Request::bearerToken();
+
+            if ($token) {
+                $accessToken = PersonalAccessToken::findToken($token);
+                if ($accessToken) {
+                    $user = $accessToken->tokenable;
+                }
+            }
+
+            $shouldIncrementViews = false;
+
+            if (!$user) {
+                $shouldIncrementViews = true;
+            } else {
+                $allowedRoles = ['admin', 'employee'];
+                $userRoles = $user->roles->pluck('name')->toArray() ?? [];
+                $hasDisallowedRole = !empty(array_intersect($allowedRoles, $userRoles));
+                if (!$hasDisallowedRole) {
+                    $shouldIncrementViews = true;
+                }
+            }
+
+            if ($shouldIncrementViews) {
+                $project->increment('views');
             }
 
             return ResponseHelper::success($project, "Project details");
@@ -335,6 +365,7 @@ class ProjectController extends Controller
             return ResponseHelper::error([], "Failed to fetch project: " . $e->getMessage(), 500);
         }
     }
+
 
 
 
