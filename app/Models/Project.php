@@ -34,4 +34,14 @@ class Project extends Model
     {
         return $this->hasMany(ProjectProposal::class);
     }
+
+    public function employer()
+    {
+        return $this->belongsTo(Employer::class);
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
 }
