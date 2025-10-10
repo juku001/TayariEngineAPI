@@ -174,6 +174,7 @@ class PopularController extends Controller
                 }
 
                 return [
+                    'id'=> $job->id,
                     'title' => $job->title,
                     'status' => $statusLabel,
                     'location' => $job->is_remote ? 'Remote' : "{$job->city}, {$job->country}",
