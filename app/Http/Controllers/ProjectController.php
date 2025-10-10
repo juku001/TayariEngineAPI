@@ -207,7 +207,7 @@ class ProjectController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'description' => 'required|string',
             'duration_min' => 'required|integer|min:1',
             'duration_max' => 'nullable|integer|min:1',
             'duration_unit' => 'required|string|in:days,weeks,months,years',
@@ -324,7 +324,7 @@ class ProjectController extends Controller
 
 
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
         try {
             $project = Project::with(['projectSkills'])->find($id);
@@ -334,7 +334,7 @@ class ProjectController extends Controller
             }
 
             $user = null;
-            $token = Request::bearerToken();
+            $token = $request->bearerToken();
 
             if ($token) {
                 $accessToken = PersonalAccessToken::findToken($token);
