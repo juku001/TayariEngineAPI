@@ -31,7 +31,7 @@ class JobPost extends Model
         'slug'
     ];
 
-    protected $appends = ['is_saved'];
+    protected $appends = ['is_saved', 'applicants_count'];
 
     public function employer()
     {
@@ -83,6 +83,12 @@ class JobPost extends Model
         return $this->savedJobs()
             ->where('user_id', $user->id)
             ->exists();
+    }
+
+
+    public function getApplicantsCountAtribute()
+    {
+        return 3;
     }
 
 }

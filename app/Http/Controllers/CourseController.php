@@ -1031,6 +1031,11 @@ class CourseController extends Controller
                                     'id' => $lesson->id,
                                     'title' => $lesson->title,
                                     'duration' => $lesson->duration,
+                                    'description' => $lesson->description,
+                                    'content_type' => $lesson->content_type,
+                                    'content_url' => $lesson->content_url,
+                                    'content_text' => $lesson->content_text,
+                                                                        'order' => $lesson->order,
                                 ];
                             }),
                         ];
