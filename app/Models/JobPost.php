@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 use Laravel\Sanctum\PersonalAccessToken;
 
@@ -64,31 +63,31 @@ class JobPost extends Model
     }
 
 
-
-
     public function getIsSavedAttribute()
     {
-        $user = null;
         $token = Request::bearerToken();
-
-        if ($token) {
-            $accessToken = PersonalAccessToken::findToken($token);
-            if ($accessToken) {
-                $user = $accessToken->tokenable; // authenticated user
-            }
+        if (!$token) {
+            return false;
         }
+
+        $accessToken = PersonalAccessToken::findToken($token);
+        if (!$accessToken) {
+            return false;
+        }
+
+        $user = $accessToken->tokenable;
         if (!$user) {
             return false;
         }
+
         return $this->savedJobs()
             ->where('user_id', $user->id)
             ->exists();
     }
 
 
-    public function getApplicantsCountAtribute()
+    public function getApplicantsCountAttribute()
     {
-        return 3;
+        return $this->applications()->count();
     }
-
 }
