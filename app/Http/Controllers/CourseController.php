@@ -1002,7 +1002,7 @@ class CourseController extends Controller
             ])->find($id);
         } else {
             // Slim version
-            $course = Course::with(['modules.lessons:id,module_id,title,duration'])->find($id);
+            $course = Course::with(['modules.lessons'])->find($id);
 
             if ($course) {
                 // Calculate totals
