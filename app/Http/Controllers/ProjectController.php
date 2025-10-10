@@ -348,7 +348,7 @@ class ProjectController extends Controller
             if (!$user) {
                 $shouldIncrementViews = true;
             } else {
-                $allowedRoles = ['admin', 'employee'];
+                $allowedRoles = ['super_admin', 'admin', 'employer'];
                 $userRoles = $user->roles->pluck('name')->toArray() ?? [];
                 $hasDisallowedRole = !empty(array_intersect($allowedRoles, $userRoles));
                 if (!$hasDisallowedRole) {
