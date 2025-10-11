@@ -25,8 +25,6 @@ Route::middleware(['auth:sanctum', 'user.type:employer'])->group(function () {
     Route::post('projects', [ProjectController::class, 'store']);
 
     Route::get('/jobs/companies/{id}', [JobPostController::class, 'companies']);
-
-    Route::get('/jobs-trending',[JobPostController::class, 'trending']);
     Route::get('/jobs/recent', [JobApplicationController::class, 'recent']);
     Route::get('/jobs/candidates', [JobApplicationController::class, 'candidates']);
     Route::get('/jobs/applications', [JobApplicationController::class, 'applications']);
@@ -84,7 +82,7 @@ Route::get('jobs/{id}', [JobPostController::class, 'show'])->whereNumber('id');
 Route::get('projects', [ProjectController::class, 'index']);
 Route::get('/projects/{id}', [ProjectController::class, 'show'])->whereNumber('id');
 
-
+    Route::get('/jobs-trending',[JobPostController::class, 'trending']);
 
 
 Route::middleware(['auth:sanctum', 'user.type:employer'])->group(function () {
