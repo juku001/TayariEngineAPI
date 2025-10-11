@@ -2045,12 +2045,19 @@
                                             "description": "Learn the basics of programming with hands-on examples.",
                                             "price": 49.99,
                                             "rating": 4.5,
+                                            "ratings_count": 30,
                                             "cover_image": "https://cdn.example.com/images/course1.jpg",
                                             "videos_count": 12,
+                                            "students_count": 12,
                                             "total_duration": 3600,
                                             "instructor": {
                                                 "id": 5,
                                                 "name": "John Doe"
+                                            },
+                                            "category": {
+                                                "id": 2,
+                                                "name": "Technology & Programming",
+                                                "slug": "Tech"
                                             },
                                             "skills": [
                                                 "PHP",
@@ -2065,12 +2072,19 @@
                                             "description": "Master advanced design systems and UX best practices.",
                                             "price": 79.99,
                                             "rating": 4.7,
+                                            "ratings_count": 3,
                                             "cover_image": "https://cdn.example.com/images/course2.jpg",
                                             "videos_count": 20,
+                                            "students_count": 1,
                                             "total_duration": 5400,
                                             "instructor": {
                                                 "id": 6,
                                                 "name": "Jane Smith"
+                                            },
+                                            "category": {
+                                                "id": 2,
+                                                "name": "UI/UX Design",
+                                                "slug": "Design"
                                             },
                                             "skills": [
                                                 "UI/UX",
@@ -2301,7 +2315,7 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
                                 "required": [
                                     "title",
@@ -2315,6 +2329,10 @@
                                         "type": "string",
                                         "example": "Introduction to Web Development"
                                     },
+                                    "subtitle": {
+                                        "type": "string",
+                                        "example": "The Basic Web Dev Languages."
+                                    },
                                     "description": {
                                         "type": "string",
                                         "example": "Learn the basics of web development including HTML, CSS, and JavaScript."
@@ -2323,6 +2341,43 @@
                                         "description": "Thumbnail image file",
                                         "type": "string",
                                         "format": "binary"
+                                    },
+                                    "objectives": {
+                                        "description": "List of course objectives",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "example": "Learn HTML"
+                                        }
+                                    },
+                                    "language": {
+                                        "type": "string",
+                                        "example": "English,Swahili"
+                                    },
+                                    "is_featured": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "category_id": {
+                                        "type": "integer",
+                                        "example": 3
+                                    },
+                                    "duration": {
+                                        "type": "integer",
+                                        "example": 30
+                                    },
+                                    "instructor": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "level_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "price": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 49.99
                                     },
                                     "status": {
                                         "type": "string",
@@ -2333,6 +2388,7 @@
                                         "example": "draft"
                                     },
                                     "modules": {
+                                        "description": "List of modules with lessons and quiz",
                                         "type": "array",
                                         "items": {
                                             "required": [
@@ -2361,12 +2417,16 @@
                                                                 "type": "string",
                                                                 "example": "Lesson 1: HTML Tags"
                                                             },
+                                                            "duration": {
+                                                                "type": "integer",
+                                                                "example": 30
+                                                            },
                                                             "description": {
                                                                 "type": "string",
                                                                 "example": "Introduction to common HTML tags."
                                                             },
                                                             "video": {
-                                                                "description": "Video file upload",
+                                                                "description": "Lesson video file",
                                                                 "type": "string",
                                                                 "format": "binary"
                                                             }
@@ -2472,51 +2532,13 @@
                         }
                     },
                     "422": {
-                        "description": "Validation errors",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Validation errors"
-                                        },
-                                        "errors": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
+                        "$ref": "#/components/responses/422"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
                     },
                     "500": {
-                        "description": "Failed to create course",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Failed to create course"
-                                        },
-                                        "error": {
-                                            "type": "string",
-                                            "example": "SQLSTATE[23000]: Integrity constraint violation ..."
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
+                        "$ref": "#/components/responses/500"
                     }
                 },
                 "security": [
@@ -2648,16 +2670,69 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
+                                "required": [
+                                    "title",
+                                    "description",
+                                    "thumbnail",
+                                    "status",
+                                    "modules"
+                                ],
                                 "properties": {
                                     "title": {
                                         "type": "string",
-                                        "example": "Updated Course Title"
+                                        "example": "Introduction to Web Development"
+                                    },
+                                    "subtitle": {
+                                        "type": "string",
+                                        "example": "The Basic Web Dev Languages."
                                     },
                                     "description": {
                                         "type": "string",
-                                        "example": "Updated course description."
+                                        "example": "Learn the basics of web development including HTML, CSS, and JavaScript."
+                                    },
+                                    "thumbnail": {
+                                        "description": "Thumbnail image file",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "objectives": {
+                                        "description": "List of course objectives",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "example": "Learn HTML"
+                                        }
+                                    },
+                                    "is_featured": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "language": {
+                                        "type": "string",
+                                        "example": "English,Swahili"
+                                    },
+                                    "category_id": {
+                                        "type": "integer",
+                                        "example": 3
+                                    },
+                                    "instructor": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "duration": {
+                                        "type": "integer",
+                                        "example": 30
+                                    },
+                                    "level_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "price": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 49.99
                                     },
                                     "status": {
                                         "type": "string",
@@ -2665,47 +2740,48 @@
                                             "draft",
                                             "published"
                                         ],
-                                        "example": "published"
-                                    },
-                                    "thumbnail": {
-                                        "description": "Thumbnail image file",
-                                        "type": "string",
-                                        "format": "binary"
+                                        "example": "draft"
                                     },
                                     "modules": {
+                                        "description": "List of modules with lessons and quiz",
                                         "type": "array",
                                         "items": {
+                                            "required": [
+                                                "title",
+                                                "lessons",
+                                                "quiz"
+                                            ],
                                             "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 10
-                                                },
                                                 "title": {
                                                     "type": "string",
-                                                    "example": "Module 1 - Basics"
+                                                    "example": "Module 1: HTML Basics"
                                                 },
                                                 "description": {
                                                     "type": "string",
-                                                    "example": "Introduction to the basics"
+                                                    "example": "Learn about HTML structure."
                                                 },
                                                 "lessons": {
                                                     "type": "array",
                                                     "items": {
+                                                        "required": [
+                                                            "title",
+                                                            "video"
+                                                        ],
                                                         "properties": {
-                                                            "id": {
-                                                                "type": "integer",
-                                                                "example": 100
-                                                            },
                                                             "title": {
                                                                 "type": "string",
-                                                                "example": "Lesson 1 - Getting Started"
+                                                                "example": "Lesson 1: HTML Tags"
+                                                            },
+                                                            "duration": {
+                                                                "type": "integer",
+                                                                "example": 30
                                                             },
                                                             "description": {
                                                                 "type": "string",
-                                                                "example": "Lesson intro"
+                                                                "example": "Introduction to common HTML tags."
                                                             },
                                                             "video": {
-                                                                "description": "Video file",
+                                                                "description": "Lesson video file",
                                                                 "type": "string",
                                                                 "format": "binary"
                                                             }
@@ -2714,26 +2790,31 @@
                                                     }
                                                 },
                                                 "quiz": {
+                                                    "required": [
+                                                        "title",
+                                                        "questions"
+                                                    ],
                                                     "properties": {
-                                                        "id": {
-                                                            "type": "integer",
-                                                            "example": 200
-                                                        },
                                                         "title": {
                                                             "type": "string",
-                                                            "example": "Quiz 1"
+                                                            "example": "Quiz 1: HTML Basics"
                                                         },
                                                         "questions": {
                                                             "type": "array",
                                                             "items": {
+                                                                "required": [
+                                                                    "question_text",
+                                                                    "type",
+                                                                    "option_a",
+                                                                    "option_b",
+                                                                    "option_c",
+                                                                    "option_d",
+                                                                    "correct_option"
+                                                                ],
                                                                 "properties": {
-                                                                    "id": {
-                                                                        "type": "integer",
-                                                                        "example": 300
-                                                                    },
                                                                     "question_text": {
                                                                         "type": "string",
-                                                                        "example": "What is PHP?"
+                                                                        "example": "What does HTML stand for?"
                                                                     },
                                                                     "type": {
                                                                         "type": "string",
@@ -2746,23 +2827,23 @@
                                                                     },
                                                                     "option_a": {
                                                                         "type": "string",
-                                                                        "example": "Programming Language"
+                                                                        "example": "Hyper Text Markup Language"
                                                                     },
                                                                     "option_b": {
                                                                         "type": "string",
-                                                                        "example": "Database"
+                                                                        "example": "Home Tool Markup Language"
                                                                     },
                                                                     "option_c": {
                                                                         "type": "string",
-                                                                        "example": "Web Server"
+                                                                        "example": "Hyperlinks and Text Markup Language"
                                                                     },
                                                                     "option_d": {
                                                                         "type": "string",
-                                                                        "example": "Operating System"
+                                                                        "example": "Hyper Tool Multi Language"
                                                                     },
                                                                     "correct_option": {
                                                                         "type": "string",
-                                                                        "example": "A"
+                                                                        "example": "option_a"
                                                                     }
                                                                 },
                                                                 "type": "object"
@@ -2810,79 +2891,14 @@
                             }
                         }
                     },
-                    "404": {
-                        "description": "Course not found",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Course not found"
-                                        },
-                                        "code": {
-                                            "type": "integer",
-                                            "example": 404
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
                     "422": {
-                        "description": "Validation errors",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Validation errors"
-                                        },
-                                        "errors": {
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Failed to update course",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Failed to update course"
-                                        },
-                                        "error": {
-                                            "type": "string",
-                                            "example": "SQLSTATE[...]: ..."
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
+                        "$ref": "#/components/responses/422"
                     },
                     "401": {
                         "$ref": "#/components/responses/401"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/500"
                     }
                 },
                 "security": [
@@ -3186,9 +3202,11 @@
                                         "slug": "organic-chemistry",
                                         "subtitle": null,
                                         "description": "This is the organic chemistry topic course",
-                                        "objectives": null,
-                                        "requirements": null,
-                                        "language": null,
+                                        "objectives": [
+                                            "Learning CSS",
+                                            "Learning HTML"
+                                        ],
+                                        "language": "English",
                                         "level_id": null,
                                         "category_id": null,
                                         "cover_image": "thumbnails/GiGazPMb4NtRMzNcGAvAVeoAPHmrAH7ME5vYBrkN.png",
@@ -3200,7 +3218,10 @@
                                         "status": "draft",
                                         "tags": null,
                                         "avg_rating": "0.0",
-                                        "instructor": 2,
+                                        "instructor": {
+                                            "id": 5,
+                                            "name": "John Doe"
+                                        },
                                         "created_by": null,
                                         "created_at": "2025-08-28T20:46:29.000000Z",
                                         "updated_at": "2025-08-28T20:46:29.000000Z",
@@ -8940,6 +8961,167 @@
                         }
                     }
                 }
+            }
+        },
+        "/courses/featured": {
+            "get": {
+                "tags": [
+                    "Courses"
+                ],
+                "summary": "Get the list of popular (featured) courses",
+                "description": "Returns a list of published courses that are marked as featured, including their average ratings and number of enrolled students.",
+                "operationId": "e93611f3e36dddca57f7582275c911bf",
+                "responses": {
+                    "200": {
+                        "description": "List of popular courses retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "List of popular courses."
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Organic Chemistry"
+                                                    },
+                                                    "avg_rating": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 4.5
+                                                    },
+                                                    "students": {
+                                                        "type": "integer",
+                                                        "example": 120
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "An unexpected error occurred"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/courses/{id}/featured": {
+            "put": {
+                "tags": [
+                    "Courses"
+                ],
+                "summary": "Toggle featured status of a course",
+                "description": "Toggles the `is_featured` field for the given course. Only accessible to authorized users (e.g., admins or instructors with permissions).",
+                "operationId": "2ed39a54cfb1611d76c24939823093e9",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the course",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Course featured status updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Course feature updated."
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Course not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Course not found."
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
         "/projects/{id}/review/start": {

@@ -29,6 +29,9 @@ class Course extends Model
         'created_by',
     ];
 
+    protected $casts = [
+        'objectives' => 'array',
+    ];
 
     public function modules()
     {

@@ -11,6 +11,7 @@ use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\LearnerSkillController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\PopularController;
+use App\Http\Controllers\PopularCourseController;
 use App\Http\Controllers\QuizController;
 
 Route::middleware(['auth:sanctum', 'user.type:learner'])->group(function () {
@@ -35,7 +36,9 @@ Route::middleware(['auth:sanctum', 'user.type:learner'])->group(function () {
 
 Route::prefix('courses')->group(function () {
     Route::get('/', [CourseController::class, 'index']);
-    Route::get('/{id}', [CourseController::class, 'show']);
+    Route::get('/{id}', [CourseController::class, 'show'])->whereNumber('id');
+    Route::get('/featured',[PopularCourseController::class, 'index']);
+    Route::patch('/{id}/featured',[PopularCourseController::class, 'update'])->middleware(['auth:sanctum', 'user.type:super_admin'])->whereNumber('id');
     Route::middleware(['auth:sanctum', 'user.type:learner'])->group(function () {
         Route::post('/{id}/enroll', [EnrollmentController::class, 'store']);
         Route::post('/{id}/drop', [EnrollmentController::class, 'destroy']);

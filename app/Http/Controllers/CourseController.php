@@ -99,12 +99,19 @@ class CourseController extends Controller
      *                         "description": "Learn the basics of programming with hands-on examples.",
      *                         "price": 49.99,
      *                         "rating": 4.5,
+     *                         "ratings_count":30,
      *                         "cover_image": "https://cdn.example.com/images/course1.jpg",
      *                         "videos_count": 12,
+     *                         "students_count": 12,
      *                         "total_duration": 3600,
      *                         "instructor": {
      *                             "id": 5,
      *                             "name": "John Doe"
+     *                         },
+     *                         "category": {
+     *                             "id": 2,
+     *                             "name": "Technology & Programming",
+     *                             "slug":"Tech"
      *                         },
      *                         "skills": {"PHP","Laravel"},
      *                         "is_enrolled": false,
@@ -116,12 +123,19 @@ class CourseController extends Controller
      *                         "description": "Master advanced design systems and UX best practices.",
      *                         "price": 79.99,
      *                         "rating": 4.7,
+     *                         "ratings_count":3,
      *                         "cover_image": "https://cdn.example.com/images/course2.jpg",
      *                         "videos_count": 20,
+     *                         "students_count": 1,
      *                         "total_duration": 5400,
      *                         "instructor": {
      *                             "id": 6,
      *                             "name": "Jane Smith"
+     *                         },
+     *                         "category": {
+     *                             "id": 2,
+     *                             "name": "UI/UX Design",
+     *                             "slug":"Design"
      *                         },
      *                         "skills": {"UI/UX","Design Thinking"},
      *                         "is_enrolled": true,
@@ -152,8 +166,11 @@ class CourseController extends Controller
             'skills',
             'modules.lessons',
             'enrollments',
+            'ratings',
             'category'
         ]);
+
+        $query->where('status', 'published');
 
         if ($request->has('category_id') && !empty($request->category_id)) {
             $query->where('category_id', $request->category_id);
@@ -168,6 +185,7 @@ class CourseController extends Controller
         $courses = $query->get()->map(function ($course) use ($request) {
             $lessons = $course->modules->flatMap->lessons;
             $videoCount = $lessons->count();
+            $studentsCount = $course->enrollments->count();
             $totalDuration = $lessons->sum('duration');
 
             $progress = null;
@@ -196,10 +214,12 @@ class CourseController extends Controller
                 'name' => $course->name,
                 'description' => $course->description,
                 'price' => $course->price,
-                'rating' => $course->avg_rating,
+                'rating' => round($course->ratings->avg('rating'), 1) ?? 0,
+                'ratings_count' => $course->ratings->count(),
                 'cover_image' => $course->cover_image,
                 'videos_count' => $videoCount,
                 'total_duration' => $totalDuration,
+                'students_count' => $studentsCount,
                 'instructor' => [
                     'id' => optional($course->instructorUser)->id,
                     'name' => optional($course->instructorUser)->id != null
@@ -212,6 +232,7 @@ class CourseController extends Controller
                 'category' => [
                     'id' => optional($course->category)->id,
                     'name' => optional($course->category)->name,
+                    'slug' => optional($course->category)->slug,
                 ],
             ];
         });
@@ -274,107 +295,156 @@ class CourseController extends Controller
 
 
     /**
-     * @OA\Post(
-     *     path="/admin/courses",
-     *     tags={"Admin"},
-     *     summary="Create a new course",
-     *     description="Creates a new course with thumbnail, modules, lessons (with video uploads), and quizzes including questions. Only accessible by admins.",
-     *     security={{"bearerAuth":{}}},
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             type="object",
-     *             required={"title","description","thumbnail","status","modules"},
-     *             @OA\Property(property="title", type="string", example="Introduction to Web Development"),
-     *             @OA\Property(property="description", type="string", example="Learn the basics of web development including HTML, CSS, and JavaScript."),
-     *             @OA\Property(property="thumbnail", type="string", format="binary", description="Thumbnail image file"),
-     *             @OA\Property(property="status", type="string", enum={"draft","published"}, example="draft"),
-     *             @OA\Property(
-     *                 property="modules",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     type="object",
-     *                     required={"title","lessons","quiz"},
-     *                     @OA\Property(property="title", type="string", example="Module 1: HTML Basics"),
-     *                     @OA\Property(property="description", type="string", example="Learn about HTML structure."),
-     *                     @OA\Property(
-     *                         property="lessons",
-     *                         type="array",
-     *                         @OA\Items(
-     *                             type="object",
-     *                             required={"title","video"},
-     *                             @OA\Property(property="title", type="string", example="Lesson 1: HTML Tags"),
-     *                             @OA\Property(property="description", type="string", example="Introduction to common HTML tags."),
-     *                             @OA\Property(property="video", type="string", format="binary", description="Video file upload")
-     *                         )
-     *                     ),
-     *                     @OA\Property(
-     *                         property="quiz",
-     *                         type="object",
-     *                         required={"title","questions"},
-     *                         @OA\Property(property="title", type="string", example="Quiz 1: HTML Basics"),
-     *                         @OA\Property(
-     *                             property="questions",
-     *                             type="array",
-     *                             @OA\Items(
-     *                                 type="object",
-     *                                 required={"question_text","type","option_a","option_b","option_c","option_d","correct_option"},
-     *                                 @OA\Property(property="question_text", type="string", example="What does HTML stand for?"),
-     *                                 @OA\Property(property="type", type="string", enum={"mcq","true_false","short_answer"}, example="mcq"),
-     *                                 @OA\Property(property="option_a", type="string", example="Hyper Text Markup Language"),
-     *                                 @OA\Property(property="option_b", type="string", example="Home Tool Markup Language"),
-     *                                 @OA\Property(property="option_c", type="string", example="Hyperlinks and Text Markup Language"),
-     *                                 @OA\Property(property="option_d", type="string", example="Hyper Tool Multi Language"),
-     *                                 @OA\Property(property="correct_option", type="string", example="option_a")
-     *                             )
-     *                         )
-     *                     )
-     *                 )
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=201,
-     *         description="Course created successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Course created successfully"),
-     *             @OA\Property(property="data", type="object")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=422,
-     *         description="Validation errors",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Validation errors"),
-     *             @OA\Property(property="errors", type="object")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Failed to create course",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Failed to create course"),
-     *             @OA\Property(property="error", type="string", example="SQLSTATE[23000]: Integrity constraint violation ...")
-     *         )
-     *     )
-     * )
-     */
+    * @OA\Post(
+    *     path="/admin/courses",
+    *     tags={"Admin"},
+    *     summary="Create a new course",
+    *     description="Creates a new course with thumbnail, modules, lessons (with video uploads), and quizzes including questions. Only accessible by admins.",
+    *     security={{"bearerAuth":{}}},
+
+    *     @OA\RequestBody(
+    *         required=true,
+    *         @OA\MediaType(
+    *             mediaType="multipart/form-data",
+    *             @OA\Schema(
+    *                 type="object",
+    *                 required={"title","description","thumbnail","status","modules"},
+    *                 
+    *                 @OA\Property(property="title", type="string", example="Introduction to Web Development"),
+    *                 @OA\Property(property="subtitle", type="string", example="The Basic Web Dev Languages."),
+    *                 @OA\Property(property="description", type="string", example="Learn the basics of web development including HTML, CSS, and JavaScript."),
+    *
+    *                 @OA\Property(
+    *                     property="thumbnail",
+    *                     type="string",
+    *                     format="binary",
+    *                     description="Thumbnail image file"
+    *                 ),
+    *
+    *                 @OA\Property(
+    *                     property="objectives",
+    *                     type="array",
+    *                     @OA\Items(type="string", example="Learn HTML"),
+    *                     description="List of course objectives"
+    *                 ),
+    *
+    *                 @OA\Property(property="language", type="string", example="English,Swahili"),   
+    *                 @OA\Property(property="is_featured", type="boolean", example=true),
+    *                 @OA\Property(property="category_id", type="integer", example=3),
+    *                @OA\Property(property="duration", type="integer", example=30),
+    *               @OA\Property(property="instructor", type="integer", example=1),
+    *                 @OA\Property(property="level_id", type="integer", example=1),
+    *                 @OA\Property(property="price", type="number", format="float", example=49.99),
+    *                 @OA\Property(property="status", type="string", enum={"draft","published"}, example="draft"),
+    *
+    *                 @OA\Property(
+    *                     property="modules",
+    *                     type="array",
+    *                     description="List of modules with lessons and quiz",
+    *                     @OA\Items(
+    *                         type="object",
+    *                         required={"title","lessons","quiz"},
+    *                         @OA\Property(property="title", type="string", example="Module 1: HTML Basics"),
+    *                         @OA\Property(property="description", type="string", example="Learn about HTML structure."),
+    *                         @OA\Property(
+    *                             property="lessons",
+    *                             type="array",
+    *                             @OA\Items(
+    *                                 type="object",
+    *                                 required={"title","video"},
+    *                                 @OA\Property(property="title", type="string", example="Lesson 1: HTML Tags"),
+    *                                  @OA\Property(property="duration", type="integer", example=30),
+    *                                 @OA\Property(property="description", type="string", example="Introduction to common HTML tags."),
+    *                                 @OA\Property(
+    *                                     property="video",
+    *                                     type="string",
+    *                                     format="binary",
+    *                                     description="Lesson video file"
+    *                                 )
+    *                             )
+    *                         ),
+    *                         @OA\Property(
+    *                             property="quiz",
+    *                             type="object",
+    *                             required={"title","questions"},
+    *                             @OA\Property(property="title", type="string", example="Quiz 1: HTML Basics"),
+    *                             @OA\Property(
+    *                                 property="questions",
+    *                                 type="array",
+    *                                 @OA\Items(
+    *                                     type="object",
+    *                                     required={"question_text","type","option_a","option_b","option_c","option_d","correct_option"},
+    *                                     @OA\Property(property="question_text", type="string", example="What does HTML stand for?"),
+    *                                     @OA\Property(property="type", type="string", enum={"mcq","true_false","short_answer"}, example="mcq"),
+    *                                     @OA\Property(property="option_a", type="string", example="Hyper Text Markup Language"),
+    *                                     @OA\Property(property="option_b", type="string", example="Home Tool Markup Language"),
+    *                                     @OA\Property(property="option_c", type="string", example="Hyperlinks and Text Markup Language"),
+    *                                     @OA\Property(property="option_d", type="string", example="Hyper Tool Multi Language"),
+    *                                     @OA\Property(property="correct_option", type="string", example="option_a")
+    *                                 )
+    *                             )
+    *                         )
+    *                     )
+    *                 )
+    *             )
+    *         )
+    *     ),
+
+    *     @OA\Response(
+    *         response=201,
+    *         description="Course created successfully",
+    *         @OA\JsonContent(
+    *             @OA\Property(property="status", type="boolean", example=true),
+    *             @OA\Property(property="message", type="string", example="Course created successfully"),
+    *             @OA\Property(property="data", type="object")
+    *         )
+    *     ),
+    *     @OA\Response(
+    *         response=422,
+    *         description="Validation errors",
+    *         ref="#/components/responses/422"
+    *     ),
+        *     @OA\Response(
+    *         response=401,
+    *         description="Validation errors",
+    *         ref="#/components/responses/401"
+    *     ),
+    *     @OA\Response(
+    *         response=500,
+    *         description="Failed to create course",
+    *         ref="#/components/responses/500"
+    *     )
+    * )
+    */
+
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'description' => 'required|string',
+            'subtitle' => 'nullable|string',
             'thumbnail' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'objectives' => 'sometimes|nullable|array',
+            'objectives.*' => 'string',
+            'language' => 'nullable|string',
+            'category_id' => 'nullable|integer|exists:categories,id',
+            'duration' => 'nullable|integer',
+            'is_featured' => 'nullable|boolean',
+            'instructor' => 'nullable|integer|exists:users,id',
+            'level_id' => 'nullable|integer|exists:levels,id',
+            'price' => 'nullable|numeric',
             'status' => 'required|in:draft,published',
             'modules' => 'required|array|min:1',
             'modules.*.title' => 'required|string|max:255',
+            'modules.*.description' => 'nullable|string|max:255',
+            'modules.*.order' => 'nullable|integer',
             'modules.*.lessons' => 'required|array|min:1',
             'modules.*.lessons.*.title' => 'required|string|max:255',
+            'modules.*.lessons.*.description' => 'nullable|string|max:255',
+            'modules.*.lessons.*.duration' => 'nullable|integer',
             'modules.*.lessons.*.video' => 'required|file|mimes:mp4,mov,avi|max:1024000',
+            'modules.*.lessons.*.order' => 'nullable|integer',
             'modules.*.quiz' => 'required|array',
             'modules.*.quiz.title' => 'required|string|max:255',
             'modules.*.quiz.questions' => 'required|array|min:1',
@@ -407,8 +477,20 @@ class CourseController extends Controller
             $course = Course::create([
                 'name' => $request->title,
                 'slug' => Str::slug($request->title),
+                'subtitle' => $request->subtitle,
                 'description' => $request->description,
                 'cover_image' => $thumbnailPath,
+                'category_id' => $request->category_id,
+                'duration' => $request->duration,
+                'level_id' => $request->level_id,
+                'objectives' => $request->has('objectives')
+                    ? $request->objectives
+                    : null,
+                'language' => $request->language,
+                'order' => $request->order ?? 0,
+                'price' => $request->price,
+                'is_featured' => $request->is_featured ?? false,
+                'instructor' => $request->instructor,
                 'created_by' => auth()->user()->id,
                 'status' => $request->status,
             ]);
@@ -417,7 +499,8 @@ class CourseController extends Controller
             foreach ($request->modules as $moduleData) {
                 $module = $course->modules()->create([
                     'title' => $moduleData['title'],
-                    'description' => $moduleData['description'] ?? null
+                    'description' => $moduleData['description'] ?? null,
+                    'order' => $moduleData['order'] ?? 0
                 ]);
 
 
@@ -429,7 +512,9 @@ class CourseController extends Controller
                         'title' => $lessonData['title'],
                         'course_id' => $course->id,
                         'description' => $lessonData['description'] ?? null,
-                        'content_url' => $videoPath
+                        'content_url' => $videoPath,
+                        'duration' => $lessonData['duration'],
+                        'order' => $lessonData['order'] ?? 0
                     ]);
                 }
 
@@ -467,7 +552,6 @@ class CourseController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-
             foreach ($uploadedFiles as $filePath) {
                 Storage::disk('public')->delete($filePath);
             }
@@ -491,13 +575,9 @@ class CourseController extends Controller
 
 
 
-
-
-
-
     /**
-     * @OA\Patch(
-     *     path="/admin/courses/{id}",
+    * @OA\Patch(
+    *     path="/admin/courses/{id}",
      *     tags={"Admin"},
      *     summary="Update an existing course",
      *     security={{"bearerAuth":{}}},
@@ -509,58 +589,94 @@ class CourseController extends Controller
      *         description="Course ID",
      *         @OA\Schema(type="integer", example=1)
      *     ),
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             type="object",
-     *             @OA\Property(property="title", type="string", example="Updated Course Title"),
-     *             @OA\Property(property="description", type="string", example="Updated course description."),
-     *             @OA\Property(property="status", type="string", enum={"draft", "published"}, example="published"),
-     *             @OA\Property(property="thumbnail", type="string", format="binary", description="Thumbnail image file"),
-     *             @OA\Property(
-     *                 property="modules",
-     *                 type="array",
-     *                 @OA\Items(
-     *                     type="object",
-     *                     @OA\Property(property="id", type="integer", example=10),
-     *                     @OA\Property(property="title", type="string", example="Module 1 - Basics"),
-     *                     @OA\Property(property="description", type="string", example="Introduction to the basics"),
-     *                     @OA\Property(
-     *                         property="lessons",
-     *                         type="array",
-     *                         @OA\Items(
-     *                             type="object",
-     *                             @OA\Property(property="id", type="integer", example=100),
-     *                             @OA\Property(property="title", type="string", example="Lesson 1 - Getting Started"),
-     *                             @OA\Property(property="description", type="string", example="Lesson intro"),
-     *                             @OA\Property(property="video", type="string", format="binary", description="Video file")
-     *                         )
-     *                     ),
-     *                     @OA\Property(
-     *                         property="quiz",
-     *                         type="object",
-     *                         @OA\Property(property="id", type="integer", example=200),
-     *                         @OA\Property(property="title", type="string", example="Quiz 1"),
-     *                         @OA\Property(
-     *                             property="questions",
-     *                             type="array",
-     *                             @OA\Items(
-     *                                 type="object",
-     *                                 @OA\Property(property="id", type="integer", example=300),
-     *                                 @OA\Property(property="question_text", type="string", example="What is PHP?"),
-     *                                 @OA\Property(property="type", type="string", enum={"mcq", "true_false", "short_answer"}, example="mcq"),
-     *                                 @OA\Property(property="option_a", type="string", example="Programming Language"),
-     *                                 @OA\Property(property="option_b", type="string", example="Database"),
-     *                                 @OA\Property(property="option_c", type="string", example="Web Server"),
-     *                                 @OA\Property(property="option_d", type="string", example="Operating System"),
-     *                                 @OA\Property(property="correct_option", type="string", example="A")
-     *                             )
-     *                         )
-     *                     )
-     *                 )
-     *             )
-     *         )
-     *     ),
+    *     @OA\RequestBody(
+    *         required=true,
+    *         @OA\MediaType(
+    *             mediaType="multipart/form-data",
+    *             @OA\Schema(
+    *                 type="object",
+    *                 required={"title","description","thumbnail","status","modules"},
+    *                 
+    *                 @OA\Property(property="title", type="string", example="Introduction to Web Development"),
+    *                 @OA\Property(property="subtitle", type="string", example="The Basic Web Dev Languages."),
+    *                 @OA\Property(property="description", type="string", example="Learn the basics of web development including HTML, CSS, and JavaScript."),
+    *
+    *                 @OA\Property(
+    *                     property="thumbnail",
+    *                     type="string",
+    *                     format="binary",
+    *                     description="Thumbnail image file"
+    *                 ),
+    *
+    *                 @OA\Property(
+    *                     property="objectives",
+    *                     type="array",
+    *                     @OA\Items(type="string", example="Learn HTML"),
+    *                     description="List of course objectives"
+    *                 ),
+    *
+    *                 @OA\Property(property="is_featured", type="boolean", example=true),
+    *                 @OA\Property(property="language", type="string", example="English,Swahili"),   
+    *                 @OA\Property(property="category_id", type="integer", example=3),
+    *                  @OA\Property(property="instructor", type="integer", example=1),
+    *                   @OA\Property(property="duration", type="integer", example=30),
+    *                 @OA\Property(property="level_id", type="integer", example=1),
+    *                 @OA\Property(property="price", type="number", format="float", example=49.99),
+    *                 @OA\Property(property="status", type="string", enum={"draft","published"}, example="draft"),
+    *
+    *                 @OA\Property(
+    *                     property="modules",
+    *                     type="array",
+    *                     description="List of modules with lessons and quiz",
+    *                     @OA\Items(
+    *                         type="object",
+    *                         required={"title","lessons","quiz"},
+    *                         @OA\Property(property="title", type="string", example="Module 1: HTML Basics"),
+    *                         @OA\Property(property="description", type="string", example="Learn about HTML structure."),
+    *                         @OA\Property(
+    *                             property="lessons",
+    *                             type="array",
+    *                             @OA\Items(
+    *                                 type="object",
+    *                                 required={"title","video"},
+    *                                 @OA\Property(property="title", type="string", example="Lesson 1: HTML Tags"),
+    *                                   @OA\Property(property="duration", type="integer", example=30),
+    *                                 @OA\Property(property="description", type="string", example="Introduction to common HTML tags."),
+    *                                 @OA\Property(
+    *                                     property="video",
+    *                                     type="string",
+    *                                     format="binary",
+    *                                     description="Lesson video file"
+    *                                 )
+    *                             )
+    *                         ),
+    *                         @OA\Property(
+    *                             property="quiz",
+    *                             type="object",
+    *                             required={"title","questions"},
+    *                             @OA\Property(property="title", type="string", example="Quiz 1: HTML Basics"),
+    *                             @OA\Property(
+    *                                 property="questions",
+    *                                 type="array",
+    *                                 @OA\Items(
+    *                                     type="object",
+    *                                     required={"question_text","type","option_a","option_b","option_c","option_d","correct_option"},
+    *                                     @OA\Property(property="question_text", type="string", example="What does HTML stand for?"),
+    *                                     @OA\Property(property="type", type="string", enum={"mcq","true_false","short_answer"}, example="mcq"),
+    *                                     @OA\Property(property="option_a", type="string", example="Hyper Text Markup Language"),
+    *                                     @OA\Property(property="option_b", type="string", example="Home Tool Markup Language"),
+    *                                     @OA\Property(property="option_c", type="string", example="Hyperlinks and Text Markup Language"),
+    *                                     @OA\Property(property="option_d", type="string", example="Hyper Tool Multi Language"),
+    *                                     @OA\Property(property="correct_option", type="string", example="option_a")
+    *                                 )
+    *                             )
+    *                         )
+    *                     )
+    *                 )
+    *             )
+    *         )
+    *     ),
+
      *     @OA\Response(
      *         response=200,
      *         description="Course updated successfully",
@@ -573,39 +689,23 @@ class CourseController extends Controller
      *             )
      *         )
      *     ),
-     *     @OA\Response(
-     *         response=404,
-     *         description="Course not found",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Course not found"),
-     *             @OA\Property(property="code", type="integer", example=404)
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=422,
-     *         description="Validation errors",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Validation errors"),
-     *             @OA\Property(property="errors", type="object")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Failed to update course",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Failed to update course"),
-     *             @OA\Property(property="error", type="string", example="SQLSTATE[...]: ...")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         ref="#/components/responses/401"
-     *     )
-     * )
-     */
+    *     @OA\Response(
+    *         response=422,
+    *         description="Validation errors",
+    *         ref="#/components/responses/422"
+    *     ),
+    *     @OA\Response(
+    *         response=401,
+    *         description="Unauthorized",
+    *         ref="#/components/responses/401"
+    *     ),
+    *     @OA\Response(
+    *         response=500,
+    *         description="Failed to create course",
+    *         ref="#/components/responses/500"
+    *     )
+    * )
+    */
 
 
     public function update(Request $request, string $id)
@@ -623,14 +723,28 @@ class CourseController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'sometimes|required|string|max:255',
             'description' => 'sometimes|required|string',
+            'subtitle' => 'sometimes|nullable|string',
             'thumbnail' => 'sometimes|image|mimes:jpeg,png,jpg|max:2048',
+            'objectives' => 'sometimes|nullable|string',
+            'language' => 'sometimes|nullable|string',
+            'duration' => 'sometimes|nullable|integer',
+            'category_id' => 'sometimes|nullable|integer|exists:categories,id',
+            'instructor' => 'sometimes|nullable|integer|exists:users,id',
+            'is_featured' => 'sometimes|nullable|boolean',
+            'level_id' => 'sometimes|nullable|integer|exists:levels,id',
+            'price' => 'sometimes|nullable|numeric',
             'status' => 'sometimes|required|in:draft,published',
             'modules' => 'sometimes|array|min:1',
             'modules.*.id' => 'sometimes|exists:modules,id',
             'modules.*.title' => 'required_with:modules|string|max:255',
+            'modules.*.description' => 'required_with:modules|string|max:255',
+            'modules.*.order' => 'required_with:modules|integer',
             'modules.*.lessons' => 'sometimes|array|min:1',
             'modules.*.lessons.*.id' => 'sometimes|exists:lessons,id',
             'modules.*.lessons.*.title' => 'required_with:modules.*.lessons|string|max:255',
+            'modules.*.lessons.*.duration' => 'required_with:modules.*.lessons|integer',
+            'modules.*.lessons.*.description' => 'required_with:modules.*.lessons|string|max:255',
+            'modules.*.lessons.*.order' => 'required_with:modules.*.lessons|integer',
             'modules.*.lessons.*.video' => 'sometimes|file|mimes:mp4,mov,avi|max:1024000',
             'modules.*.quiz' => 'sometimes|array',
             'modules.*.quiz.id' => 'sometimes|exists:quizzes,id',
@@ -658,12 +772,52 @@ class CourseController extends Controller
                 $course->name = $request->title;
                 $course->slug = Str::slug($request->title);
             }
+
             if ($request->has('description')) {
                 $course->description = $request->description;
             }
+
+            if ($request->has('subtitle')) {
+                $course->subtitle = $request->subtitle;
+            }
+
+            if ($request->has('duration')) {
+                $course->duration = $request->duration;
+            }
+
+            // New fields, following the same pattern
+            if ($request->has('objectives')) {
+                $course->objectives = json_decode($request->objectives, true);
+            }
+
+            if ($request->has('language')) {
+                $course->language = $request->language;
+            }
+
+            if ($request->has('category_id')) {
+                $course->category_id = $request->category_id;
+            }
+
+            if ($request->has('is_featured')) {
+                $course->is_featured = $request->is_featured;
+            }
+
+            if ($request->has('level_id')) {
+                $course->level_id = $request->level_id;
+            }
+
+            if ($request->has('instructor')) {
+                $course->instructor = $request->instructor;
+            }
+
+            if ($request->has('price')) {
+                $course->price = $request->price;
+            }
+
             if ($request->has('status')) {
                 $course->status = $request->status;
             }
+
 
             // Handle new thumbnail upload
             if ($request->hasFile('thumbnail')) {
@@ -687,6 +841,7 @@ class CourseController extends Controller
                         $module->update([
                             'title' => $moduleData['title'] ?? $module->title,
                             'description' => $moduleData['description'] ?? $module->description,
+                            'order' => $moduleData['order'] ?? $module->order,
                         ]);
                     }
 
@@ -711,6 +866,8 @@ class CourseController extends Controller
                                 $lesson->update([
                                     'title' => $lessonData['title'] ?? $lesson->title,
                                     'description' => $lessonData['description'] ?? $lesson->description,
+                                    'duration' => $lessonData['duration'] ?? $lesson->duration,
+                                    'order' => $lessonData['order'] ?? $lesson->order
                                 ]);
                             }
                         }
@@ -885,9 +1042,8 @@ class CourseController extends Controller
      *                     "slug": "organic-chemistry",
      *                     "subtitle": null,
      *                     "description": "This is the organic chemistry topic course",
-     *                     "objectives": null,
-     *                     "requirements": null,
-     *                     "language": null,
+     *                     "objectives": {"Learning CSS", "Learning HTML"},
+     *                     "language": "English",
      *                     "level_id": null,
      *                     "category_id": null,
      *                     "cover_image": "thumbnails/GiGazPMb4NtRMzNcGAvAVeoAPHmrAH7ME5vYBrkN.png",
@@ -899,7 +1055,10 @@ class CourseController extends Controller
      *                     "status": "draft",
      *                     "tags": null,
      *                     "avg_rating": "0.0",
-     *                     "instructor": 2,
+     *                     "instructor": {
+     *                             "id": 5,
+     *                             "name": "John Doe"
+     *                         },
      *                     "created_by": null,
      *                     "created_at": "2025-08-28T20:46:29.000000Z",
      *                     "updated_at": "2025-08-28T20:46:29.000000Z",
@@ -998,11 +1157,68 @@ class CourseController extends Controller
             // Full details
             $course = Course::with([
                 'modules.lessons',
-                'modules.quizzes'
+                'modules.quizzes',
+                'instructorUser',
+                'ratings',
+                'enrollments'
             ])->find($id);
+            if ($course) {
+                // Calculate totals
+                $totalModules = $course->modules->count();
+                $totalLessons = $course->modules->sum(fn($m) => $m->lessons->count());
+
+                // Transform response
+                $course = [
+                    'id' => $course->id,
+                    'title' => $course->name,
+                    'sub-title' => $course->sub_title,
+                    'description' => $course->description,
+                    'objectives' => $course->objectives,
+                    'students_count' => $course->enrollments->count(),
+                    'ratings' => round($course->ratings->avg('rating'), 1) ?? 0,
+                    'skills' => $course->skills->map(function ($skill) {
+
+                        return $skill->name;
+                    }),
+                    'instructor' => [
+                        'id' => optional($course->instructorUser)->id,
+                        'name' => optional($course->instructorUser)->id != null
+                            ? optional($course->instructorUser)->first_name . ' ' . optional($course->instructorUser)->last_name
+                            : null,
+                    ],
+                    'total_modules' => $totalModules,
+                    'total_lessons' => $totalLessons,
+                    'modules' => $course->modules->map(function ($module) {
+                        return [
+                            'id' => $module->id,
+                            'title' => $module->title,
+                            'description' => $module->description,
+                            'order' => $module->order,
+                            'lessons' => $module->lessons->map(function ($lesson) {
+                                return [
+                                    'id' => $lesson->id,
+                                    'title' => $lesson->title,
+                                    'description' => $lesson->description,
+                                    'content_url' => $lesson->content_url,
+                                    'duration' => $lesson->duration,
+                                    'order' => $lesson->order,
+                                ];
+                            }),
+                            'quizzes' => $module->quizzes->map(function ($quiz) {
+                                return [
+                                    'id' => $quiz->id,
+                                    'title' => $quiz->title,
+                                    'passing_score' => $quiz->passing_score
+                                ];
+                            }),
+                        ];
+                    }),
+                ];
+            }
+
         } else {
             // Slim version
-            $course = Course::with(['modules.lessons'])->find($id);
+            $course = Course::with(['modules.lessons', 'instructorUser', 'ratings', 'enrollments'])->find($id);
 
             if ($course) {
                 // Calculate totals
@@ -1015,14 +1231,22 @@ class CourseController extends Controller
                     'title' => $course->name,
                     'sub-title' => $course->sub_title,
                     'description' => $course->description,
+                    'objectives' => $course->objectives,
+                    'students_count' => $course->enrollments->count(),
+                    'ratings' => round($course->ratings->avg('rating'), 1) ?? 0,
                     'skills' => $course->skills->map(function ($skill) {
 
                         return $skill->name;
                     }),
-                    'instructor' => $course->instructorUser(),
+                    'instructor' => [
+                        'id' => optional($course->instructorUser)->id,
+                        'name' => optional($course->instructorUser)->id != null
+                            ? optional($course->instructorUser)->first_name . ' ' . optional($course->instructorUser)->last_name
+                            : null,
+                    ],
                     'total_modules' => $totalModules,
                     'total_lessons' => $totalLessons,
-                    'content' => $course->modules->map(function ($module) {
+                    'modules' => $course->modules->map(function ($module) {
                         return [
                             'id' => $module->id,
                             'title' => $module->title,
@@ -1031,11 +1255,7 @@ class CourseController extends Controller
                                     'id' => $lesson->id,
                                     'title' => $lesson->title,
                                     'duration' => $lesson->duration,
-                                    'description' => $lesson->description,
-                                    'content_type' => $lesson->content_type,
-                                    'content_url' => $lesson->content_url,
-                                    'content_text' => $lesson->content_text,
-                                                                        'order' => $lesson->order,
+                                    'order' => $lesson->order,
                                 ];
                             }),
                         ];
