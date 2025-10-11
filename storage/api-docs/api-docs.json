@@ -6357,14 +6357,48 @@
                                         "example": "Germany"
                                     },
                                     "job_type": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "currency": {
+                                        "type": "string",
+                                        "example": "TZS"
+                                    },
+                                    "experience_level": {
+                                        "type": "string",
+                                        "example": "Experience 4 years of related industry"
+                                    },
+                                    "education_level": {
+                                        "type": "string",
+                                        "example": "Bachelor Degree"
+                                    },
+                                    "is_remote": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "applications_count": {
+                                        "description": "No of vacancy",
+                                        "type": "number",
+                                        "example": 40
+                                    },
+                                    "deadline": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-09-09"
+                                    },
+                                    "category_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "status": {
                                         "type": "string",
                                         "enum": [
-                                            "full-time",
-                                            "project",
-                                            "flexible-virtual-hire",
-                                            "internship"
+                                            "draft",
+                                            "published",
+                                            "closed",
+                                            "expired"
                                         ],
-                                        "example": "full-time"
+                                        "example": "draft"
                                     },
                                     "skills": {
                                         "description": "Array of skill IDs",
@@ -6374,11 +6408,11 @@
                                             "example": 3
                                         }
                                     },
-                                    "min_payment": {
+                                    "salary_min": {
                                         "type": "number",
                                         "example": 1000
                                     },
-                                    "max_payment": {
+                                    "salary_max": {
                                         "type": "number",
                                         "example": 3000
                                     }
@@ -6433,23 +6467,44 @@
                                                     "type": "integer",
                                                     "example": 2
                                                 },
-                                                "min_salary": {
+                                                "salary_min": {
                                                     "type": "number",
                                                     "example": 1000
                                                 },
-                                                "max_salary": {
+                                                "salary_max": {
                                                     "type": "number",
                                                     "example": 3000
                                                 },
-                                                "employer_id": {
-                                                    "type": "integer",
-                                                    "example": 5
+                                                "currency": {
+                                                    "type": "string",
+                                                    "example": "TZS"
                                                 },
-                                                "company_id": {
+                                                "experience_level": {
+                                                    "type": "string",
+                                                    "example": "Experience 4 years of related industry"
+                                                },
+                                                "education_level": {
+                                                    "type": "string",
+                                                    "example": "Bachelor Degree"
+                                                },
+                                                "is_remote": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "applications_count": {
+                                                    "type": "number",
+                                                    "example": 40
+                                                },
+                                                "deadline": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2025-09-09"
+                                                },
+                                                "category_id": {
                                                     "type": "integer",
                                                     "example": 2
                                                 },
-                                                "job_skills": {
+                                                "skills": {
                                                     "type": "array",
                                                     "items": {
                                                         "properties": {
@@ -6479,14 +6534,7 @@
                         }
                     },
                     "422": {
-                        "description": "Validation failed",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/responses/422"
-                                }
-                            }
-                        }
+                        "$ref": "#/components/responses/422"
                     },
                     "401": {
                         "$ref": "#/components/responses/401"
@@ -6834,15 +6882,9 @@
                                         "type": "string",
                                         "example": "Tanzania"
                                     },
-                                    "job_type": {
-                                        "type": "string",
-                                        "enum": [
-                                            "full-time",
-                                            "project",
-                                            "flexible-virtual-hire",
-                                            "internship"
-                                        ],
-                                        "example": "project"
+                                    "type_id": {
+                                        "type": "integer",
+                                        "example": 2
                                     },
                                     "skills": {
                                         "type": "array",
@@ -6851,11 +6893,11 @@
                                             "example": 3
                                         }
                                     },
-                                    "min_payment": {
+                                    "salary_min": {
                                         "type": "number",
                                         "example": 700
                                     },
-                                    "max_payment": {
+                                    "salary_max": {
                                         "type": "number",
                                         "example": 2000
                                     },
@@ -6875,10 +6917,6 @@
                                         "type": "boolean",
                                         "example": false
                                     },
-                                    "is_saved": {
-                                        "type": "boolean",
-                                        "example": false
-                                    },
                                     "deadline": {
                                         "type": "string",
                                         "format": "date",
@@ -6887,6 +6925,10 @@
                                     "category_id": {
                                         "type": "integer",
                                         "example": 2
+                                    },
+                                    "applications_count": {
+                                        "type": "number",
+                                        "example": 40
                                     },
                                     "status": {
                                         "type": "string",
@@ -6949,11 +6991,11 @@
                                                     "type": "integer",
                                                     "example": 2
                                                 },
-                                                "min_salary": {
+                                                "salary_min": {
                                                     "type": "number",
                                                     "example": 1000
                                                 },
-                                                "max_salary": {
+                                                "salary_max": {
                                                     "type": "number",
                                                     "example": 3000
                                                 },
@@ -6995,20 +7037,91 @@
                         }
                     },
                     "422": {
-                        "description": "Validation failed",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/responses/422"
-                                }
-                            }
-                        }
+                        "$ref": "#/components/responses/422"
                     },
                     "401": {
                         "$ref": "#/components/responses/401"
                     },
                     "500": {
                         "$ref": "#/components/responses/500"
+                    }
+                }
+            }
+        },
+        "/jobs-trending": {
+            "get": {
+                "tags": [
+                    "Employer"
+                ],
+                "summary": "Get trending jobs",
+                "description": "Returns a list of trending jobs based on most applications, newest, and closing soon.",
+                "operationId": "getTrendingJobs",
+                "responses": {
+                    "200": {
+                        "description": "Trending jobs retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Trending jobs"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Frontend Developer"
+                                                    },
+                                                    "is_remote": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "city": {
+                                                        "type": "string",
+                                                        "example": "Nairobi"
+                                                    },
+                                                    "country": {
+                                                        "type": "string",
+                                                        "example": "Kenya"
+                                                    },
+                                                    "salary_min": {
+                                                        "type": "number",
+                                                        "example": 500
+                                                    },
+                                                    "salary_max": {
+                                                        "type": "number",
+                                                        "example": 1000
+                                                    },
+                                                    "applications_available": {
+                                                        "description": "Vacancies left: total positions minus applied",
+                                                        "type": "integer",
+                                                        "example": 5
+                                                    },
+                                                    "status": {
+                                                        "description": "hot or closing soon depending on deadline and when it was posted",
+                                                        "type": "string",
+                                                        "example": "hot"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 }
             }

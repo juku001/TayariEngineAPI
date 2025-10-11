@@ -269,20 +269,23 @@ class JobPostController extends Controller
      *             @OA\Property(property="description", type="string", example="We are looking for a skilled frontend developer with React experience."),
      *             @OA\Property(property="city", type="string", example="Berlin"),
      *             @OA\Property(property="country", type="string", example="Germany"),
-     *             @OA\Property(
-     *                 property="job_type",
-     *                 type="string",
-     *                 enum={"full-time","project","flexible-virtual-hire","internship"},
-     *                 example="full-time"
-     *             ),
+     *                 @OA\Property(property="job_type", type="integer", example=2),
+     *                 @OA\Property(property="currency", type="string", example="TZS"),
+     *                 @OA\Property(property="experience_level", type="string", example="Experience 4 years of related industry"),
+     *                 @OA\Property(property="education_level", type="string", example="Bachelor Degree"),
+     *                 @OA\Property(property="is_remote", type="boolean", example=false),
+     *                 @OA\Property(property="applications_count", type="number", example=40,description="No of vacancy"),
+     *                 @OA\Property(property="deadline", type="date", example="2025-09-09"),
+     *                 @OA\Property(property="category_id", type="integer", example=2),
+     *              @OA\Property(property="status", type="string", enum={"draft","published","closed","expired"}, example="draft"),
      *             @OA\Property(
      *                 property="skills",
      *                 type="array",
      *                 @OA\Items(type="integer", example=3),
      *                 description="Array of skill IDs"
      *             ),
-     *             @OA\Property(property="min_payment", type="number", example=1000),
-     *             @OA\Property(property="max_payment", type="number", example=3000)
+     *             @OA\Property(property="salary_min", type="number", example=1000),
+     *             @OA\Property(property="salary_max", type="number", example=3000)
      *         )
      *     ),
      *
@@ -302,12 +305,17 @@ class JobPostController extends Controller
      *                 @OA\Property(property="city", type="string", example="Berlin"),
      *                 @OA\Property(property="country", type="string", example="Germany"),
      *                 @OA\Property(property="type_id", type="integer", example=2),
-     *                 @OA\Property(property="min_salary", type="number", example=1000),
-     *                 @OA\Property(property="max_salary", type="number", example=3000),
-     *                 @OA\Property(property="employer_id", type="integer", example=5),
-     *                 @OA\Property(property="company_id", type="integer", example=2),
+     *                 @OA\Property(property="salary_min", type="number", example=1000),
+     *                 @OA\Property(property="salary_max", type="number", example=3000),
+     *                 @OA\Property(property="currency", type="string", example="TZS"),
+     *                 @OA\Property(property="experience_level", type="string", example="Experience 4 years of related industry"),
+     *                 @OA\Property(property="education_level", type="string", example="Bachelor Degree"),
+     *                 @OA\Property(property="is_remote", type="boolean", example=false),
+     *                 @OA\Property(property="applications_count", type="number", example=40),
+     *                 @OA\Property(property="deadline", type="date", example="2025-09-09"),
+     *                 @OA\Property(property="category_id", type="integer", example=2),
      *                 @OA\Property(
-     *                     property="job_skills",
+     *                     property="skills",
      *                     type="array",
      *                     @OA\Items(
      *                         type="object",
@@ -315,7 +323,8 @@ class JobPostController extends Controller
      *                         @OA\Property(property="job_post_id", type="integer", example=12),
      *                         @OA\Property(property="skill_id", type="integer", example=3)
      *                     )
-     *                 )
+     *                 ),
+     *                 
      *             )
      *         )
      *     ),
@@ -323,12 +332,7 @@ class JobPostController extends Controller
      *     @OA\Response(
      *         response=422,
      *         description="Validation failed",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Failed to validate fields"),
-     *             @OA\Property(property="code", type="integer", example=422),
-     *             ref="#/components/responses/422"
-     *         )
+     *                 ref="#/components/responses/422"
      *     ),
      *     @OA\Response(
      *       response=401,
@@ -354,18 +358,20 @@ class JobPostController extends Controller
             'skills' => 'required|array|min:1',
             'skills.*' => 'integer|exists:skills,id',
 
-            'min_payment' => 'nullable|numeric|min:0',
-            'max_payment' => 'nullable|numeric|gte:min_payment',
+            'salary_min' => 'nullable|numeric|min:0',
+            'salary_max' => 'nullable|numeric|gte:salary_min',
 
             'currency' => 'nullable|string|size:3',
             'experience_level' => 'nullable|string|max:100',
             'education_level' => 'nullable|string|max:100',
-            'is_remote' => 'boolean',
+            'is_remote' => 'nullable|boolean',
             'deadline' => 'nullable|date',
-            'no_of_vacancy' => 'nullable|numeric|min:0',
+            'status' => 'required|string|in:draft,published',
+            'applications_count' => 'nullable|numeric|min:0',
             'category_id' => 'nullable|integer|exists:categories,id',
         ], [
-            'job_type.numeric' => 'Use the job type id'
+            'job_type.numeric' => 'Use the job type id',
+            'status.in' => 'Status is either draft or published'
         ]);
 
         if ($validator->fails()) {
@@ -382,13 +388,6 @@ class JobPostController extends Controller
                 return ResponseHelper::error([], 'Employer not found', 404);
             }
 
-            // $typeId = null;
-            // if ($request->has('job_type')) {
-            //     $type = JobPostType::where('slug', $request->job_type)->first();
-            //     if ($type) {
-            //         $typeId = $type->id;
-            //     }
-            // }
             $typeId = $request->job_type;
 
             $job = JobPost::create([
@@ -400,15 +399,15 @@ class JobPostController extends Controller
                 'employer_id' => $employer->id,
                 'company_id' => $employer->company_id,
                 'category_id' => $request->category_id,
-                'status' => 'published',
-                'salary_min' => $request->min_payment,
-                'salary_max' => $request->max_payment,
+                'status' => $request->status,
+                'salary_min' => $request->salary_min,
+                'salary_max' => $request->salary_max,
                 'currency' => $request->currency ?? 'TZS',
                 'experience_level' => $request->experience_level,
                 'education_level' => $request->education_level,
                 'is_remote' => $request->is_remote ?? false,
                 'deadline' => $request->deadline,
-                'applications_count' => $request->no_of_vacancy,
+                'applications_count' => $request->applications_count,
                 'slug' => Str::slug($request->title) . '-' . uniqid(),
             ]);
 
@@ -450,17 +449,17 @@ class JobPostController extends Controller
      *             @OA\Property(property="description", type="string", example="Updated job description"),
      *             @OA\Property(property="city", type="string", example="Arusha"),
      *             @OA\Property(property="country", type="string", example="Tanzania"),
-     *             @OA\Property(property="job_type", type="string", enum={"full-time","project","flexible-virtual-hire","internship"}, example="project"),
+     *             @OA\Property(property="type_id", type="integer", example=2),
      *             @OA\Property(property="skills", type="array", @OA\Items(type="integer", example=3)),
-     *             @OA\Property(property="min_payment", type="number", example=700),
-     *             @OA\Property(property="max_payment", type="number", example=2000),
+     *             @OA\Property(property="salary_min", type="number", example=700),
+     *             @OA\Property(property="salary_max", type="number", example=2000),
      *             @OA\Property(property="currency", type="string", example="USD"),
      *             @OA\Property(property="experience_level", type="string", example="Senior"),
      *             @OA\Property(property="education_level", type="string", example="Masters"),
      *             @OA\Property(property="is_remote", type="boolean", example=false),
-     *             @OA\Property(property="is_saved", type="boolean", example=false),
      *             @OA\Property(property="deadline", type="string", format="date", example="2026-01-15"),
      *             @OA\Property(property="category_id", type="integer", example=2),
+     *             @OA\Property(property="applications_count", type="number", example=40),
      *             @OA\Property(property="status", type="string", enum={"draft","published","closed","expired"}, example="closed")
      *         )
      *     ),
@@ -480,8 +479,8 @@ class JobPostController extends Controller
      *                 @OA\Property(property="city", type="string", example="Berlin"),
      *                 @OA\Property(property="country", type="string", example="Germany"),
      *                 @OA\Property(property="type_id", type="integer", example=2),
-     *                 @OA\Property(property="min_salary", type="number", example=1000),
-     *                 @OA\Property(property="max_salary", type="number", example=3000),
+     *                 @OA\Property(property="salary_min", type="number", example=1000),
+     *                 @OA\Property(property="salary_max", type="number", example=3000),
      *                 @OA\Property(property="employer_id", type="integer", example=5),
      *                 @OA\Property(property="company_id", type="integer", example=2),
      *                 @OA\Property(
@@ -500,12 +499,7 @@ class JobPostController extends Controller
      *     @OA\Response(
      *         response=422,
      *         description="Validation failed",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Failed to validate fields"),
-     *             @OA\Property(property="code", type="integer", example=422),
-     *             ref="#/components/responses/422"
-     *         )
+     *         ref="#/components/responses/422"
      *     ),
      *     @OA\Response(
      *       response=401,
@@ -530,9 +524,8 @@ class JobPostController extends Controller
             'job_type' => 'sometimes|required|exists:job_post_types,id',
             'skills' => 'sometimes|array|min:1',
             'skills.*' => 'integer|exists:skills,id',
-
-            'min_payment' => 'nullable|numeric|min:0',
-            'max_payment' => 'nullable|numeric|gte:min_payment',
+            'salary_min' => 'nullable|numeric|min:0',
+            'salary_max' => 'nullable|numeric|gte:salary_min',
             'currency' => 'nullable|string|size:3',
             'experience_level' => 'nullable|string|max:100',
             'education_level' => 'nullable|string|max:100',
@@ -540,7 +533,7 @@ class JobPostController extends Controller
             'deadline' => 'nullable|date',
             'category_id' => 'nullable|integer|exists:categories,id',
             'status' => 'nullable|in:draft,published,closed,expired',
-            'no_of_vacancy' => 'nullable|numeric|min:0',
+            'applications_count' => 'nullable|numeric|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -575,8 +568,8 @@ class JobPostController extends Controller
                 'city' => $request->city ?? $job->city,
                 'country' => $request->country ?? $job->country,
                 'type_id' => $typeId,
-                'salary_min' => $request->min_payment ?? $job->salary_min,
-                'salary_max' => $request->max_payment ?? $job->salary_max,
+                'salary_min' => $request->salary_min ?? $job->salary_min,
+                'salary_max' => $request->salary_max ?? $job->salary_max,
                 'currency' => $request->currency ?? $job->currency,
                 'experience_level' => $request->experience_level ?? $job->experience_level,
                 'education_level' => $request->education_level ?? $job->education_level,
@@ -606,6 +599,92 @@ class JobPostController extends Controller
             return ResponseHelper::error([], "Error: {$e->getMessage()}", 500);
         }
     }
+
+        /**
+     * @OA\Get(
+     *     path="/jobs-trending",
+     *     tags={"Employer"},
+     *     summary="Get trending jobs",
+     *     description="Returns a list of trending jobs based on most applications, newest, and closing soon.",
+     *     operationId="getTrendingJobs",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Trending jobs retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Trending jobs"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="title", type="string", example="Frontend Developer"),
+     *                     @OA\Property(property="is_remote", type="boolean", example=true),
+     *                     @OA\Property(property="city", type="string", example="Nairobi"),
+     *                     @OA\Property(property="country", type="string", example="Kenya"),
+     *                     @OA\Property(property="salary_min", type="number", example=500),
+     *                     @OA\Property(property="salary_max", type="number", example=1000),
+     *                     @OA\Property(property="applications_available", type="integer", example=5, description="Vacancies left: total positions minus applied"),
+     *                     @OA\Property(property="status", type="string", example="hot", description="hot or closing soon depending on deadline and when it was posted")
+     *                 )
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function trending()
+    {
+        $jobs = JobPost::with('applications')
+            ->where('status', 'published');
+
+
+        $mostApplied = (clone $jobs)
+            ->get()
+            ->sortByDesc(fn($job) => $job->applications->count())
+            ->take(5);
+
+        $newest = (clone $jobs)->orderByDesc('created_at')->take(5)->get();
+        $closingSoon = (clone $jobs)->orderBy('deadline')->take(5)->get();
+
+        $trending = $mostApplied
+            ->merge($newest)
+            ->merge($closingSoon)
+            ->unique('id')
+            ->values()
+            ->take(4);
+
+        $trendingJobs = $trending->map(function ($jobpost) {
+            $status = 'hot';
+            $now = now();
+            if ($jobpost->deadline && $jobpost->deadline->diffInDays($now, false) <= 3) {
+                $status = 'closing soon';
+            } elseif ($jobpost->created_at && $jobpost->created_at->diffInDays($now, false) <= 7) {
+                $status = 'hot';
+            }
+
+            $applied = $jobpost->applications->count(); // number of applications
+            $available = $jobpost->applications_count - $applied; // assuming you have a vacancy column
+
+            return [
+                'id' => $jobpost->id,
+                'title' => $jobpost->title,
+                'is_remote' => $jobpost->is_remote,
+                'city' => $jobpost->city ?? null,
+                'country' => $jobpost->country ?? null,
+                'salary_min' => $jobpost->salary_min,
+                'salary_max' => $jobpost->salary_max,
+                'applications_available' => max($available, 0),
+                'status' => $status,
+            ];
+        });
+
+        return ResponseHelper::success($trendingJobs, 'Trending jobs');
+    }
+
+
+
 
 
 
@@ -695,5 +774,11 @@ class JobPostController extends Controller
 
         return ResponseHelper::success($job, 'Job details');
     }
+
+
+
+
+
+
 
 }

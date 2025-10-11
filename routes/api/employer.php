@@ -26,6 +26,7 @@ Route::middleware(['auth:sanctum', 'user.type:employer'])->group(function () {
 
     Route::get('/jobs/companies/{id}', [JobPostController::class, 'companies']);
 
+    Route::get('/jobs-trending',[JobPostController::class, 'trending']);
     Route::get('/jobs/recent', [JobApplicationController::class, 'recent']);
     Route::get('/jobs/candidates', [JobApplicationController::class, 'candidates']);
     Route::get('/jobs/applications', [JobApplicationController::class, 'applications']);
