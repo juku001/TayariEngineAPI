@@ -82,6 +82,7 @@ class JobPostController extends Controller
      *                     @OA\Property(property="is_remote", type="boolean", example=false),
      *                     @OA\Property(property="deadline", type="string", format="date", example="2025-12-31"),
      *                     @OA\Property(property="views", type="integer", example=120),
+     *                     @OA\Property(property="applicants_count", type="integer", example=1),
      *                     @OA\Property(property="applications_count", type="integer", example=15),
      *                     @OA\Property(property="slug", type="string", example="frontend-developer"),
      *                     @OA\Property(property="created_at", type="string", format="date-time", example="2025-09-11T12:24:38.000000Z"),
@@ -277,6 +278,7 @@ class JobPostController extends Controller
      *                 @OA\Property(property="applications_count", type="number", example=40,description="No of vacancy"),
      *                 @OA\Property(property="deadline", type="date", example="2025-09-09"),
      *                 @OA\Property(property="category_id", type="integer", example=2),
+     *                 @OA\Property(property="applicants_count", type="integer", example=1),
      *              @OA\Property(property="status", type="string", enum={"draft","published","closed","expired"}, example="draft"),
      *             @OA\Property(
      *                 property="skills",
@@ -313,6 +315,7 @@ class JobPostController extends Controller
      *                 @OA\Property(property="is_remote", type="boolean", example=false),
      *                 @OA\Property(property="applications_count", type="number", example=40),
      *                 @OA\Property(property="deadline", type="date", example="2025-09-09"),
+     *                 @OA\Property(property="applicants_count", type="integer", example=1),
      *                 @OA\Property(property="category_id", type="integer", example=2),
      *                 @OA\Property(
      *                     property="skills",
@@ -460,6 +463,7 @@ class JobPostController extends Controller
      *             @OA\Property(property="deadline", type="string", format="date", example="2026-01-15"),
      *             @OA\Property(property="category_id", type="integer", example=2),
      *             @OA\Property(property="applications_count", type="number", example=40),
+     *             @OA\Property(property="applicants_count", type="integer", example=1),
      *             @OA\Property(property="status", type="string", enum={"draft","published","closed","expired"}, example="closed")
      *         )
      *     ),
@@ -726,6 +730,7 @@ class JobPostController extends Controller
      *                 @OA\Property(property="deadline", type="string", format="date-time", nullable=true, example=null),
      *                 @OA\Property(property="views", type="integer", example=0),
      *                 @OA\Property(property="applications_count", type="integer", example=0),
+     *                 @OA\Property(property="applicants_count", type="integer", example=1),
      *                 @OA\Property(property="created_at", type="string", format="date-time", example="2025-09-01T18:06:51.000000Z"),
      *                 @OA\Property(property="updated_at", type="string", format="date-time", example="2025-09-01T18:06:51.000000Z"),
      *                 @OA\Property(

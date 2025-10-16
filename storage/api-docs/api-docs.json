@@ -2342,6 +2342,11 @@
                                         "type": "string",
                                         "format": "binary"
                                     },
+                                    "cover_video": {
+                                        "description": "Cover video video file",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
                                     "objectives": {
                                         "description": "List of course objectives",
                                         "type": "array",
@@ -2694,6 +2699,11 @@
                                     },
                                     "thumbnail": {
                                         "description": "Thumbnail image file",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "cover_video": {
+                                        "description": "Cover video video file",
                                         "type": "string",
                                         "format": "binary"
                                     },
@@ -6187,6 +6197,10 @@
                                                         "type": "integer",
                                                         "example": 120
                                                     },
+                                                    "applicants_count": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
                                                     "applications_count": {
                                                         "type": "integer",
                                                         "example": 15
@@ -6390,6 +6404,10 @@
                                         "type": "integer",
                                         "example": 2
                                     },
+                                    "applicants_count": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
                                     "status": {
                                         "type": "string",
                                         "enum": [
@@ -6499,6 +6517,10 @@
                                                     "type": "string",
                                                     "format": "date",
                                                     "example": "2025-09-09"
+                                                },
+                                                "applicants_count": {
+                                                    "type": "integer",
+                                                    "example": 1
                                                 },
                                                 "category_id": {
                                                     "type": "integer",
@@ -6758,6 +6780,10 @@
                                                     "type": "integer",
                                                     "example": 0
                                                 },
+                                                "applicants_count": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
                                                 "created_at": {
                                                     "type": "string",
                                                     "format": "date-time",
@@ -6929,6 +6955,10 @@
                                     "applications_count": {
                                         "type": "number",
                                         "example": 40
+                                    },
+                                    "applicants_count": {
+                                        "type": "integer",
+                                        "example": 1
                                     },
                                     "status": {
                                         "type": "string",

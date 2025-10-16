@@ -320,6 +320,12 @@ class CourseController extends Controller
     *                     format="binary",
     *                     description="Thumbnail image file"
     *                 ),
+    *                 @OA\Property(
+    *                     property="cover_video",
+    *                     type="string",
+    *                     format="binary",
+    *                     description="Cover video video file"
+    *                 ),
     *
     *                 @OA\Property(
     *                     property="objectives",
@@ -425,6 +431,7 @@ class CourseController extends Controller
             'description' => 'required|string',
             'subtitle' => 'nullable|string',
             'thumbnail' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'cover_video' => 'nullable|file|mimes:mp4,mov,avi|max:1024000',
             'objectives' => 'sometimes|nullable|array',
             'objectives.*' => 'string',
             'language' => 'nullable|string',
@@ -474,12 +481,16 @@ class CourseController extends Controller
             $thumbnailPath = $request->file('thumbnail')->store('thumbnails', 'public');
             $uploadedFiles[] = $thumbnailPath;
 
+            $coverVideoPath = $request->file('cover_video')->store('cover_videos', 'public');
+            $uploadedFiles[] = $coverVideoPath;
+
             $course = Course::create([
                 'name' => $request->title,
                 'slug' => Str::slug($request->title),
                 'subtitle' => $request->subtitle,
                 'description' => $request->description,
                 'cover_image' => $thumbnailPath,
+                'cover_video' => $coverVideoPath,
                 'category_id' => $request->category_id,
                 'duration' => $request->duration,
                 'level_id' => $request->level_id,
@@ -607,6 +618,12 @@ class CourseController extends Controller
     *                     format="binary",
     *                     description="Thumbnail image file"
     *                 ),
+    *                 @OA\Property(
+    *                     property="cover_video",
+    *                     type="string",
+    *                     format="binary",
+    *                     description="Cover video video file"
+    *                 ),
     *
     *                 @OA\Property(
     *                     property="objectives",
@@ -725,6 +742,7 @@ class CourseController extends Controller
             'description' => 'sometimes|required|string',
             'subtitle' => 'sometimes|nullable|string',
             'thumbnail' => 'sometimes|image|mimes:jpeg,png,jpg|max:2048',
+            'cover_video' => 'sometimes|nullable|file|mimes:mp4,mov,avi|max:1024000',
             'objectives' => 'sometimes|nullable|string',
             'language' => 'sometimes|nullable|string',
             'duration' => 'sometimes|nullable|integer',
@@ -819,13 +837,20 @@ class CourseController extends Controller
             }
 
 
-            // Handle new thumbnail upload
             if ($request->hasFile('thumbnail')) {
                 if ($course->cover_image) {
                     Storage::disk('public')->delete($course->cover_image);
                 }
                 $thumbnailPath = $request->file('thumbnail')->store('thumbnails', 'public');
                 $course->cover_image = $thumbnailPath;
+            }
+
+            if ($request->hasFile('cover_video')) {
+                if ($course->cover_video) {
+                    Storage::disk('public')->delete($course->cover_video);
+                }
+                $coverVideoPath = $request->file('cover_video')->store('cover_videos', 'public');
+                $course->cover_video = $coverVideoPath;
             }
 
             $course->save();
