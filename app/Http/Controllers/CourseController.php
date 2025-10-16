@@ -1257,6 +1257,7 @@ class CourseController extends Controller
                     'title' => $course->name,
                     'sub-title' => $course->sub_title,
                     'description' => $course->description,
+                    'cover_video'=> $course->cover_video,
                     'objectives' => $course->objectives,
                     'students_count' => $course->enrollments->count(),
                     'ratings' => round($course->ratings->avg('rating'), 1) ?? 0,
