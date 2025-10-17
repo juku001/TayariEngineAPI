@@ -21,6 +21,7 @@ Route::middleware(['auth:sanctum', 'user.type:learner'])->group(function () {
     Route::get('/certificates', [CertificateController::class, 'index']);
     Route::post('/certificates/share', [CertificateShareController::class, 'share']);
     Route::get('/certificates/{id}', [CertificateController::class, 'show']);
+    Route::get('/module/{id}/quiz',[QuizController::class, 'index']);
     Route::post('/quiz/submit/{id}', [QuizController::class, 'storeAttempt']);
     Route::post('/quiz/check/{id}', [QuizController::class, 'checkAnswer']);
     Route::post('/complete/lesson/{id}', [LessonController::class, 'completeLesson']);
@@ -34,12 +35,15 @@ Route::middleware(['auth:sanctum', 'user.type:learner'])->group(function () {
 
 
 
+
 Route::prefix('courses')->group(function () {
     Route::get('/', [CourseController::class, 'index']);
     Route::get('/{id}', [CourseController::class, 'show'])->whereNumber('id');
     Route::get('/featured',[PopularCourseController::class, 'index']);
     Route::patch('/{id}/featured',[PopularCourseController::class, 'update'])->middleware(['auth:sanctum', 'user.type:super_admin'])->whereNumber('id');
+    
     Route::middleware(['auth:sanctum', 'user.type:learner'])->group(function () {
+        
         Route::post('/{id}/enroll', [EnrollmentController::class, 'store']);
         Route::post('/{id}/drop', [EnrollmentController::class, 'destroy']);
         Route::get('/{id}/progress', [EnrollmentController::class, 'progress']);

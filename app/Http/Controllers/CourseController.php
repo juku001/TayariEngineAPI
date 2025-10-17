@@ -752,31 +752,38 @@ class CourseController extends Controller
             'level_id' => 'sometimes|nullable|integer|exists:levels,id',
             'price' => 'sometimes|nullable|numeric',
             'status' => 'sometimes|required|in:draft,published',
+
+            // Modules
             'modules' => 'sometimes|array|min:1',
             'modules.*.id' => 'sometimes|exists:modules,id',
-            'modules.*.title' => 'required_with:modules|string|max:255',
-            'modules.*.description' => 'required_with:modules|string|max:255',
-            'modules.*.order' => 'required_with:modules|integer',
+            'modules.*.title' => 'sometimes|string|max:255',
+            'modules.*.description' => 'sometimes|string|max:255',
+            'modules.*.order' => 'sometimes|integer',
+
+            // Lessons
             'modules.*.lessons' => 'sometimes|array|min:1',
             'modules.*.lessons.*.id' => 'sometimes|exists:lessons,id',
-            'modules.*.lessons.*.title' => 'required_with:modules.*.lessons|string|max:255',
-            'modules.*.lessons.*.duration' => 'required_with:modules.*.lessons|integer',
-            'modules.*.lessons.*.description' => 'required_with:modules.*.lessons|string|max:255',
-            'modules.*.lessons.*.order' => 'required_with:modules.*.lessons|integer',
+            'modules.*.lessons.*.title' => 'sometimes|string|max:255',
+            'modules.*.lessons.*.duration' => 'sometimes|integer',
+            'modules.*.lessons.*.description' => 'sometimes|string|max:255',
+            'modules.*.lessons.*.order' => 'sometimes|integer',
             'modules.*.lessons.*.video' => 'sometimes|file|mimes:mp4,mov,avi|max:1024000',
+
+            // Quiz
             'modules.*.quiz' => 'sometimes|array',
             'modules.*.quiz.id' => 'sometimes|exists:quizzes,id',
-            'modules.*.quiz.title' => 'required_with:modules.*.quiz|string|max:255',
+            'modules.*.quiz.title' => 'sometimes|string|max:255',
             'modules.*.quiz.questions' => 'sometimes|array|min:1',
             'modules.*.quiz.questions.*.id' => 'sometimes|exists:questions,id',
-            'modules.*.quiz.questions.*.question_text' => 'required_with:modules.*.quiz.questions|string',
-            'modules.*.quiz.questions.*.type' => 'required_with:modules.*.quiz.questions|in:mcq,true_false,short_answer',
+            'modules.*.quiz.questions.*.question_text' => 'sometimes|string',
+            'modules.*.quiz.questions.*.type' => 'sometimes|in:mcq,true_false,short_answer',
             'modules.*.quiz.questions.*.option_a' => 'nullable|string',
             'modules.*.quiz.questions.*.option_b' => 'nullable|string',
             'modules.*.quiz.questions.*.option_c' => 'nullable|string',
             'modules.*.quiz.questions.*.option_d' => 'nullable|string',
             'modules.*.quiz.questions.*.correct_option' => 'nullable|string'
         ]);
+
 
         if ($validator->fails()) {
             return ResponseHelper::error($validator->errors(), "Failed to validate fields", 422);
@@ -1199,7 +1206,7 @@ class CourseController extends Controller
                     'sub-title' => $course->sub_title,
                     'description' => $course->description,
                     'objectives' => $course->objectives,
-                    'cover_video'=> $course->cover_video,
+                    'cover_video' => $course->cover_video,
                     'students_count' => $course->enrollments->count(),
                     'ratings' => round($course->ratings->avg('rating'), 1) ?? 0,
                     'skills' => $course->skills->map(function ($skill) {
@@ -1257,7 +1264,7 @@ class CourseController extends Controller
                     'title' => $course->name,
                     'sub-title' => $course->sub_title,
                     'description' => $course->description,
-                    'cover_video'=> $course->cover_video,
+                    'cover_video' => $course->cover_video,
                     'objectives' => $course->objectives,
                     'students_count' => $course->enrollments->count(),
                     'ratings' => round($course->ratings->avg('rating'), 1) ?? 0,

@@ -230,4 +230,75 @@ class QuizController extends Controller
         );
     }
     //
+
+    /**
+     * @OA\Get(
+     *     path="/module/{id}/quiz",
+     *     tags={"Quizzes"},
+     *     summary="Get list of quizzes for a module",
+     *     description="Retrieve all quizzes belonging to a specific module, including their questions.",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Module ID",
+     *         @OA\Schema(type="integer", example=2)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="List of quizzes."),
+     *             @OA\Property(property="code", type="integer", example=200),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     @OA\Property(property="id", type="integer", example=2),
+     *                     @OA\Property(property="module_id", type="integer", example=2),
+     *                     @OA\Property(property="title", type="string", example="Quez"),
+     *                     @OA\Property(property="passing_score", type="integer", example=50),
+     *                     @OA\Property(property="created_at", type="string", format="date-time", example="2025-09-16T15:04:32.000000Z"),
+     *                     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-09-16T15:04:32.000000Z"),
+     *                     @OA\Property(
+     *                         property="questions",
+     *                         type="array",
+     *                         @OA\Items(
+     *                             @OA\Property(property="id", type="integer", example=2),
+     *                             @OA\Property(property="quiz_id", type="integer", example=2),
+     *                             @OA\Property(property="question_text", type="string", example="How do you trade"),
+     *                             @OA\Property(property="type", type="string", enum={"mcq","true_false","short_answer"}, example="mcq"),
+     *                             @OA\Property(property="option_a", type="string", example="ICT"),
+     *                             @OA\Property(property="option_b", type="string", example="MarkteMaker"),
+     *                             @OA\Property(property="option_c", type="string", example="BTMM"),
+     *                             @OA\Property(property="option_d", type="string", example="KillerFX"),
+     *                             @OA\Property(property="correct_option", type="string", example="option_b"),
+     *                             @OA\Property(property="created_at", type="string", format="date-time", example="2025-09-16T15:04:32.000000Z"),
+     *                             @OA\Property(property="updated_at", type="string", format="date-time", example="2025-09-16T15:04:32.000000Z")
+     *                         )
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Module not found"
+     *     )
+     * )
+     */
+    public function index($moduleId)
+    {
+        $quizzes = Quiz::with('questions')->where('module_id', $moduleId)->get();
+        return ResponseHelper::success($quizzes, 'List of quizzes.');
+    }
+
+
+
 }
