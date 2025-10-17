@@ -11191,6 +11191,158 @@
                 ]
             }
         },
+        "/module/{id}/quiz": {
+            "get": {
+                "tags": [
+                    "Quizzes"
+                ],
+                "summary": "Get list of quizzes for a module",
+                "description": "Retrieve all quizzes belonging to a specific module, including their questions.",
+                "operationId": "668ccb17d352f893a54e066b6af6eb1e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Module ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 2
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "List of quizzes."
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 2
+                                                    },
+                                                    "module_id": {
+                                                        "type": "integer",
+                                                        "example": 2
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Quez"
+                                                    },
+                                                    "passing_score": {
+                                                        "type": "integer",
+                                                        "example": 50
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2025-09-16T15:04:32.000000Z"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2025-09-16T15:04:32.000000Z"
+                                                    },
+                                                    "questions": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer",
+                                                                    "example": 2
+                                                                },
+                                                                "quiz_id": {
+                                                                    "type": "integer",
+                                                                    "example": 2
+                                                                },
+                                                                "question_text": {
+                                                                    "type": "string",
+                                                                    "example": "How do you trade"
+                                                                },
+                                                                "type": {
+                                                                    "type": "string",
+                                                                    "enum": [
+                                                                        "mcq",
+                                                                        "true_false",
+                                                                        "short_answer"
+                                                                    ],
+                                                                    "example": "mcq"
+                                                                },
+                                                                "option_a": {
+                                                                    "type": "string",
+                                                                    "example": "ICT"
+                                                                },
+                                                                "option_b": {
+                                                                    "type": "string",
+                                                                    "example": "MarkteMaker"
+                                                                },
+                                                                "option_c": {
+                                                                    "type": "string",
+                                                                    "example": "BTMM"
+                                                                },
+                                                                "option_d": {
+                                                                    "type": "string",
+                                                                    "example": "KillerFX"
+                                                                },
+                                                                "correct_option": {
+                                                                    "type": "string",
+                                                                    "example": "option_b"
+                                                                },
+                                                                "created_at": {
+                                                                    "type": "string",
+                                                                    "format": "date-time",
+                                                                    "example": "2025-09-16T15:04:32.000000Z"
+                                                                },
+                                                                "updated_at": {
+                                                                    "type": "string",
+                                                                    "format": "date-time",
+                                                                    "example": "2025-09-16T15:04:32.000000Z"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Module not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/auth/register": {
             "post": {
                 "tags": [
