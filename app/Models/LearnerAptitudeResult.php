@@ -18,4 +18,9 @@ class LearnerAptitudeResult extends Model
         'total_score',
         'answers'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

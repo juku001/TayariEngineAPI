@@ -535,6 +535,30 @@
                                 }
                             }
                         }
+                    },
+                    "400": {
+                        "description": "Denied",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User already has aptitude test."
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -1437,7 +1461,7 @@
                 }
             }
         },
-        "/certificate/view/{code}": {
+        "/certificates/{code}": {
             "get": {
                 "tags": [
                     "Certificates"
@@ -1622,7 +1646,7 @@
                 ]
             }
         },
-        "/certificate/{id}": {
+        "/certificates/{id}": {
             "get": {
                 "tags": [
                     "Certificates"
@@ -7915,6 +7939,10 @@
                                                     "type": "string",
                                                     "example": "1|abc123tokenvalue"
                                                 },
+                                                "aptitude_check": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
                                                 "user": {
                                                     "properties": {
                                                         "id": {
@@ -8103,6 +8131,10 @@
                                                 "token": {
                                                     "type": "string",
                                                     "example": "1|XqXhP9Y..."
+                                                },
+                                                "aptitude_check": {
+                                                    "type": "boolean",
+                                                    "example": false
                                                 },
                                                 "user": {
                                                     "properties": {

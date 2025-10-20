@@ -14,7 +14,7 @@ class CertificateController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/certificate/view/{code}",
+     *     path="/certificates/{code}",
      *     operationId="viewCertificatePage",
      *     tags={"Certificates"},
      *     summary="View certificate page",
@@ -197,7 +197,7 @@ class CertificateController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/certificate/{id}",
+     *     path="/certificates/{id}",
      *     operationId="getCertificate",
      *     tags={"Certificates"},
      *     summary="Get certificate details",

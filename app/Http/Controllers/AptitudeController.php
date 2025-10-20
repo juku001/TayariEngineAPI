@@ -106,6 +106,15 @@ class AptitudeController extends Controller
      *             @OA\Property(property="status", type="boolean", example=false),
      *             @OA\Property(property="message", type="string", example="Only learners can access this"),
      *             @OA\Property(property="code", type="integer", example=403),
+     *         ),
+     *     ),
+     *       @OA\Response(
+     *         response=400,
+     *         description="Denied",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="User already has aptitude test."),
+     *             @OA\Property(property="code", type="integer", example=400),
      *         )
      *     )
      * )
@@ -114,10 +123,14 @@ class AptitudeController extends Controller
 
     public function index()
     {
+
+        $userAptitude = LearnerAptitudeResult::where('user_id', auth()->user()->id)->first();
+        if ($userAptitude) {
+            return ResponseHelper::error([], 'User already has aptitude test.', 400);
+        }
         $aptQuestions = AptitudeQuestion::with('options')->get();
 
-
-        return ResponseHelper::success($aptQuestions, "Starting aptitude tests");
+        return ResponseHelper::success($aptQuestions, "Starting aptitude test.");
 
     }
 

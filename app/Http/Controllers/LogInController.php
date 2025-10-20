@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
+use App\Models\LearnerAptitudeResult;
 use App\Models\User;
 use App\Services\AdminLogService;
 use Carbon\Carbon;
@@ -54,6 +55,7 @@ class LogInController extends Controller
      *                 property="data",
      *                 type="object",
      *                 @OA\Property(property="token", type="string", example="1|abc123tokenvalue"),
+     *                 @OA\Property(property="aptitude_check", type="boolean", example=false),  
      *                 @OA\Property(
      *                     property="user",
      *                     type="object",
@@ -77,8 +79,8 @@ class LogInController extends Controller
      *                                 @OA\Property(property="id", type="integer", example=1),
      *                                 @OA\Property(property="name", type="string", example="learner"),
      *                             )
-     *                      ) 
-     *                 )
+     *                      )
+     *                 ),
      *             )
      *         )
      *     ),
@@ -142,9 +144,14 @@ class LogInController extends Controller
             );
         }
         $success['token'] = $user->createToken('TayariToken')->plainTextToken;
-        $success['user'] = $user;
+
         $action = $this->logService->getActionByCode(1);
         $userType = ucfirst($user->roles->pluck('name')->first());
+
+        if ($userType == 'Learner') {
+            $success['aptitude_check'] = LearnerAptitudeResult::where('user_id', $user->id)->exists();
+        }
+        $success['user'] = $user;
         $this->logService->record($user->id, $action, $userType . ' dashboard access');
         return ResponseHelper::success($success, 'User login successful.');
     }
@@ -198,6 +205,7 @@ class LogInController extends Controller
      *             property="data",
      *             type="object",
      *             @OA\Property(property="token", type="string", example="1|XqXhP9Y..."),
+     *             @OA\Property(property="aptitude_check", type="boolean", example=false),
      *             @OA\Property(
      *               property="user",
      *               type="object",
@@ -217,7 +225,8 @@ class LogInController extends Controller
      *                   @OA\Property(property="id", type="integer", example=1),
      *                   @OA\Property(property="name", type="string", example="learner")
      *                 )
-     *               )
+     *               ),
+     *                 
      *             )
      *           )
      *         )
@@ -260,10 +269,19 @@ class LogInController extends Controller
 
         $token = $user->createToken('TayariToken')->plainTextToken;
 
-        return response()->json([
-            'token' => $token,
-            'user' => $user,
-        ]);
+
+
+        $success['token'] = $token;
+        $action = $this->logService->getActionByCode(1);
+        $userType = ucfirst($user->roles->pluck('name')->first());
+
+        if ($userType == 'Learner') {
+            $success['aptitude_check'] = LearnerAptitudeResult::where('user_id', $user->id)->exists();
+        }
+        $success['user'] = $user;
+        $this->logService->record($user->id, $action, $userType . ' dashboard access');
+
+        return response()->json($success);
     }
 
 }
