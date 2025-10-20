@@ -281,7 +281,7 @@ class LogInController extends Controller
         $success['user'] = $user;
         $this->logService->record($user->id, $action, $userType . ' dashboard access');
 
-        return response()->json($success);
+        return ResponseHelper::success($success, 'Login successful');
     }
 
 }
