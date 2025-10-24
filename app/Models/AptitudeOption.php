@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class AptitudeOption extends Model
 {
-    protected $filalble = [
+    protected $fillable = [
         'question_id',
         'title',
         'sub_title',
