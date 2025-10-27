@@ -177,7 +177,7 @@ class LogInController extends Controller
      */
     public function redirect(Request $request)
     {
-   
+
         return Socialite::driver('google')->stateless()->redirect();
     }
 
@@ -271,18 +271,16 @@ class LogInController extends Controller
         $token = $user->createToken('TayariToken')->plainTextToken;
 
 
-
-        $success['token'] = $token;
         $action = $this->logService->getActionByCode(1);
         $userType = ucfirst($user->roles->pluck('name')->first());
-
+        $aptitudeCheck = null;
         if ($userType == 'Learner') {
-            $success['aptitude_check'] = LearnerAptitudeResult::where('user_id', $user->id)->exists();
+            $aptitudeCheck = LearnerAptitudeResult::where('user_id', $user->id)->exists();
         }
-        $success['user'] = $user;
         $this->logService->record($user->id, $action, $userType . ' dashboard access');
 
-        return ResponseHelper::success($success, 'Login successful');
+        $redirectUrl = 'https://tayari.work/login?token' . urlencode($token) . '?aptitude=' . $aptitudeCheck;
+        return redirect($redirectUrl);
     }
 
 }
