@@ -8972,7 +8972,7 @@
             }
         },
         "/auth/google": {
-            "post": {
+            "get": {
                 "tags": [
                     "Authentication"
                 ],
@@ -9005,101 +9005,38 @@
                     "Authentication"
                 ],
                 "summary": "Google OAuth callback",
-                "description": "Handles the Google OAuth callback after a successful login/consent. \n     *         Creates or updates a user, generates an access token, and returns user details.",
+                "description": "Handles the Google OAuth callback after successful Google authentication. \n *         Creates or updates the user record, generates an access token, \n *         and redirects the user to the frontend with token and aptitude info.",
                 "operationId": "googleCallback",
+                "parameters": [
+                    {
+                        "name": "code",
+                        "in": "query",
+                        "description": "Authorization code returned by Google OAuth",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "4/0Ab32j93ksjQLfriVeleqyXTaKaTvWwPrDfNQ0ReJKcS9rJwq1h3DlIbS2RTio3ulFkHrYQ"
+                        }
+                    }
+                ],
                 "responses": {
-                    "200": {
-                        "description": "Successful Google login",
-                        "content": {
-                            "application/json": {
+                    "302": {
+                        "description": "Redirects to the frontend with token and aptitude status",
+                        "headers": {
+                            "Location": {
+                                "description": "Frontend URL where the user is redirected, including token and aptitude query params",
                                 "schema": {
-                                    "properties": {
-                                        "status": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Successful Google login"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "token": {
-                                                    "type": "string",
-                                                    "example": "1|XqXhP9Y..."
-                                                },
-                                                "aptitude_check": {
-                                                    "type": "boolean",
-                                                    "example": false
-                                                },
-                                                "user": {
-                                                    "properties": {
-                                                        "id": {
-                                                            "type": "integer",
-                                                            "example": 12
-                                                        },
-                                                        "first_name": {
-                                                            "type": "string",
-                                                            "example": "John"
-                                                        },
-                                                        "last_name": {
-                                                            "type": "string",
-                                                            "example": "Doe"
-                                                        },
-                                                        "email": {
-                                                            "type": "string",
-                                                            "example": "johndoe@gmail.com"
-                                                        },
-                                                        "mobile": {
-                                                            "type": "string",
-                                                            "example": "255712345678"
-                                                        },
-                                                        "email_verified_at": {
-                                                            "type": "string",
-                                                            "format": "date-time",
-                                                            "example": "2025-08-30T04:20:21.000000Z"
-                                                        },
-                                                        "profile_pic": {
-                                                            "type": "string",
-                                                            "example": "https://lh3.googleusercontent.com/..."
-                                                        },
-                                                        "google_id": {
-                                                            "type": "string",
-                                                            "example": "10817626491827364"
-                                                        },
-                                                        "roles": {
-                                                            "type": "array",
-                                                            "items": {
-                                                                "properties": {
-                                                                    "id": {
-                                                                        "type": "integer",
-                                                                        "example": 1
-                                                                    },
-                                                                    "name": {
-                                                                        "type": "string",
-                                                                        "example": "learner"
-                                                                    }
-                                                                },
-                                                                "type": "object"
-                                                            }
-                                                        }
-                                                    },
-                                                    "type": "object"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
+                                    "type": "string",
+                                    "example": "https://tayari.work/login?token=223%7CCF5Uz2UtQRKW2tqPBOkSM6GEJ9LX8YFpniYdmG2Y371b3536&aptitude=false"
                                 }
                             }
                         }
                     },
                     "400": {
-                        "description": "Invalid Google response"
+                        "description": "Invalid or expired authorization code"
                     },
                     "500": {
-                        "$ref": "#/components/responses/500"
+                        "description": "Server error during Google authentication"
                     }
                 }
             }

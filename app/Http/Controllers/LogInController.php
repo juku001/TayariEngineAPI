@@ -159,7 +159,7 @@ class LogInController extends Controller
 
 
     /**
-     * @OA\Post(
+     * @OA\Get(
      *     path="/auth/google",
      *     summary="Redirect to Google OAuth",
      *     description="Starts the Google OAuth flow by redirecting the user to Google's login/consent screen.",
@@ -186,64 +186,48 @@ class LogInController extends Controller
 
 
 
-    /**
-     * @OA\Get(
-     *     path="/auth/google/callback",
-     *     summary="Google OAuth callback",
-     *     description="Handles the Google OAuth callback after a successful login/consent. 
-     *         Creates or updates a user, generates an access token, and returns user details.",
-     *     operationId="googleCallback",
-     *     tags={"Authentication"},
-     *
-     *     @OA\Response(
-     *         response=200,
-     *         description="Successful Google login",
-     *         @OA\JsonContent(
-     *           type="object",
-     *           @OA\Property(property="status", type="boolean", example=true),
-     *           @OA\Property(property="message", type="string", example="Successful Google login"),
-     *           @OA\Property(
-     *             property="data",
-     *             type="object",
-     *             @OA\Property(property="token", type="string", example="1|XqXhP9Y..."),
-     *             @OA\Property(property="aptitude_check", type="boolean", example=false),
-     *             @OA\Property(
-     *               property="user",
-     *               type="object",
-     *               @OA\Property(property="id", type="integer", example=12),
-     *               @OA\Property(property="first_name", type="string", example="John"),
-     *               @OA\Property(property="last_name", type="string", example="Doe"),
-     *               @OA\Property(property="email", type="string", example="johndoe@gmail.com"),
-     *               @OA\Property(property="mobile", type="string", example="255712345678"),
-     *               @OA\Property(property="email_verified_at", type="string", format="date-time", example="2025-08-30T04:20:21.000000Z"),
-     *               @OA\Property(property="profile_pic", type="string", example="https://lh3.googleusercontent.com/..."),
-     *               @OA\Property(property="google_id", type="string", example="10817626491827364"),
-     *               @OA\Property(
-     *                 property="roles",
-     *                 type="array",
-     *                 @OA\Items(
-     *                   type="object",
-     *                   @OA\Property(property="id", type="integer", example=1),
-     *                   @OA\Property(property="name", type="string", example="learner")
-     *                 )
-     *               ),
-     *                 
-     *             )
-     *           )
-     *         )
-     *     ),
-     *
-     *     @OA\Response(
-     *         response=400,
-     *         description="Invalid Google response"
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error",
-     *         ref="#/components/responses/500"
-     *     )
-     * )
-     */
+/**
+ * @OA\Get(
+ *     path="/auth/google/callback",
+ *     summary="Google OAuth callback",
+ *     description="Handles the Google OAuth callback after successful Google authentication. 
+ *         Creates or updates the user record, generates an access token, 
+ *         and redirects the user to the frontend with token and aptitude info.",
+ *     operationId="googleCallback",
+ *     tags={"Authentication"},
+ *
+ *     @OA\Parameter(
+ *         name="code",
+ *         in="query",
+ *         description="Authorization code returned by Google OAuth",
+ *         required=true,
+ *         @OA\Schema(type="string", example="4/0Ab32j93ksjQLfriVeleqyXTaKaTvWwPrDfNQ0ReJKcS9rJwq1h3DlIbS2RTio3ulFkHrYQ")
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=302,
+ *         description="Redirects to the frontend with token and aptitude status",
+ *         @OA\Header(
+ *             header="Location",
+ *             description="Frontend URL where the user is redirected, including token and aptitude query params",
+ *             @OA\Schema(
+ *                 type="string",
+ *                 example="https://tayari.work/login?token=223%7CCF5Uz2UtQRKW2tqPBOkSM6GEJ9LX8YFpniYdmG2Y371b3536&aptitude=false"
+ *             )
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=400,
+ *         description="Invalid or expired authorization code"
+ *     ),
+ *     @OA\Response(
+ *         response=500,
+ *         description="Server error during Google authentication"
+ *     )
+ * )
+ */
+
     public function callback(Request $request)
     {
         $googleUser = Socialite::driver('google')->stateless()->user();
