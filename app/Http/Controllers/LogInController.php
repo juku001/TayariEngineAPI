@@ -279,7 +279,7 @@ class LogInController extends Controller
         }
         $this->logService->record($user->id, $action, $userType . ' dashboard access');
 
-        $redirectUrl = 'https://tayari.work/login?token' . urlencode($token) . '?aptitude=' . $aptitudeCheck;
+        $redirectUrl = 'https://tayari.work/login?token=' . urlencode($token) . '?aptitude=' . $aptitudeCheck;
         return redirect($redirectUrl);
     }
 
