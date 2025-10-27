@@ -19,7 +19,6 @@ Route::get('dashboard/admin', [DashboardController::class, 'admin'])->middleware
 
 
 
-
 Route::prefix('admin')->group(function () {
 
     Route::middleware(['auth:sanctum', 'user.type:super_admin,admin'])->group(function () {
@@ -37,7 +36,7 @@ Route::prefix('admin')->group(function () {
         Route::put('/aptitudes/{id}', [AptitudeController::class, 'update']);
         Route::get('/aptitudes/{id}', [AptitudeController::class, 'show']);
         Route::delete('/aptitudes/{id}', [AptitudeController::class, 'destroy']);
-        Route::delete('/aptitude/{id}/options/{id}', [AptitudeController::class, 'destroyOptions']);
+        Route::delete('/aptitude/{questionId}/options/{optionid}', [AptitudeController::class, 'destroyOptions']);
     });
 
 });

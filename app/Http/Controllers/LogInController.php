@@ -177,6 +177,7 @@ class LogInController extends Controller
      */
     public function redirect(Request $request)
     {
+   
         return Socialite::driver('google')->stateless()->redirect();
     }
 
