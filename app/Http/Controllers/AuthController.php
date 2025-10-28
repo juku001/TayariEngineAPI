@@ -32,6 +32,42 @@ class AuthController extends Controller
         );
     }
 
+
+
+
+
+
+
+    /**
+     * @OA\Get(
+     *     path="/is_auth",
+     *     tags={"Authentication"},
+     *     summary="Check if the current user is authenticated",
+     *     description="Validates the Sanctum token and confirms whether the user is authenticated or not.",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="User is authenticated",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Authenticated"),
+     *             @OA\Property(property="code", type="integer", example=200)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized - invalid or missing token",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Unauthorized"),
+     *             @OA\Property(property="code", type="integer", example=401)
+     *         )
+     *     )
+     * )
+     */
+
     public function authorized()
     {
         return ResponseHelper::success(
@@ -180,5 +216,82 @@ class AuthController extends Controller
             );
         }
         return ResponseHelper::success([], 'User verified');
+    }
+
+
+
+
+    /**
+     * @OA\Get(
+     *     path="/auth/me",
+     *     tags={"Authentication"},
+     *     summary="Get logged-in user details",
+     *     description="Returns the details of the currently authenticated user based on the Sanctum bearer token.",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Logged in user details",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Logged in user details"),
+     *             @OA\Property(property="code", type="integer", example=200),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=3),
+     *                 @OA\Property(property="first_name", type="string", example="Juma"),
+     *                 @OA\Property(property="middle_name", type="string", nullable=true, example=null),
+     *                 @OA\Property(property="last_name", type="string", example="Kujellah"),
+     *                 @OA\Property(property="email", type="string", example="jumakujellah89@gmail.com"),
+     *                 @OA\Property(property="mobile", type="string", nullable=true, example=null),
+     *                 @OA\Property(property="email_verified_at", type="string", nullable=true, example=null),
+     *                 @OA\Property(property="profile_pic", type="string", nullable=true, example=null),
+     *                 @OA\Property(property="date_of_birth", type="string", nullable=true, example=null),
+     *                 @OA\Property(property="provider", type="string", example="email"),
+     *                 @OA\Property(property="google_id", type="string", nullable=true, example=null),
+     *                 @OA\Property(property="created_by", type="string", nullable=true, example=null),
+     *                 @OA\Property(property="deleted_by", type="string", nullable=true, example=null),
+     *                 @OA\Property(property="status", type="string", example="active"),
+     *                 @OA\Property(property="archive", type="string", nullable=true, example=null),
+     *                 @OA\Property(property="deleted_at", type="string", nullable=true, example=null),
+     *                 @OA\Property(property="created_at", type="string", example="2025-09-16T20:19:02.000000Z"),
+     *                 @OA\Property(property="updated_at", type="string", example="2025-09-17T12:16:16.000000Z"),
+     *                 @OA\Property(property="learner_points", type="integer", example=0),
+     *                 @OA\Property(
+     *                     property="roles",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=3),
+     *                         @OA\Property(property="name", type="string", example="learner"),
+     *                         @OA\Property(property="description", type="string", nullable=true, example=null),
+     *                         @OA\Property(property="created_at", type="string", example="2025-09-16T14:57:05.000000Z"),
+     *                         @OA\Property(property="updated_at", type="string", example="2025-09-16T14:57:05.000000Z")
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized - missing or invalid token",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Unauthorized"),
+     *             @OA\Property(property="code", type="integer", example=401)
+     *         )
+     *     )
+     * )
+     */
+
+    public function me()
+    {
+        $authId = auth()->user()->id;
+
+        $user = User::with('roles')->find($authId);
+
+        return ResponseHelper::success($user, 'Logged in user details');
     }
 }

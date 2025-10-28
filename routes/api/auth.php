@@ -15,6 +15,7 @@ Route::get('/is_auth', [AuthController::class, 'authorized'])->middleware('auth:
 Route::post('is_verified', [AuthController::class, 'verified']);
 Route::prefix('auth')->group(function () {
 
+    Route::get('me', [AuthController::class, 'me'])->middleware('auth:sanctum');
     Route::post('/login', [LogInController::class, 'index']);
     Route::post('/register', [RegisterController::class, 'index']);
     Route::post('/logout', [AuthController::class, 'destroy']);
