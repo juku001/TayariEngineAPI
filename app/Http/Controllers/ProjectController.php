@@ -73,23 +73,33 @@ class ProjectController extends Controller
 
     public function index(Request $request)
     {
+        $auth = auth()->user();
+        $authId = $auth->id;
+        $employer = Employer::where('user_id', $authId)->first();
+
+        $companyId = $employer->company_id;
+
         try {
             $search = $request->get('search');
 
             $projects = Project::with('projectSkills')
+                ->where('company_id', $companyId) // restrict to employer's company
                 ->when($search, function ($query, $search) {
-                    $query->where('title', 'like', "%{$search}%")
-                        ->orWhereHas('company', function ($q) use ($search) {
-                            $q->where('name', 'like', "%{$search}%");
-                        });
+                    $query->where(function ($q) use ($search) {
+                        $q->where('title', 'like', "%{$search}%")
+                            ->orWhereHas('company', function ($q2) use ($search) {
+                                $q2->where('name', 'like', "%{$search}%");
+                            });
+                    });
                 })
-                ->get(); // remove pagination
+                ->get(); // no pagination
 
             return ResponseHelper::success($projects, "Projects retrieved successfully");
         } catch (\Exception $e) {
             return ResponseHelper::error([], "Failed to fetch projects: " . $e->getMessage(), 500);
         }
     }
+
 
 
 

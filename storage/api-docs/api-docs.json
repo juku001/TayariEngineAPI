@@ -1926,7 +1926,7 @@
                                                 },
                                                 "first_name": {
                                                     "type": "string",
-                                                    "example": "Juma"
+                                                    "example": "John"
                                                 },
                                                 "middle_name": {
                                                     "type": "string",
@@ -1935,11 +1935,11 @@
                                                 },
                                                 "last_name": {
                                                     "type": "string",
-                                                    "example": "Kujellah"
+                                                    "example": "Doe"
                                                 },
                                                 "email": {
                                                     "type": "string",
-                                                    "example": "jumakujellah89@gmail.com"
+                                                    "example": "johndoe89@gmail.com"
                                                 },
                                                 "mobile": {
                                                     "type": "string",
