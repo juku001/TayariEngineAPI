@@ -11129,7 +11129,7 @@
                             }
                         }
                     },
-                    "200": {
+                    "500": {
                         "$ref": "#/components/responses/500"
                     }
                 },
@@ -11308,6 +11308,222 @@
                         }
                     }
                 }
+            },
+            "patch": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Update an existing project",
+                "description": "Employer updates a project with optional fields.",
+                "operationId": "5b7dbb6a81eae1aa3c213756f24d9e14",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Updated Project Title"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Updated description."
+                                    },
+                                    "duration_min": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "duration_max": {
+                                        "type": "integer",
+                                        "example": 8
+                                    },
+                                    "duration_unit": {
+                                        "type": "string",
+                                        "enum": [
+                                            "days",
+                                            "weeks",
+                                            "months",
+                                            "years"
+                                        ],
+                                        "example": "weeks"
+                                    },
+                                    "salary_min": {
+                                        "type": "number",
+                                        "example": 600
+                                    },
+                                    "salary_max": {
+                                        "type": "number",
+                                        "example": 1500
+                                    },
+                                    "currency": {
+                                        "type": "string",
+                                        "example": "USD"
+                                    },
+                                    "deadline": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-12-31"
+                                    },
+                                    "skills": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer",
+                                            "example": 3
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Project updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Project updated successfully"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Full Stack Developer"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Get a Job for free my dear."
+                                                },
+                                                "duration_min": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "duration_max": {
+                                                    "type": "integer",
+                                                    "example": null
+                                                },
+                                                "duration_unit": {
+                                                    "type": "string",
+                                                    "example": "months"
+                                                },
+                                                "employer_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "company_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "salary_min": {
+                                                    "type": "number",
+                                                    "example": 500
+                                                },
+                                                "salary_max": {
+                                                    "type": "number",
+                                                    "example": 1200
+                                                },
+                                                "currency": {
+                                                    "type": "string",
+                                                    "example": "TZS"
+                                                },
+                                                "deadline": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2025-12-31"
+                                                },
+                                                "project_skills": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "project_id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "skill_id": {
+                                                                "type": "integer",
+                                                                "example": 2
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/422"
+                    },
+                    "404": {
+                        "description": "Employer not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Employer not found."
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/500"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/projects/companies/{id}": {

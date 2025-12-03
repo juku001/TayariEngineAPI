@@ -205,7 +205,7 @@ class ProjectController extends Controller
      *         )
      *     ),
      *     @OA\Response(
-     *       response=200,
+     *       response=500,
      *       description="Internal server error",
      *       ref="#/components/responses/500"
      *     )
@@ -266,6 +266,177 @@ class ProjectController extends Controller
 
 
 
+    /**
+     * @OA\Patch(
+     *     path="/projects/{id}",
+     *     tags={"Projects"},
+     *     summary="Update an existing project",
+     *     description="Employer updates a project with optional fields.",
+     *     security={{"bearerAuth":{}}},
+     *
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Project ID",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *
+     *     @OA\RequestBody(
+     *         required=false,
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="title", type="string", example="Updated Project Title"),
+     *             @OA\Property(property="description", type="string", example="Updated description."),
+     *             @OA\Property(property="duration_min", type="integer", example=2),
+     *             @OA\Property(property="duration_max", type="integer", example=8),
+     *             @OA\Property(property="duration_unit", type="string", enum={"days","weeks","months","years"}, example="weeks"),
+     *             @OA\Property(property="salary_min", type="number", example=600),
+     *             @OA\Property(property="salary_max", type="number", example=1500),
+     *             @OA\Property(property="currency", type="string", example="USD"),
+     *             @OA\Property(property="deadline", type="string", format="date", example="2025-12-31"),
+     *             @OA\Property(
+     *                 property="skills",
+     *                 type="array",
+     *                 @OA\Items(type="integer", example=3)
+     *             )
+     *         )
+     *     ),
+     *
+    *     @OA\Response(
+     *         response=200,
+     *         description="Project updated successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Project updated successfully"),
+     *             @OA\Property(property="code", type="integer", example=200),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="title", type="string", example="Full Stack Developer"),
+     *                 @OA\Property(property="description", type="string", example="Get a Job for free my dear."),
+     *                 @OA\Property(property="duration_min", type="integer", example=1),
+     *                 @OA\Property(property="duration_max", type="integer", example=null),
+     *                 @OA\Property(property="duration_unit", type="string", example="months"),
+     *                 @OA\Property(property="employer_id", type="integer", example=1),
+     *                 @OA\Property(property="company_id", type="integer", example=1),
+     *                 @OA\Property(property="salary_min", type="number", example=500),
+     *                 @OA\Property(property="salary_max", type="number", example=1200),
+     *                 @OA\Property(property="currency", type="string", example="TZS"),
+     *                 @OA\Property(property="deadline", type="string", format="date", example="2025-12-31"),
+     *                 @OA\Property(
+     *                     property="project_skills",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="project_id", type="integer", example=1),
+     *                         @OA\Property(property="skill_id", type="integer", example=2)
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         ref="#/components/responses/422"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Employer not found",
+     *         @OA\JsonContent(
+     *           type="object",
+     *           @OA\Property(
+     *             property="status",
+     *             type="boolean",
+     *             example=false,
+     *           ),
+     *           @OA\Property(
+     *             property="message",
+     *             type="string",
+     *             example="Employer not found."
+     *           ),
+     *           @OA\Property(
+     *             property="code",
+     *             type="integer",
+     *             example=404
+     *           )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *       response=500,
+     *       description="Internal server error",
+     *       ref="#/components/responses/500"
+     *     )
+     * )
+     */
+    public function update(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'title' => 'sometimes|string|max:255',
+            'description' => 'sometimes|string',
+            'duration_min' => 'sometimes|integer|min:1',
+            'duration_max' => 'sometimes|integer|min:1',
+            'duration_unit' => 'sometimes|string|in:days,weeks,months,years',
+            'salary_min' => 'sometimes|numeric|min:0',
+            'salary_max' => 'sometimes|numeric|min:0',
+            'currency' => 'sometimes|string|max:3',
+            'deadline' => 'sometimes|date|after:today',
+            'skills' => 'sometimes|array',
+            'skills.*' => 'exists:skills,id',
+        ]);
+
+        if ($validator->fails()) {
+            return ResponseHelper::error([], $validator->errors(), 422);
+        }
+
+        $auth = auth()->user();
+        $authId = $auth->id;
+        $employer = Employer::where('user_id', $authId)->first();
+
+        if (!$employer) {
+            return ResponseHelper::error([], "Employer Not Recognized", 404);
+        }
+
+        $project = Project::where('id', $id)
+            ->where('employer_id', $employer->id)
+            ->first();
+
+        if (!$project) {
+            return ResponseHelper::error([], "Project not found", 404);
+        }
+
+        try {
+            $validated = $validator->validated();
+
+            // Update project fields (PATCH means only provided fields)
+            $project->update($validated);
+
+            // If skills were provided, sync them
+            if (array_key_exists('skills', $validated)) {
+                $project->projectSkills()->delete(); // Remove old skills
+
+                foreach ($validated['skills'] as $skillId) {
+                    $project->projectSkills()->create([
+                        'skill_id' => $skillId,
+                    ]);
+                }
+            }
+
+            return ResponseHelper::success(
+                $project->load('projectSkills'),
+                "Project updated successfully",
+                200
+            );
+
+        } catch (\Exception $e) {
+            return ResponseHelper::error([], "Failed to update project: " . $e->getMessage(), 500);
+        }
+    }
 
     /**
      * @OA\Get(
