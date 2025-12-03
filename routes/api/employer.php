@@ -23,6 +23,7 @@ Route::middleware(['auth:sanctum', 'user.type:employer'])->group(function () {
     Route::get('/dashboard/employer', [DashboardController::class, 'employer']);
 
     Route::post('projects', [ProjectController::class, 'store']);
+    Route::patch('projects/{id}', [ProjectController::class, 'update']);
 
     Route::get('/jobs/companies/{id}', [JobPostController::class, 'companies']);
     Route::get('/jobs/recent', [JobApplicationController::class, 'recent']);
@@ -70,7 +71,7 @@ Route::middleware(['auth:sanctum', 'user.type:learner'])->group(function () {
     Route::post('/jobs/apply', [JobApplicationController::class, 'apply']);
 
     Route::get('/saved-jobs', [SavedJobsController::class, 'index']);
-    Route::post('/saved-jobs',[SavedJobsController::class, 'store']);
+    Route::post('/saved-jobs', [SavedJobsController::class, 'store']);
 
     Route::post('/projects/{id}/start', [ProjectActivityController::class, 'learnerStart']);
     Route::post('/projects/{id}/complete', [ProjectActivityController::class, 'learnerComplete']);
@@ -82,7 +83,7 @@ Route::get('jobs/{id}', [JobPostController::class, 'show'])->whereNumber('id');
 Route::get('projects', [ProjectController::class, 'index']);
 Route::get('/projects/{id}', [ProjectController::class, 'show'])->whereNumber('id');
 
-    Route::get('/jobs-trending',[JobPostController::class, 'trending']);
+Route::get('/jobs-trending', [JobPostController::class, 'trending']);
 
 
 Route::middleware(['auth:sanctum', 'user.type:employer'])->group(function () {

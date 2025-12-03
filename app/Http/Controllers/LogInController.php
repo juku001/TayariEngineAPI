@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
+use App\Models\Employer;
 use App\Models\LearnerAptitudeResult;
 use App\Models\User;
 use App\Services\AdminLogService;
@@ -151,7 +152,11 @@ class LogInController extends Controller
         if ($userType == 'Learner') {
             $success['aptitude_check'] = LearnerAptitudeResult::where('user_id', $user->id)->exists();
         }
+
         $success['user'] = $user;
+        if ($userType == 'employer') {
+            $success['user']['company_id'] = Employer::where('user_id', $user->id)->first()->company_id;
+        }
         $this->logService->record($user->id, $action, $userType . ' dashboard access');
         return ResponseHelper::success($success, 'User login successful.');
     }
@@ -186,47 +191,47 @@ class LogInController extends Controller
 
 
 
-/**
- * @OA\Get(
- *     path="/auth/google/callback",
- *     summary="Google OAuth callback",
- *     description="Handles the Google OAuth callback after successful Google authentication. 
- *         Creates or updates the user record, generates an access token, 
- *         and redirects the user to the frontend with token and aptitude info.",
- *     operationId="googleCallback",
- *     tags={"Authentication"},
- *
- *     @OA\Parameter(
- *         name="code",
- *         in="query",
- *         description="Authorization code returned by Google OAuth",
- *         required=true,
- *         @OA\Schema(type="string", example="4/0Ab32j93ksjQLfriVeleqyXTaKaTvWwPrDfNQ0ReJKcS9rJwq1h3DlIbS2RTio3ulFkHrYQ")
- *     ),
- *
- *     @OA\Response(
- *         response=302,
- *         description="Redirects to the frontend with token and aptitude status",
- *         @OA\Header(
- *             header="Location",
- *             description="Frontend URL where the user is redirected, including token and aptitude query params",
- *             @OA\Schema(
- *                 type="string",
- *                 example="https://tayari.work/login?token=223%7CCF5Uz2UtQRKW2tqPBOkSM6GEJ9LX8YFpniYdmG2Y371b3536&aptitude=false"
- *             )
- *         )
- *     ),
- *
- *     @OA\Response(
- *         response=400,
- *         description="Invalid or expired authorization code"
- *     ),
- *     @OA\Response(
- *         response=500,
- *         description="Server error during Google authentication"
- *     )
- * )
- */
+    /**
+     * @OA\Get(
+     *     path="/auth/google/callback",
+     *     summary="Google OAuth callback",
+     *     description="Handles the Google OAuth callback after successful Google authentication. 
+     *         Creates or updates the user record, generates an access token, 
+     *         and redirects the user to the frontend with token and aptitude info.",
+     *     operationId="googleCallback",
+     *     tags={"Authentication"},
+     *
+     *     @OA\Parameter(
+     *         name="code",
+     *         in="query",
+     *         description="Authorization code returned by Google OAuth",
+     *         required=true,
+     *         @OA\Schema(type="string", example="4/0Ab32j93ksjQLfriVeleqyXTaKaTvWwPrDfNQ0ReJKcS9rJwq1h3DlIbS2RTio3ulFkHrYQ")
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=302,
+     *         description="Redirects to the frontend with token and aptitude status",
+     *         @OA\Header(
+     *             header="Location",
+     *             description="Frontend URL where the user is redirected, including token and aptitude query params",
+     *             @OA\Schema(
+     *                 type="string",
+     *                 example="https://tayari.work/login?token=223%7CCF5Uz2UtQRKW2tqPBOkSM6GEJ9LX8YFpniYdmG2Y371b3536&aptitude=false"
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=400,
+     *         description="Invalid or expired authorization code"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error during Google authentication"
+     *     )
+     * )
+     */
 
     public function callback(Request $request)
     {
@@ -258,12 +263,17 @@ class LogInController extends Controller
         $action = $this->logService->getActionByCode(1);
         $userType = ucfirst($user->roles->pluck('name')->first());
         $aptitudeCheck = null;
+        $companyId = null;
         if ($userType == 'Learner') {
             $aptitudeCheck = LearnerAptitudeResult::where('user_id', $user->id)->exists();
         }
         $this->logService->record($user->id, $action, $userType . ' dashboard access');
 
-        $redirectUrl = 'https://tayari.work/login?token=' . urlencode($token) . '?aptitude=' . $aptitudeCheck;
+        if ($userType == 'employer') {
+            $companyId = Employer::where('user_id', $user->id)->first()->company_id;
+        }
+
+        $redirectUrl = 'https://tayari.work/login?token=' . urlencode($token) . '?aptitude=' . $aptitudeCheck . '?company=' . $companyId;
         return redirect($redirectUrl);
     }
 
