@@ -71,19 +71,52 @@ class ProjectController extends Controller
      */
 
 
+    // public function index(Request $request)
+    // {
+    //     $auth = auth()->user();
+    //     $authId = $auth->id;
+    //     $employer = Employer::where('user_id', $authId)->first();
+
+    //     $companyId = $employer->company_id;
+
+    //     try {
+    //         $search = $request->get('search');
+
+    //         $projects = Project::with('projectSkills')
+    //             ->where('company_id', $companyId) 
+    //             ->when($search, function ($query, $search) {
+    //                 $query->where(function ($q) use ($search) {
+    //                     $q->where('title', 'like', "%{$search}%")
+    //                         ->orWhereHas('company', function ($q2) use ($search) {
+    //                             $q2->where('name', 'like', "%{$search}%");
+    //                         });
+    //                 });
+    //             })
+    //             ->get(); // no pagination
+
+    //         return ResponseHelper::success($projects, "Projects retrieved successfully");
+    //     } catch (\Exception $e) {
+    //         return ResponseHelper::error([], "Failed to fetch projects: " . $e->getMessage(), 500);
+    //     }
+    // }
+
     public function index(Request $request)
     {
-        $auth = auth()->user();
-        $authId = $auth->id;
-        $employer = Employer::where('user_id', $authId)->first();
-
-        $companyId = $employer->company_id;
-
         try {
             $search = $request->get('search');
 
+            // Check if user is logged in
+            $auth = auth()->user();
+
             $projects = Project::with('projectSkills')
-                ->where('company_id', $companyId) // restrict to employer's company
+                ->when($auth, function ($query) use ($auth) {
+
+                    $employer = Employer::where('user_id', $auth->id)->first();
+
+                    if ($employer && $employer->company_id) {
+                        $query->where('company_id', $employer->company_id);
+                    }
+                })
                 ->when($search, function ($query, $search) {
                     $query->where(function ($q) use ($search) {
                         $q->where('title', 'like', "%{$search}%")
@@ -99,7 +132,6 @@ class ProjectController extends Controller
             return ResponseHelper::error([], "Failed to fetch projects: " . $e->getMessage(), 500);
         }
     }
-
 
 
 
@@ -303,7 +335,7 @@ class ProjectController extends Controller
      *         )
      *     ),
      *
-    *     @OA\Response(
+     *     @OA\Response(
      *         response=200,
      *         description="Project updated successfully",
      *         @OA\JsonContent(

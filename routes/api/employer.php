@@ -81,7 +81,7 @@ Route::middleware(['auth:sanctum', 'user.type:learner'])->group(function () {
 Route::post('team/invite/accept/{token}', [TeamController::class, 'accept']);
 Route::get('jobs', [JobPostController::class, 'index']);
 Route::get('jobs/{id}', [JobPostController::class, 'show'])->whereNumber('id');
-Route::get('projects', [ProjectController::class, 'index']);
+Route::get('/projects', [ProjectController::class, 'index']);
 Route::get('/projects/{id}', [ProjectController::class, 'show'])->whereNumber('id');
 
 Route::get('/jobs-trending', [JobPostController::class, 'trending']);
