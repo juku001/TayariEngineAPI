@@ -153,8 +153,9 @@ class LogInController extends Controller
             $success['aptitude_check'] = LearnerAptitudeResult::where('user_id', $user->id)->exists();
         }
 
+
         $success['user'] = $user;
-        if ($userType == 'employer') {
+        if ($userType == 'Employer') {
             $success['user']['company_id'] = Employer::where('user_id', $user->id)->first()->company_id;
         }
         $this->logService->record($user->id, $action, $userType . ' dashboard access');
@@ -269,7 +270,7 @@ class LogInController extends Controller
         }
         $this->logService->record($user->id, $action, $userType . ' dashboard access');
 
-        if ($userType == 'employer') {
+        if ($userType == 'Employer') {
             $companyId = Employer::where('user_id', $user->id)->first()->company_id;
         }
 

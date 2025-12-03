@@ -22,6 +22,7 @@ Route::get('/jobs/matches', [JobMatchController::class, 'index'])->middleware('a
 Route::middleware(['auth:sanctum', 'user.type:employer'])->group(function () {
     Route::get('/dashboard/employer', [DashboardController::class, 'employer']);
 
+    
     Route::post('projects', [ProjectController::class, 'store']);
     Route::patch('projects/{id}', [ProjectController::class, 'update']);
 

@@ -413,10 +413,8 @@ class ProjectController extends Controller
         try {
             $validated = $validator->validated();
 
-            // Update project fields (PATCH means only provided fields)
             $project->update($validated);
 
-            // If skills were provided, sync them
             if (array_key_exists('skills', $validated)) {
                 $project->projectSkills()->delete(); // Remove old skills
 
