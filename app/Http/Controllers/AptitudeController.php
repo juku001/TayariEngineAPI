@@ -430,7 +430,10 @@ class AptitudeController extends Controller
 
     public function getAllAptitudes()
     {
-        $aptQuestions = AptitudeQuestion::with('options')->get();
+        //     $aptQuestions = AptitudeQuestion::with('options')->orderBy('created_at', 'desc')->get();
+        $aptQuestions = AptitudeQuestion::with('options')
+            ->latest()
+            ->get();
 
         return ResponseHelper::success($aptQuestions, "All aptitude questions.");
     }
