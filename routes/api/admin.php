@@ -32,6 +32,7 @@ Route::prefix('admin')->group(function () {
         Route::get('logs', [AdminController::class, 'logs']);
         Route::post('communications', [AdminController::class, 'comms']);
 
+        Route::get('/aptitudes', [AptitudeController::class, 'getAllAptitudes']);
         Route::post('/aptitudes', [AptitudeController::class, 'addNewAptitude']);
         Route::put('/aptitudes/{id}', [AptitudeController::class, 'update']);
         Route::get('/aptitudes/{id}', [AptitudeController::class, 'show']);

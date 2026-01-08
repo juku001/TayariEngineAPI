@@ -337,12 +337,116 @@ class AptitudeController extends Controller
 
 
 
+
+    /**
+     * @OA\Get(
+     *     path="/admin/aptitudes",
+     *     operationId="getAllAptitudes",
+     *     tags={"Aptitude"},
+     *     summary="For Admin to fetch all aptitude questions",
+     *     description="Requires authentication. Only users with the role 'admin' can access this endpoint. Returns a list of aptitude questions with their options.",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             example={
+     *                 "status": true,
+     *                 "message": "All aptitude questions.",
+     *                 "code": 200,
+     *                 "data": {
+     *                     {
+     *                         "id": 1,
+     *                         "title": "What interests you most?",
+     *                         "sub_title": "Select all areas you'd like to learn about",
+     *                         "qn_type": "multiple",
+     *                         "created_at": "2025-08-28T19:46:10.000000Z",
+     *                         "updated_at": "2025-08-28T19:46:10.000000Z",
+     *                         "options": {
+     *                             {
+     *                                 "id": 1,
+     *                                 "question_id": 1,
+     *                                 "title": "Technology & Programming",
+     *                                 "key": "Tech",
+     *                                 "sub_title": null,
+     *                                 "icon": "fa fa-business",
+     *                                 "color": "#ff0000",
+     *                                 "created_at": "2025-08-28T19:46:10.000000Z",
+     *                                 "updated_at": "2025-08-28T19:46:10.000000Z"
+     *                             },
+     *                             {
+     *                                 "id": 2,
+     *                                 "question_id": 1,
+     *                                 "title": "Digital Marketing",
+     *                                 "key": "Marketing",
+     *                                 "sub_title": null,
+     *                                 "icon": "fa fa-stocks",
+     *                                 "color": "#ff2e20",
+     *                                 "created_at": "2025-08-28T19:46:10.000000Z",
+     *                                 "updated_at": "2025-08-28T19:46:10.000000Z"
+     *                             }
+     *                         }
+     *                     },
+     *                     {
+     *                         "id": 2,
+     *                         "title": "What's your current skill level?",
+     *                         "sub_title": "Be honest - this helps us recommend the right courses",
+     *                         "qn_type": "single",
+     *                         "created_at": "2025-08-28T19:46:10.000000Z",
+     *                         "updated_at": "2025-08-28T19:46:10.000000Z",
+     *                         "options": {
+     *                             {
+     *                                 "id": 5,
+     *                                 "question_id": 2,
+     *                                 "title": "Beginner",
+     *                                 "key": "beginner",
+     *                                 "sub_title": "Just getting started",
+     *                                 "icon": null,
+     *                                 "color": null,
+     *                                 "created_at": "2025-08-28T19:46:10.000000Z",
+     *                                 "updated_at": "2025-08-28T19:46:10.000000Z"
+     *                             }
+     *                         }
+     *                     }
+     *                 }
+     *             }
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         ref="#/components/responses/401"
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden - Only admins can access this resource",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Only admins can access this"),
+     *             @OA\Property(property="code", type="integer", example=403),
+     *         ),
+     *     )
+     * )
+     */
+
+    public function getAllAptitudes()
+    {
+        $aptQuestions = AptitudeQuestion::with('options')->get();
+
+        return ResponseHelper::success($aptQuestions, "All aptitude questions.");
+    }
+
+
+
+
+
+
     /**
      * @OA\Post(
      *     path="/admin/aptitudes",
      *     tags={"Aptitude"},
      *     summary="Create a new aptitude question with options",
      *     description="Creates a new aptitude question with its related options.",
+     *     security={{"bearerAuth": {}}},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
@@ -482,7 +586,7 @@ class AptitudeController extends Controller
      *     summary="Update an existing aptitude question and its options",
      *     description="Updates an aptitude question and optionally its related options. 
      *     Existing options can be updated by including their IDs, or new options can be added without an ID.",
-     *     
+     *     security={{"bearerAuth": {}}},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -647,7 +751,7 @@ class AptitudeController extends Controller
      *     tags={"Aptitude"},
      *     summary="Fetch a single aptitude question by ID",
      *     description="Returns a specific aptitude question and its related options.",
-     * 
+     *     security={{"bearerAuth": {}}},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -737,7 +841,7 @@ class AptitudeController extends Controller
      *     tags={"Aptitude"},
      *     summary="Delete an aptitude question",
      *     description="Deletes a specific aptitude question and all its related options.",
-     * 
+     *     security={{"bearerAuth": {}}},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -805,7 +909,7 @@ class AptitudeController extends Controller
      *     tags={"Aptitude"},
      *     summary="Delete an option from an aptitude question",
      *     description="Deletes a specific option belonging to a particular aptitude question.",
-     * 
+     *     security={{"bearerAuth": {}}},
      *     @OA\Parameter(
      *         name="questionId",
      *         in="path",

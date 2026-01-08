@@ -782,6 +782,116 @@
             }
         },
         "/admin/aptitudes": {
+            "get": {
+                "tags": [
+                    "Aptitude"
+                ],
+                "summary": "For Admin to fetch all aptitude questions",
+                "description": "Requires authentication. Only users with the role 'admin' can access this endpoint. Returns a list of aptitude questions with their options.",
+                "operationId": "getAllAptitudes",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "status": true,
+                                    "message": "All aptitude questions.",
+                                    "code": 200,
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "title": "What interests you most?",
+                                            "sub_title": "Select all areas you'd like to learn about",
+                                            "qn_type": "multiple",
+                                            "created_at": "2025-08-28T19:46:10.000000Z",
+                                            "updated_at": "2025-08-28T19:46:10.000000Z",
+                                            "options": [
+                                                {
+                                                    "id": 1,
+                                                    "question_id": 1,
+                                                    "title": "Technology & Programming",
+                                                    "key": "Tech",
+                                                    "sub_title": null,
+                                                    "icon": "fa fa-business",
+                                                    "color": "#ff0000",
+                                                    "created_at": "2025-08-28T19:46:10.000000Z",
+                                                    "updated_at": "2025-08-28T19:46:10.000000Z"
+                                                },
+                                                {
+                                                    "id": 2,
+                                                    "question_id": 1,
+                                                    "title": "Digital Marketing",
+                                                    "key": "Marketing",
+                                                    "sub_title": null,
+                                                    "icon": "fa fa-stocks",
+                                                    "color": "#ff2e20",
+                                                    "created_at": "2025-08-28T19:46:10.000000Z",
+                                                    "updated_at": "2025-08-28T19:46:10.000000Z"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "id": 2,
+                                            "title": "What's your current skill level?",
+                                            "sub_title": "Be honest - this helps us recommend the right courses",
+                                            "qn_type": "single",
+                                            "created_at": "2025-08-28T19:46:10.000000Z",
+                                            "updated_at": "2025-08-28T19:46:10.000000Z",
+                                            "options": [
+                                                {
+                                                    "id": 5,
+                                                    "question_id": 2,
+                                                    "title": "Beginner",
+                                                    "key": "beginner",
+                                                    "sub_title": "Just getting started",
+                                                    "icon": null,
+                                                    "color": null,
+                                                    "created_at": "2025-08-28T19:46:10.000000Z",
+                                                    "updated_at": "2025-08-28T19:46:10.000000Z"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/401"
+                    },
+                    "403": {
+                        "description": "Forbidden - Only admins can access this resource",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Only admins can access this"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 403
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
             "post": {
                 "tags": [
                     "Aptitude"
@@ -1021,7 +1131,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/admin/aptitudes/{id}": {
@@ -1199,7 +1314,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             },
             "put": {
                 "tags": [
@@ -1474,7 +1594,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             },
             "delete": {
                 "tags": [
@@ -1568,7 +1693,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/admin/aptitude/{questionId}/options/{optionId}": {
@@ -1674,7 +1804,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/is_auth": {
@@ -9255,7 +9390,7 @@
                     "Authentication"
                 ],
                 "summary": "Google OAuth callback",
-                "description": "Handles the Google OAuth callback after successful Google authentication. \n *         Creates or updates the user record, generates an access token, \n *         and redirects the user to the frontend with token and aptitude info.",
+                "description": "Handles the Google OAuth callback after successful Google authentication. \n     *         Creates or updates the user record, generates an access token, \n     *         and redirects the user to the frontend with token and aptitude info.",
                 "operationId": "googleCallback",
                 "parameters": [
                     {
