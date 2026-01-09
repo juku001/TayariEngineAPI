@@ -423,7 +423,7 @@ class TeamController extends Controller
             $authId = auth()->user()->id;
             $team = Team::find($request->team_id);
 
-            if(!$team){
+            if (isset($request->team_id) && !$team) {
                 return ResponseHelper::error([], 'Team not found.', 404);
             }
 
@@ -440,7 +440,7 @@ class TeamController extends Controller
                     'token' => Str::random(40), // unique token for acceptance
                     'status' => 'pending',
                     'invited_by' => $authId,
-                    'company_id' => $team->company_id
+                    'company_id' => $team->company_id ?? null
                 ]);
 
                 $invitations[] = $invitation;
