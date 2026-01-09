@@ -423,6 +423,11 @@ class TeamController extends Controller
             $authId = auth()->user()->id;
             $team = Team::find($request->team_id);
 
+            if(!$team){
+                return ResponseHelper::error([], 'Team not found.', 404);
+            }
+
+
             $invitations = [];
             foreach ($emails as $email) {
                 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
