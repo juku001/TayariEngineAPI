@@ -68,9 +68,9 @@ class JobMatchController extends Controller
         $jobs = JobPost::all();
 
         $data = $jobs->map(function ($jobPost) use ($user) {
-            // Run your job matching logic
+   
             $jobMatchingHelper = new JobMatchingHelper($jobPost, $user);
-            $matchScore = $jobMatchingHelper->getMatchingStatus(); // assuming you have this method
+            $matchScore = $jobMatchingHelper->getMatchingStatus(); 
 
             return [
                 'job' => $jobPost,

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
+use App\Models\Employer;
+use App\Models\Project;
 use App\Models\ProjectProposal;
 use Exception;
 use Illuminate\Http\Request;
@@ -93,13 +95,6 @@ class ProposalController extends Controller
 
     public function index()
     {
-        // try {
-        //     $proposals = ProjectProposal::with('project')->get();
-        //     return ResponseHelper::success($proposals, 'List of proposals');
-        // } catch (Exception $e) {
-        //     return ResponseHelper::error([], "Failed to fetch proposals: " . $e->getMessage(), 500);
-        // }
-
         $authId = auth()->user()->id;
         try {
             $proposals = ProjectProposal::with('project')->where(
@@ -329,6 +324,244 @@ class ProposalController extends Controller
             return ResponseHelper::error([], "Failed to update proposal: " . $e->getMessage(), 500);
         }
     }
+
+
+
+
+
+
+
+    /**
+     * @OA\Get(
+     *     path="/projects/proposals/employer",
+     *     operationId="getEmployerProjectProposals",
+     *     tags={"Projects"},
+     *     summary="Get employer projects with filtered proposals",
+     *     description="Returns a list of projects belonging to the authenticated employer's company, with project proposals optionally filtered by status.",
+     *     security={{"bearerAuth":{}}},
+     *
+     *     @OA\Parameter(
+     *         name="status",
+     *         in="query",
+     *         description="Filter project proposals by status",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="string",
+     *             enum={"pending", "shortlist", "accepted", "denied"},
+     *             example="shortlist"
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of projects and filtered proposals",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="List of projects and filtered proposals"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="title", type="string", example="Website Redesign"),
+     *                     @OA\Property(
+     *                         property="project_proposals",
+     *                         type="array",
+     *                         @OA\Items(
+     *                             @OA\Property(property="id", type="integer", example=10),
+     *                             @OA\Property(property="status", type="string", example="shortlist"),
+     *                             @OA\Property(property="created_at", type="string", format="date-time")
+     *                         )
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *           type="object",
+     *           @OA\Property(property="status", type="boolean", example=false),
+     *           @OA\Property(property="message", type="string", example="Unauthorized"),
+     *           @OA\Property(property="code", type="integer", example=401),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden: Not the employer",
+     *         @OA\JsonContent(
+     *           type="object",
+     *           @OA\Property(property="status", type="boolean", example=false),
+     *           @OA\Property(property="message", type="string", example="You are not allowed to perform this action"),
+     *           @OA\Property(property="code", type="integer", example=403)
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=404,
+     *         description="Employer Company not found",
+     *         @OA\JsonContent(
+     *           type="object",
+     *           @OA\Property(property="status", type="boolean", example=false),
+     *           @OA\Property(property="message", type="string", example="Employer Company not found"),
+     *           @OA\Property(property="code", type="integer", example=404)
+     *         )
+     *     )
+     * )
+     */
+
+
+    public function employer(Request $request)
+    {
+        $authId = auth()->user()->id;
+
+        $employer = Employer::where('user_id', $authId)->first();
+        if (!$employer || !$employer->company_id) {
+            return ResponseHelper::error([], 'Employer company not found', 404);
+        }
+
+        $status = $request->query('status');
+        $projects = Project::with([
+            'projectProposals' => function ($query) use ($status) {
+                if ($status) {
+                    $query->where('status', $status);
+                }
+            }
+        ])
+            ->where('company_id', $employer->company_id)
+            ->get();
+
+        return ResponseHelper::success($projects, 'List of projects and filtered proposals');
+    }
+
+
+
+    /**
+     * @OA\Get(
+     *     path="/projects/proposals/project/{id}",
+     *     operationId="getProjectProposalsByProject",
+     *     tags={"Projects"},
+     *     summary="Get proposals for a specific project",
+     *     description="Returns all proposals for a specific project owned by the authenticated employer's company. Proposals can be filtered by status.",
+     *     security={{"bearerAuth":{}}},
+     *
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Project ID",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer",
+     *             example=12
+     *         )
+     *     ),
+     *
+     *     @OA\Parameter(
+     *         name="status",
+     *         in="query",
+     *         description="Filter project proposals by status",
+     *         required=false,
+     *         @OA\Schema(
+     *             type="string",
+     *             enum={"pending", "shortlist", "accepted", "denied"},
+     *             example="shortlist"
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Project proposals retrieved successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Project proposals retrieved successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=12),
+     *                 @OA\Property(property="title", type="string", example="Mobile App Development"),
+     *                 @OA\Property(
+     *                     property="project_proposals",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         @OA\Property(property="id", type="integer", example=45),
+     *                         @OA\Property(property="status", type="string", example="shortlist"),
+     *                         @OA\Property(property="created_at", type="string", format="date-time")
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *
+    *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *           type="object",
+     *           @OA\Property(property="status", type="boolean", example=false),
+     *           @OA\Property(property="message", type="string", example="Unauthorized"),
+     *           @OA\Property(property="code", type="integer", example=401),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden: Not the employer",
+     *         @OA\JsonContent(
+     *           type="object",
+     *           @OA\Property(property="status", type="boolean", example=false),
+     *           @OA\Property(property="message", type="string", example="You are not allowed to perform this action"),
+     *           @OA\Property(property="code", type="integer", example=403)
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=404,
+     *         description="Employer Company not found",
+     *         @OA\JsonContent(
+     *           type="object",
+     *           @OA\Property(property="status", type="boolean", example=false),
+     *           @OA\Property(property="message", type="string", example="Employer Company not found"),
+     *           @OA\Property(property="code", type="integer", example=404)
+     *         )
+     *     )
+     * )
+     */
+
+    public function byProject(Request $request, $id)
+    {
+        $authId = auth()->user()->id;
+
+        $employer = Employer::where('user_id', $authId)->first();
+        if (!$employer || !$employer->company_id) {
+            return ResponseHelper::error([], 'Employer has no company', 404);
+        }
+
+        $status = $request->query('status');
+
+        $project = Project::with([
+            'projectProposals' => function ($query) use ($status) {
+                if ($status) {
+                    $query->where('status', $status);
+                }
+            }
+        ])
+            ->where('company_id', $employer->company_id)
+            ->where('id', $id)
+            ->first();
+
+        if (!$project) {
+            return ResponseHelper::error([], 'Project not found', 404);
+        }
+
+        return ResponseHelper::success($project, 'Project proposals retrieved successfully');
+    }
+
+
+
+
 
 
 }

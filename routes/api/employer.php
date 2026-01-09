@@ -22,7 +22,7 @@ Route::get('/jobs/matches', [JobMatchController::class, 'index'])->middleware('a
 Route::middleware(['auth:sanctum', 'user.type:employer'])->group(function () {
 
     Route::get('/dashboard/employer', [DashboardController::class, 'employer']);
-    Route::post('projects', [ProjectController::class, 'store']);  
+    Route::post('projects', [ProjectController::class, 'store']);
     Route::patch('projects/{id}', [ProjectController::class, 'update']);
 
     Route::get('/jobs/companies/{id}', [JobPostController::class, 'companies']);
@@ -45,10 +45,6 @@ Route::middleware(['auth:sanctum', 'user.type:employer'])->group(function () {
     Route::delete('team/invites/remove/{id}', [TeamController::class, 'destroy']);
     Route::get('/dashboard/employer/teams', [DashboardController::class, 'teams']);
 
-    Route::patch('/projects/proposal/feedback/{id}', [ProposalController::class, 'feedback']);
-
-
-
     Route::patch('/projects/{id}/review/start', [ProjectActivityController::class, 'reviewStart']);
     Route::post('/projects/{id}/review/submit', [ProjectActivityController::class, 'reviewSubmit']);
 
@@ -62,12 +58,6 @@ Route::middleware(['auth:sanctum', 'user.type:employer'])->group(function () {
 });
 
 Route::middleware(['auth:sanctum', 'user.type:learner'])->group(function () {
-    Route::prefix('/projects/proposals')->group(function () {
-        Route::get('/', [ProposalController::class, 'index']);
-        Route::post('/', [ProposalController::class, 'store']);
-    });
-
-
     Route::post('/jobs/apply', [JobApplicationController::class, 'apply']);
 
     Route::get('/saved-jobs', [SavedJobsController::class, 'index']);
@@ -98,3 +88,20 @@ Route::resource('/job-types', JobTypeController::class);
 
 Route::get('/jobs/trending', [PopularController::class, 'trending']);
 
+
+
+
+//PROPOSALS
+
+Route::middleware(['auth:sanctum', 'user.type:learner'])->group(function () {
+    Route::prefix('/projects/proposals')->group(function () {
+        Route::get('/', [ProposalController::class, 'index']);
+        Route::post('/', [ProposalController::class, 'store']);
+    });
+});
+
+Route::middleware(['auth:sanctum', 'user.type:employer'])->group(function () {
+    Route::patch('/projects/proposal/feedback/{id}', [ProposalController::class, 'feedback']);
+    Route::get('/projects/proposals/employer', [ProposalController::class, 'employer']); //get list of proposals with their projects (filter status)
+    Route::get('/projects/proposals/project/{id}', [ProposalController::class, 'byProject']); //get list of proposals of one project (filter status)
+});
