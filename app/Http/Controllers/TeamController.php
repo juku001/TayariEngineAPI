@@ -452,10 +452,17 @@ class TeamController extends Controller
                 $inviteLink = url("/invite/accept/{$invitation->token}");
 
                 // Send email
+                $user = auth()->user();
+
+                $name = trim(
+                    ($user->first_name ?? '') . ' ' . ($user->last_name ?? '')
+                );
+                $name = $name !== '' ? $name : 'Team Admin';
+
                 Mail::to($email)->send(new TeamInviteMail(
                     $inviteLink,
-                     optional($team)->name ?? 'No Group',
-                    auth()->user()->name
+                    optional($team)->name ?? 'No Group',
+                    $name
                 ));
 
             }
