@@ -417,16 +417,19 @@ class TeamController extends Controller
         }
 
         try {
+            $authId = auth()->user()->id;
+            $employer = Employer::where('user_id', $authId)->first();
             // Split and clean up emails
             $emails = array_map('trim', explode(',', $request->email_addresses));
 
             $authId = auth()->user()->id;
             $team = Team::find($request->team_id);
 
+
             if (isset($request->team_id) && !$team) {
                 return ResponseHelper::error([], 'Team not found.', 404);
             }
-
+            $companyId = $employer->company_id;
 
             $invitations = [];
             foreach ($emails as $email) {
@@ -436,11 +439,11 @@ class TeamController extends Controller
 
                 $invitation = TeamInvitation::create([
                     'email' => $email,
-                    'team_id' => $request->team_id,
+                    'team_id' => $request->team_id ?? null,
                     'token' => Str::random(40), // unique token for acceptance
                     'status' => 'pending',
                     'invited_by' => $authId,
-                    'company_id' => $team->company_id ?? null
+                    'company_id' => $companyId
                 ]);
 
                 $invitations[] = $invitation;
