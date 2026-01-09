@@ -449,7 +449,8 @@ class TeamController extends Controller
                 $invitations[] = $invitation;
 
                 // Build the invite link (adjust route name/domain)
-                $inviteLink = url("/invite/accept/{$invitation->token}");
+                // $inviteLink = url("/invite/accept/{$invitation->token}");
+                $inviteLink = "https://tayari.work/invite/accept/{$invitation->token}";
 
                 // Send email
                 $user = auth()->user();
