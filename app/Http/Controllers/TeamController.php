@@ -454,7 +454,7 @@ class TeamController extends Controller
                 // Send email
                 Mail::to($email)->send(new TeamInviteMail(
                     $inviteLink,
-                    optional($team)->name ?? 'No Group',
+                    'No Group',
                     auth()->user()->name
                 ));
 
