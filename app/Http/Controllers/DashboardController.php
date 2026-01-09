@@ -391,6 +391,7 @@ class DashboardController extends Controller
         $employer = Employer::where('user_id', $authId)->first();
         $companyId = $employer->company_id;
 
+   
 
         $teamMembers = EmployerTeamMember::query()
             ->whereHas('team', function ($q) use ($companyId) {
@@ -402,7 +403,7 @@ class DashboardController extends Controller
         $query = TeamInvitation::where('company_id', $employer->company_id);
 
         $pending = $query->where('status', 'pending')->count();
-        $pending = $query->where('status', 'accepted')->count();
+        $active = $query->where('status', 'accepted')->count();
 
 
         $data = [
