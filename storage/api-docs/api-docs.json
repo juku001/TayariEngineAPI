@@ -15115,14 +15115,14 @@
                 }
             }
         },
-        "/team/invite/remove/{id}": {
+        "/team/invites/remove/{id}": {
             "delete": {
                 "tags": [
                     "Employer"
                 ],
                 "summary": "Remove a team invitation",
                 "description": "Deletes a specific team invitation by ID. Only available to authenticated employers.",
-                "operationId": "23851ba9522062631cf8d02f67e223ac",
+                "operationId": "4a393f76a73c70874c604dba5aecf0d0",
                 "parameters": [
                     {
                         "name": "id",
