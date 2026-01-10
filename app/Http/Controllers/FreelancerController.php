@@ -373,7 +373,7 @@ class FreelancerController extends Controller
 
 
         if ($validator->fails()) {
-            return ResponseHelper::error([], 'Validation failed', 422);
+            return ResponseHelper::error($validator->errors(), 'Validation failed', 422);
         }
         $data = $validator->validated();
         $data['user_id'] = auth()->user()->id;
@@ -518,7 +518,7 @@ class FreelancerController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return ResponseHelper::error([], 'Validation failed', 422);
+            return ResponseHelper::error($validator->errors(), 'Validation failed', 422);
         }
 
         $freelancer->update($validator->validated());
