@@ -9,6 +9,7 @@ class EmployerTeamMember extends Model
     protected $fillable = [
         'user_id',
         'team_id',
+        'company_id',
         'role'
     ];
 

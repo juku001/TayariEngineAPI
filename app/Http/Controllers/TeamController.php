@@ -11,10 +11,12 @@ use App\Models\TeamInvitation;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Mail;
 use Response;
 use Str;
+use Illuminate\Support\Facades\Password;
 
 class TeamController extends Controller
 {
@@ -528,6 +530,8 @@ class TeamController extends Controller
      * )
      */
 
+
+
     public function accept(string $token)
     {
         $invitation = TeamInvitation::where('token', $token)
@@ -538,29 +542,35 @@ class TeamController extends Controller
             return ResponseHelper::error([], 'Invalid or expired invitation token.', 404);
         }
 
-        $user = User::where('email', $invitation->email)->first();
 
-        if ($user) {
-            EmployerTeamMember::firstOrCreate([
-                'team_id' => $invitation->team_id,
-                'user_id' => $user->id,
-            ]);
+        $user = User::firstOrCreate(
+            ['email' => $invitation->email],
+            [
+                'name' => $invitation->name ?? 'New User',
+                'password' => Hash::make(str()->random(16)), // random secure password
+            ]
+        );
 
-            $invitation->update(['status' => 'accepted']);
-
-            return ResponseHelper::success(
-                $user,
-                'You have been added to the team successfully.',
-                200
-            );
-        }
-        session(['team_invite_token' => $invitation->token]);
-
-        return redirect()->route('register')->with([
-            'invite_email' => $invitation->email,
-            'invite_team_id' => $invitation->team_id
+        // Add to team
+        EmployerTeamMember::firstOrCreate([
+            'user_id' => $user->id,
+            'company_id' => $invitation->company_id,
+            'team_id' => $invitation->team_id,
         ]);
+
+        // Mark invitation as accepted
+        $invitation->update(['status' => 'accepted']);
+
+        // ✅ Send email notification (optional)
+        // Mail::to($user->email)->send(new TeamInvitationAcknowledgementMail($user, $invitation));
+
+        return ResponseHelper::success(
+            $user,
+            'You have been successfully added to the team.',
+            200
+        );
     }
+
 
 
 
