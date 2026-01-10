@@ -12,6 +12,7 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProposalController;
 use App\Http\Controllers\SavedJobsController;
 use App\Http\Controllers\TeamController;
+use App\Http\Controllers\TeamTrainingController;
 use App\Http\Controllers\TrainingController;
 
 Route::get('/jobs/matches', [JobMatchController::class, 'index'])->middleware('auth:sanctum');
@@ -106,4 +107,16 @@ Route::middleware(['auth:sanctum', 'user.type:employer'])->group(function () {
     Route::patch('/projects/proposal/feedback/{id}', [ProposalController::class, 'feedback']);
     Route::get('/projects/proposals/employer', [ProposalController::class, 'employer']); //get list of proposals with their projects (filter status)
     Route::get('/projects/proposals/project/{id}', [ProposalController::class, 'byProject']); //get list of proposals of one project (filter status)
+});
+
+
+Route::prefix('/employer/training')->group(function () {
+
+    Route::middleware(['auth:sanctum', 'user.type:employer'])->group(function () { 
+        Route::post('/assign', [TeamTrainingController::class, 'store']);
+        Route::get('/members', [TeamTrainingController::class, 'members']);
+        Route::get('/overview', [TeamTrainingController::class, 'index']);
+        Route::get('/courses', [TeamTrainingController::class, 'courses']);
+        Route::get('/progress', [TeamTrainingController::class, 'progress']);
+    });
 });

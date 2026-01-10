@@ -13,6 +13,7 @@ class Enrollment extends Model
         'progress',
         'enrollment_type',
         'team_id',
+        'company_id',
         'assigned_by'
     ];
 

@@ -38,6 +38,11 @@ class Course extends Model
         return $this->hasMany(Module::class);
     }
 
+
+    public function level()
+    {
+        return $this->belongsTo(Level::class);
+    }
     public function lessons()
     {
         return $this->hasMany(Lesson::class);
