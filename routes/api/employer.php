@@ -43,7 +43,7 @@ Route::middleware(['auth:sanctum', 'user.type:employer'])->group(function () {
     Route::get('team/invites', [TeamController::class, 'getInvites']);
     Route::post('team/invites', [TeamController::class, 'invite']);
 
-    Route::delete('team/invites/remove/{id}', [TeamController::class, 'destroy']);
+    Route::delete('/team/invites/remove/{id}', [TeamController::class, 'destroy']);
     Route::get('/dashboard/employer/teams', [DashboardController::class, 'teams']);
 
     Route::patch('/projects/{id}/review/start', [ProjectActivityController::class, 'reviewStart']);
@@ -69,6 +69,7 @@ Route::middleware(['auth:sanctum', 'user.type:learner'])->group(function () {
 });
 
 Route::post('team/invite/accept/{token}', [TeamController::class, 'accept']);
+
 Route::get('jobs', [JobPostController::class, 'index']);
 Route::get('jobs/{id}', [JobPostController::class, 'show'])->whereNumber('id');
 Route::get('/projects', [ProjectController::class, 'index']);
