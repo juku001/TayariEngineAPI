@@ -191,7 +191,7 @@ class TeamTrainingController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return ResponseHelper::error([], 'Failed to validate fields', 422);
+            return ResponseHelper::error($validator->errors(), 'Failed to validate fields', 422);
         }
 
         $authId = auth()->user()->id;
