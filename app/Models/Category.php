@@ -9,7 +9,8 @@ class Category extends Model
     protected $fillable = [
         'name',
         'slug',
-        'description'
+        'description',
+        'status'
     ];
 
     public function courses()

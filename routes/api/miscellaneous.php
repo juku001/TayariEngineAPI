@@ -8,7 +8,10 @@ use App\Http\Controllers\SkillController;
 use App\Models\Level;
 
 
+Route::patch('/categories/{id}/status', [CategoryController::class, 'status']);
 Route::resource('categories', CategoryController::class);
+
+Route::patch('/skills/{id}/status', [SkillController::class, 'status']);
 Route::resource('skills', SkillController::class);
 Route::get('levels', [SkillController::class, 'levels']);
 

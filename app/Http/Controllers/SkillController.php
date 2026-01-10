@@ -456,4 +456,89 @@ class SkillController extends Controller
             "List of all levels"
         );
     }
+
+
+
+    /**
+     * @OA\Patch(
+     *     path="/skills/{id}/status",
+     *     summary="Update Skills status",
+     *     description="Toggle or update the status of a Skills",
+     *     operationId="updateSkillsStatus",
+     *     tags={"Skills"},
+     *     security={{"bearerAuth":{}}},
+     *
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Skills ID",
+     *         @OA\Schema(
+     *             type="string",
+     *             example="1"
+     *         )
+     *     ),
+     *
+     *     @OA\RequestBody(
+     *         required=false,
+     *         description="Optional: Set status explicitly",
+     *         @OA\JsonContent(
+     *             required={"status"},
+     *             @OA\Property(
+     *                 property="status",
+     *                 type="string",
+     *                 enum={"active","inactive"},
+     *                 example="inactive"
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Skills status updated successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Skills status updated successfully."),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="Technology"),
+     *                 @OA\Property(property="status", type="string", example="inactive")
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=404,
+     *         description="Skills not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Skills not found"),
+     *             @OA\Property(property="data", type="array", @OA\Items())
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated"
+     *     )
+     * )
+     */
+    public function status(Request $request, string $id)
+    {
+        $skill = Skill::find($id);
+
+        if (!$skill) {
+            return ResponseHelper::error([], 'Skill not found', 404);
+        }
+
+        $skill->status = $skill->status === 'active' ? 'inactive' : 'active';
+        $skill->save();
+
+        return ResponseHelper::success(
+            $skill,
+            'Skill status updated successfully.'
+        );
+    }
 }

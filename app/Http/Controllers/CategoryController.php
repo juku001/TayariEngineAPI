@@ -58,7 +58,8 @@ class CategoryController extends Controller
 
     public function index()
     {
-        $cats = Category::all();
+        // $cats = Category::all();
+        $cats = Category::where('status', 'active')->get();
         return ResponseHelper::success($cats, 'List of all categories');
     }
 
@@ -131,7 +132,7 @@ class CategoryController extends Controller
         try {
             $slug = Str::slug($request->name);
 
-           
+
             $originalSlug = $slug;
             $counter = 1;
             while (Category::where('slug', $slug)->exists()) {
@@ -272,7 +273,7 @@ class CategoryController extends Controller
         $validator = Validator::make(
             $request->all(),
             [
-                'name' => 'required|string|unique:categories,name,' . $id, 
+                'name' => 'required|string|unique:categories,name,' . $id,
                 'description' => 'nullable|string'
             ]
         );
@@ -290,7 +291,7 @@ class CategoryController extends Controller
 
             $slug = Str::slug($request->name);
 
-      
+
             $originalSlug = $slug;
             $counter = 1;
             while (Category::where('slug', $slug)->where('id', '!=', $id)->exists()) {
@@ -369,4 +370,94 @@ class CategoryController extends Controller
             204
         );
     }
+
+
+    /**
+     * @OA\Patch(
+     *     path="/categories/{id}/status",
+     *     summary="Update category status",
+     *     description="Toggle or update the status of a category",
+     *     operationId="updateCategoryStatus",
+     *     tags={"Categories"},
+     *     security={{"bearerAuth":{}}},
+     *
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Category ID",
+     *         @OA\Schema(
+     *             type="string",
+     *             example="1"
+     *         )
+     *     ),
+     *
+     *     @OA\RequestBody(
+     *         required=false,
+     *         description="Optional: Set status explicitly",
+     *         @OA\JsonContent(
+     *             required={"status"},
+     *             @OA\Property(
+     *                 property="status",
+     *                 type="string",
+     *                 enum={"active","inactive"},
+     *                 example="inactive"
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Category status updated successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Category status updated successfully."),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="Technology"),
+     *                 @OA\Property(property="status", type="string", example="inactive")
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=404,
+     *         description="Category not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Category not found"),
+     *             @OA\Property(property="data", type="array", @OA\Items())
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated"
+     *     )
+     * )
+     */
+
+    public function status(Request $request, string $id)
+    {
+        $cat = Category::find($id);
+
+        if (!$cat) {
+            return ResponseHelper::error([], 'Category not found', 404);
+        }
+
+        $cat->status = $cat->status === 'active' ? 'inactive' : 'active';
+        $cat->save();
+
+        return ResponseHelper::success(
+            $cat,
+            'Category status updated successfully.'
+        );
+    }
+
 }
+
+
+
+
