@@ -198,7 +198,6 @@ class SkillController extends Controller
      *             @OA\Property(property="status", type="boolean", example=false),
      *             @OA\Property(property="message", type="string", example="Skill not found"),
      *             @OA\Property(property="code", type="integer", example=404),
-     *             @OA\Property(property="data", type="object", example={})
      *         )
      *     )
      * )
@@ -512,11 +511,11 @@ class SkillController extends Controller
      *
      *     @OA\Response(
      *         response=404,
-     *         description="Skills not found",
+     *         description="Skill not found",
      *         @OA\JsonContent(
      *             @OA\Property(property="status", type="boolean", example=false),
-     *             @OA\Property(property="message", type="string", example="Skills not found"),
-     *             @OA\Property(property="data", type="array", @OA\Items())
+     *             @OA\Property(property="message", type="string", example="Skill not found"),
+     *             @OA\Property(property="code", type="integer", example=404),
      *         )
      *     ),
      *
