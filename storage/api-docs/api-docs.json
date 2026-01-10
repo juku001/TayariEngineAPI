@@ -6059,6 +6059,1034 @@
                 }
             }
         },
+        "/freelancers": {
+            "get": {
+                "tags": [
+                    "Freelancer"
+                ],
+                "summary": "Get list of available freelancers",
+                "description": "Returns all freelancers who are currently available.",
+                "operationId": "getAvailableFreelancers",
+                "responses": {
+                    "200": {
+                        "description": "Freelancers retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "user_id": {
+                                                        "type": "integer",
+                                                        "example": 12
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Data Scientist"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Expert in machine learning and data analysis."
+                                                    },
+                                                    "country": {
+                                                        "type": "string",
+                                                        "example": "Nigeria"
+                                                    },
+                                                    "region": {
+                                                        "type": "string",
+                                                        "example": "Lagos"
+                                                    },
+                                                    "address": {
+                                                        "type": "string",
+                                                        "example": "Victoria Island"
+                                                    },
+                                                    "start_price": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 55
+                                                    },
+                                                    "end_price": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 70
+                                                    },
+                                                    "rate": {
+                                                        "type": "string",
+                                                        "example": "hr"
+                                                    },
+                                                    "currency": {
+                                                        "type": "string",
+                                                        "example": "USD"
+                                                    },
+                                                    "responds_in": {
+                                                        "type": "string",
+                                                        "example": "4 hours"
+                                                    },
+                                                    "rating": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 5
+                                                    },
+                                                    "reviews_count": {
+                                                        "type": "integer",
+                                                        "example": 42
+                                                    },
+                                                    "projects_completed": {
+                                                        "type": "integer",
+                                                        "example": 73
+                                                    },
+                                                    "success_rate": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 100
+                                                    },
+                                                    "status": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-01-10T12:00:00Z"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2026-01-10T12:00:00Z"
+                                                    },
+                                                    "user": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 12
+                                                            },
+                                                            "first_name": {
+                                                                "type": "string",
+                                                                "example": "Amina"
+                                                            },
+                                                            "last_name": {
+                                                                "type": "string",
+                                                                "example": "Hassan"
+                                                            },
+                                                            "email": {
+                                                                "type": "string",
+                                                                "example": "amina@example.com"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Freelancers retrieved successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Freelancer"
+                ],
+                "summary": "Create a new freelancer",
+                "description": "Creates a new freelancer profile for a logged in user.",
+                "operationId": "createFreelancer",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "user_id",
+                                    "title",
+                                    "description",
+                                    "rate",
+                                    "currency"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Data Scientist"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Expert in machine learning and data analysis."
+                                    },
+                                    "country": {
+                                        "type": "string",
+                                        "example": "Nigeria"
+                                    },
+                                    "region": {
+                                        "type": "string",
+                                        "example": "Lagos"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "Victoria Island"
+                                    },
+                                    "start_price": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 55
+                                    },
+                                    "end_price": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 70
+                                    },
+                                    "rate": {
+                                        "type": "string",
+                                        "enum": [
+                                            "hr",
+                                            "day",
+                                            "project",
+                                            "month"
+                                        ],
+                                        "example": "hr"
+                                    },
+                                    "currency": {
+                                        "type": "string",
+                                        "enum": [
+                                            "TZS",
+                                            "USD",
+                                            "EUR"
+                                        ],
+                                        "example": "USD"
+                                    },
+                                    "responds_in": {
+                                        "type": "string",
+                                        "example": "4 hours"
+                                    },
+                                    "rating": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 5
+                                    },
+                                    "reviews_count": {
+                                        "type": "integer",
+                                        "example": 42
+                                    },
+                                    "projects_completed": {
+                                        "type": "integer",
+                                        "example": 73
+                                    },
+                                    "success_rate": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 100
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Freelancer created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 201
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Data Scientist"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Expert in machine learning and data analysis."
+                                                },
+                                                "country": {
+                                                    "type": "string",
+                                                    "example": "Nigeria"
+                                                },
+                                                "region": {
+                                                    "type": "string",
+                                                    "example": "Lagos"
+                                                },
+                                                "address": {
+                                                    "type": "string",
+                                                    "example": "Victoria Island"
+                                                },
+                                                "start_price": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 55
+                                                },
+                                                "end_price": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 70
+                                                },
+                                                "rate": {
+                                                    "type": "string",
+                                                    "example": "hr"
+                                                },
+                                                "currency": {
+                                                    "type": "string",
+                                                    "example": "USD"
+                                                },
+                                                "responds_in": {
+                                                    "type": "string",
+                                                    "example": "4 hours"
+                                                },
+                                                "rating": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 5
+                                                },
+                                                "reviews_count": {
+                                                    "type": "integer",
+                                                    "example": 42
+                                                },
+                                                "projects_completed": {
+                                                    "type": "integer",
+                                                    "example": 73
+                                                },
+                                                "success_rate": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 100
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Freelancer created successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 422
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/freelancers/{id}/status": {
+            "put": {
+                "tags": [
+                    "Freelancer"
+                ],
+                "summary": "Toggle freelancer availability status",
+                "description": "Updates the 'is_available' status of the authenticated user's freelancer account.",
+                "operationId": "toggleFreelancerStatus",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Freelancer ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Freelancer status updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "user_id": {
+                                                    "type": "integer",
+                                                    "example": 12
+                                                },
+                                                "is_available": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Freelancer status updated successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Freelancer account not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Freelancer account not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/freelancers/{id}": {
+            "get": {
+                "tags": [
+                    "Freelancer"
+                ],
+                "summary": "Get a single freelancer",
+                "description": "Returns detailed information about a freelancer by ID, including user details.",
+                "operationId": "getFreelancerById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Freelancer ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Freelancer retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "user_id": {
+                                                    "type": "integer",
+                                                    "example": 12
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Data Scientist"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Expert in machine learning and data analysis."
+                                                },
+                                                "country": {
+                                                    "type": "string",
+                                                    "example": "Nigeria"
+                                                },
+                                                "region": {
+                                                    "type": "string",
+                                                    "example": "Lagos"
+                                                },
+                                                "address": {
+                                                    "type": "string",
+                                                    "example": "Victoria Island"
+                                                },
+                                                "start_price": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 55
+                                                },
+                                                "end_price": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 70
+                                                },
+                                                "rate": {
+                                                    "type": "string",
+                                                    "example": "hr"
+                                                },
+                                                "currency": {
+                                                    "type": "string",
+                                                    "example": "USD"
+                                                },
+                                                "responds_in": {
+                                                    "type": "string",
+                                                    "example": "4 hours"
+                                                },
+                                                "rating": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 5
+                                                },
+                                                "reviews_count": {
+                                                    "type": "integer",
+                                                    "example": 42
+                                                },
+                                                "projects_completed": {
+                                                    "type": "integer",
+                                                    "example": 73
+                                                },
+                                                "success_rate": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 100
+                                                },
+                                                "is_available": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-01-10T12:00:00Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2026-01-10T12:00:00Z"
+                                                },
+                                                "user": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 12
+                                                        },
+                                                        "first_name": {
+                                                            "type": "string",
+                                                            "example": "Amina"
+                                                        },
+                                                        "last_name": {
+                                                            "type": "string",
+                                                            "example": "Hassan"
+                                                        },
+                                                        "email": {
+                                                            "type": "string",
+                                                            "example": "amina@example.com"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Freelancer retrieved successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Freelancer not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Freelancer not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Freelancer"
+                ],
+                "summary": "Update an existing freelancer",
+                "description": "Updates the details of an existing freelancer by ID.",
+                "operationId": "updateFreelancer",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Freelancer ID to update",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Senior Data Scientist"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Expert in machine learning and statistical modeling."
+                                    },
+                                    "country": {
+                                        "type": "string",
+                                        "example": "Nigeria"
+                                    },
+                                    "region": {
+                                        "type": "string",
+                                        "example": "Lagos"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "Victoria Island"
+                                    },
+                                    "start_price": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 55
+                                    },
+                                    "end_price": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 70
+                                    },
+                                    "rate": {
+                                        "type": "string",
+                                        "enum": [
+                                            "hr",
+                                            "day",
+                                            "project",
+                                            "month"
+                                        ],
+                                        "example": "hr"
+                                    },
+                                    "currency": {
+                                        "type": "string",
+                                        "enum": [
+                                            "TZS",
+                                            "USD",
+                                            "EUR"
+                                        ],
+                                        "example": "USD"
+                                    },
+                                    "responds_in": {
+                                        "type": "string",
+                                        "example": "4 hours"
+                                    },
+                                    "rating": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 5
+                                    },
+                                    "reviews_count": {
+                                        "type": "integer",
+                                        "example": 42
+                                    },
+                                    "projects_completed": {
+                                        "type": "integer",
+                                        "example": 73
+                                    },
+                                    "success_rate": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 100
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Freelancer updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "user_id": {
+                                                    "type": "integer",
+                                                    "example": 12
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Data Scientist"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Expert in machine learning and data analysis."
+                                                },
+                                                "country": {
+                                                    "type": "string",
+                                                    "example": "Nigeria"
+                                                },
+                                                "region": {
+                                                    "type": "string",
+                                                    "example": "Lagos"
+                                                },
+                                                "address": {
+                                                    "type": "string",
+                                                    "example": "Victoria Island"
+                                                },
+                                                "start_price": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 55
+                                                },
+                                                "end_price": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 70
+                                                },
+                                                "rate": {
+                                                    "type": "string",
+                                                    "example": "hr"
+                                                },
+                                                "currency": {
+                                                    "type": "string",
+                                                    "example": "USD"
+                                                },
+                                                "responds_in": {
+                                                    "type": "string",
+                                                    "example": "4 hours"
+                                                },
+                                                "rating": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 5
+                                                },
+                                                "reviews_count": {
+                                                    "type": "integer",
+                                                    "example": 42
+                                                },
+                                                "projects_completed": {
+                                                    "type": "integer",
+                                                    "example": 73
+                                                },
+                                                "success_rate": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 100
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Freelancer updated successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Freelancer not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Freelancer not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 422
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation failed"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/instructor/applications": {
             "get": {
                 "tags": [
@@ -16976,6 +18004,10 @@
         {
             "name": "Projects",
             "description": "Project APIs for the Employers. Viewing projects, sending proposals, accept and deny for proposals. "
+        },
+        {
+            "name": "Freelancer",
+            "description": "Freelancer APIs for the employer to get freelancers, and also users to create freelancer accounts. "
         },
         {
             "name": "Training",

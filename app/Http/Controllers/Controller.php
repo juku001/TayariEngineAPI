@@ -170,6 +170,10 @@ namespace App\Http\Controllers;
  *     description="Project APIs for the Employers. Viewing projects, sending proposals, accept and deny for proposals. "
  * ),
  * @OA\Tag(
+ *     name="Freelancer",
+ *     description="Freelancer APIs for the employer to get freelancers, and also users to create freelancer accounts. "
+ * ),
+ * @OA\Tag(
  *     name="Training",
  *     description="This API si for the Employers to manage Training for their teams. View analysis, Training progress and Course Performance. "
  * ),  

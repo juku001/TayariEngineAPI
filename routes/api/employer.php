@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FreelancerController;
 use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\JobMatchController;
 use App\Http\Controllers\JobPostController;
@@ -112,11 +113,25 @@ Route::middleware(['auth:sanctum', 'user.type:employer'])->group(function () {
 
 Route::prefix('/employer/training')->group(function () {
 
-    Route::middleware(['auth:sanctum', 'user.type:employer'])->group(function () { 
+    Route::middleware(['auth:sanctum', 'user.type:employer'])->group(function () {
         Route::post('/assign', [TeamTrainingController::class, 'store']);
         Route::get('/members', [TeamTrainingController::class, 'members']);
         Route::get('/overview', [TeamTrainingController::class, 'index']);
         Route::get('/courses', [TeamTrainingController::class, 'courses']);
         Route::get('/progress', [TeamTrainingController::class, 'progress']);
+    });
+});
+
+
+
+Route::prefix('/freelancers')->group(function () {
+    Route::middleware(['auth:sanctum'])->group(function () {
+        Route::get('/', [FreelancerController::class, 'index'])->middleware('user.type:employer');
+        Route::get('/{id}/status', [FreelancerController::class, 'status']);
+        Route::get('/{id}', [FreelancerController::class, 'show']);
+        // Route::middleware('user.type:learner')->group(function () /{
+            Route::post('/', [FreelancerController::class, 'store']);
+            Route::put('/{id}', [FreelancerController::class, 'update']);
+        // });
     });
 });
