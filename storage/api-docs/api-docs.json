@@ -2838,9 +2838,9 @@
                                             "type": "string",
                                             "example": "Category not found"
                                         },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {}
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
                                         }
                                     },
                                     "type": "object"
@@ -14051,10 +14051,6 @@
                                         "code": {
                                             "type": "integer",
                                             "example": 404
-                                        },
-                                        "data": {
-                                            "type": "object",
-                                            "example": []
                                         }
                                     },
                                     "type": "object"
@@ -14518,7 +14514,7 @@
                         }
                     },
                     "404": {
-                        "description": "Skills not found",
+                        "description": "Skill not found",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -14529,11 +14525,11 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Skills not found"
+                                            "example": "Skill not found"
                                         },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {}
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
                                         }
                                     },
                                     "type": "object"
