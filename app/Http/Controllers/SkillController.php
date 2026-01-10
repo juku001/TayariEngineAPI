@@ -49,7 +49,8 @@ class SkillController extends Controller
 
     public function index()
     {
-        $skills = Skill::all();
+        // $skills = Skill::all();
+        $skills = Skill::where('status', 'active')->get();
         return ResponseHelper::success($skills, 'List of all skills.');
     }
 
