@@ -43,7 +43,7 @@ Route::middleware(['auth:sanctum', 'user.type:employer'])->group(function () {
     Route::get('team/invites', [TeamController::class, 'getInvites']);
     Route::post('team/invites', [TeamController::class, 'invite']);
 
-    Route::delete('/team/invites/remove/{id}', [TeamController::class, 'destroy']);
+    Route::delete('/team/invite/remove/{id}', [TeamController::class, 'destroy']);
     Route::get('/dashboard/employer/teams', [DashboardController::class, 'teams']);
 
     Route::patch('/projects/{id}/review/start', [ProjectActivityController::class, 'reviewStart']);

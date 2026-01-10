@@ -567,7 +567,7 @@ class TeamController extends Controller
 
     /**
      * @OA\Delete(
-     *     path="/team/invites/remove/{id}",
+     *     path="/team/invite/remove/{id}",
      *     tags={"Employer"},
      *     summary="Remove a team invitation",
      *     description="Deletes a specific team invitation by ID. Only available to authenticated employers.",
