@@ -127,7 +127,7 @@ Route::prefix('/employer/training')->group(function () {
 Route::prefix('/freelancers')->group(function () {
     Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/', [FreelancerController::class, 'index'])->middleware('user.type:employer');
-        Route::get('/{id}/status', [FreelancerController::class, 'status']);
+        Route::patch('/{id}/status', [FreelancerController::class, 'status']);
         Route::get('/{id}', [FreelancerController::class, 'show']);
         // Route::middleware('user.type:learner')->group(function () /{
             Route::post('/', [FreelancerController::class, 'store']);

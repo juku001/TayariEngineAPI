@@ -94,7 +94,7 @@ class FreelancerController extends Controller
      */
 
     /**
-     * @OA\Put(
+     * @OA\Patch(
      *     path="/freelancers/{id}/status",
      *     summary="Toggle freelancer availability status",
      *     description="Updates the 'is_available' status of the authenticated user's freelancer account.",
