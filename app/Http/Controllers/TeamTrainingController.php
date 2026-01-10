@@ -6,6 +6,7 @@ use App\Helpers\ResponseHelper;
 use App\Models\Employer;
 use App\Models\EmployerTeamMember;
 use App\Models\Enrollment;
+use App\Models\LearnerPoint;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -90,9 +91,12 @@ class TeamTrainingController extends Controller
             ->distinct('user_id')
             ->count('user_id');
 
-        // Average learner points
-        $avgPoints = User::whereIn('id', $memberIds)
-            ->avg('learner_points');
+        $avgPoints = LearnerPoint::whereIn('user_id', $memberIds)
+            ->selectRaw('SUM(points) / COUNT(DISTINCT user_id) as avg_points')
+            ->value('avg_points');
+
+        $avgPoints = round($avgPoints ?? 0, 2);
+
 
         $data = [
             'total' => $total,
