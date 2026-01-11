@@ -135,3 +135,5 @@ Route::prefix('/freelancers')->group(function () {
         // });
     });
 });
+
+// Route::prefix("proposals")
