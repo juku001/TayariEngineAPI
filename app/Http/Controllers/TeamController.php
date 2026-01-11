@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
+use App\Mail\TeamInvitationAcknowledgementMail;
 use App\Mail\TeamInviteMail;
 use App\Models\Employer;
 use App\Models\EmployerTeamMember;
@@ -542,16 +543,18 @@ class TeamController extends Controller
             return ResponseHelper::error([], 'Invalid or expired invitation token.', 404);
         }
 
+        // Generate plain password ONLY if user is new
+        $plainPassword = str()->random(16);
 
         $user = User::firstOrCreate(
             ['email' => $invitation->email],
             [
                 'name' => $invitation->name ?? 'New User',
-                'password' => Hash::make(str()->random(16)), // random secure password
+                'password' => Hash::make($plainPassword),
             ]
         );
 
-        // Add to team
+        // Add user to team
         EmployerTeamMember::firstOrCreate([
             'user_id' => $user->id,
             'company_id' => $invitation->company_id,
@@ -561,8 +564,27 @@ class TeamController extends Controller
         // Mark invitation as accepted
         $invitation->update(['status' => 'accepted']);
 
-        // ✅ Send email notification (optional)
-        // Mail::to($user->email)->send(new TeamInvitationAcknowledgementMail($user, $invitation));
+        /**
+         * ✅ Send correct email
+         */
+        if ($user->wasRecentlyCreated) {
+            // New user → send password
+            Mail::to($user->email)->send(
+                new TeamInvitationAcknowledgementMail(
+                    user: $user,
+                    invitation: $invitation,
+                    password: $plainPassword
+                )
+            );
+        } else {
+            // Existing user → no password
+            Mail::to($user->email)->send(
+                new TeamInvitationAcknowledgementMail(
+                    user: $user,
+                    invitation: $invitation
+                )
+            );
+        }
 
         return ResponseHelper::success(
             $user,
@@ -570,6 +592,7 @@ class TeamController extends Controller
             200
         );
     }
+
 
 
 
