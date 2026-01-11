@@ -424,15 +424,16 @@ class ProposalController extends Controller
         }
 
         // Ensure logged-in user is the employer of the project
-        $employerId = auth()->user()->id;
-        if ($proposal->project->employer_id !== $employerId) {
+        $userId = auth()->user()->id;
+        $employer = Employer::where('user_id', $userId)->first();
+        if ($proposal->project->employer_id !== $employer->id) {
             return ResponseHelper::error([], "Unauthorized: You are not the employer of this project", 403);
         }
 
         try {
             // Update the proposal
             $proposal->status = $request->status;
-            $proposal->employer_id = $employerId;
+            $proposal->freelancer_id = $userId;
             $proposal->save();
 
             return ResponseHelper::success($proposal, "Proposal status updated successfully");
