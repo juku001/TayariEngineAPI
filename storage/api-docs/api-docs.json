@@ -13879,9 +13879,13 @@
                                                                             "type": "integer",
                                                                             "example": 3
                                                                         },
-                                                                        "name": {
+                                                                        "first_name": {
                                                                             "type": "string",
-                                                                            "example": "John Doe"
+                                                                            "example": "John"
+                                                                        },
+                                                                        "last_name": {
+                                                                            "type": "string",
+                                                                            "example": "Doe"
                                                                         }
                                                                     },
                                                                     "type": "object"

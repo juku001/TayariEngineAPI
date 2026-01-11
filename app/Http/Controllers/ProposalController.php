@@ -496,7 +496,8 @@ class ProposalController extends Controller
      *                                 property="freelancer",
      *                                 type="object",
      *                                 @OA\Property(property="id", type="integer", example=3),
-     *                                 @OA\Property(property="name", type="string", example="John Doe")
+     *                                 @OA\Property(property="first_name", type="string", example="John"),
+     *                                 @OA\Property(property="last_name", type="string", example="Doe")
      *                             )
      *                         )
      *                     )
@@ -560,7 +561,7 @@ class ProposalController extends Controller
                 }
 
                 // 👇 load freelancer user
-                $query->with('freelancer:id,name');
+                $query->with('freelancer:id,first_name,last_name');
             }
         ])
             ->where('company_id', $employer->company_id)
