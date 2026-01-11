@@ -48,7 +48,7 @@ class JobMatchingHelper
 
     private function calculateSkillScore()
     {
-        $jobSkills = $this->jobPost->skills->pluck('name')->toArray(); // assuming relation
+        $jobSkills = $this->jobPost->jobSkills->pluck('name')->toArray(); // assuming relation
         $userSkillLevel = strtolower($this->aptitude->skill_level); // beginner/intermediate/advanced
 
         // map levels to numeric scores
