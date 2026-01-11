@@ -6,6 +6,7 @@ use App\Helpers\ResponseHelper;
 use App\Models\Employer;
 use App\Models\Project;
 use App\Models\ProjectProposal;
+use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -108,6 +109,121 @@ class ProposalController extends Controller
     }
 
 
+
+
+
+
+
+    /**
+     * @OA\Get(
+     *     path="/projects/proposals/freelancer/{id}",
+     *     tags={"Projects"},
+     *     summary="Get list of proposals submitted by the given freelancer",
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="proposalId",
+     *         in="path",
+     *         description="ID of the freelancer",
+     *         required=true,
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of proposals retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="List of proposals by freelancer"),
+     *             @OA\Property(property="code", type="integer", example=200),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="project_id", type="integer", example=1),
+     *                     @OA\Property(property="freelancer_id", type="integer", example=7),
+     *                     @OA\Property(property="amount", type="number", format="float", example=500),
+     *                     @OA\Property(property="experience", type="integer", example=2),
+     *                     @OA\Property(property="experience_unit", type="string", example="years"),
+     *                     @OA\Property(property="status", type="string", example="pending"),
+     *                     @OA\Property(property="message", type="string", example="Something something"),
+     *                     @OA\Property(property="created_at", type="string", format="date-time", example="2025-09-01T22:19:27.000000Z"),
+     *                     @OA\Property(property="updated_at", type="string", format="date-time", example="2025-09-01T22:19:27.000000Z"),
+     *                     @OA\Property(
+     *                         property="project",
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="title", type="string", example="Full Stack Developer"),
+     *                         @OA\Property(property="description", type="string", example="Get a Job for free my dear."),
+     *                         @OA\Property(property="duration_min", type="integer", example=1),
+     *                         @OA\Property(property="duration_max", type="integer", example=null),
+     *                         @OA\Property(property="duration_unit", type="string", example="months"),
+     *                         @OA\Property(property="employer_id", type="integer", example=1),
+     *                         @OA\Property(property="company_id", type="integer", example=1),
+     *                         @OA\Property(property="status", type="string", example="in_review"),
+     *                         @OA\Property(property="salary_min", type="number", format="float", example=null),
+     *                         @OA\Property(property="salary_max", type="number", format="float", example=null),
+     *                         @OA\Property(property="currency", type="string", example="TZS"),
+     *                         @OA\Property(property="deadline", type="string", format="date-time", example=null),
+     *                         @OA\Property(property="views", type="integer", example=0),
+     *                         @OA\Property(property="proposal_count", type="integer", example=0),
+     *                         @OA\Property(property="slug", type="string", example=null),
+     *                         @OA\Property(property="created_at", type="string", format="date-time", example="2025-09-01T21:28:31.000000Z"),
+     *                         @OA\Property(property="updated_at", type="string", format="date-time", example="2025-09-01T21:28:31.000000Z")
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *           type="object",
+     *           @OA\Property(property="status", type="boolean", example=false),
+     *           @OA\Property(property="message", type="string", example="Unauthorized"),
+     *           @OA\Property(property="code", type="integer", example=401)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Not Found",
+     *         @OA\JsonContent(
+     *           type="object",
+     *           @OA\Property(property="status", type="boolean", example=false),
+     *           @OA\Property(property="message", type="string", example="User Not found"),
+     *           @OA\Property(property="code", type="integer", example=404)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error",
+     *         @OA\JsonContent(
+     *           type="object",
+     *           @OA\Property(property="status", type="boolean", example=false),
+     *           @OA\Property(property="message", type="string", example="Failed to fetch proposals"),
+     *           @OA\Property(property="code", type="integer", example=500)
+     *         )
+     *     )
+     * )
+     */
+    public function byFreelancer(string $id)
+    {
+        $user = User::find($id);
+        if (!$user) {
+            return ResponseHelper::error([], 'User not found', 404);
+        }
+        $authId = $user->id;
+        try {
+            $proposals = ProjectProposal::with('project')->where(
+                'freelancer_id',
+                $authId
+            )->get();
+            return ResponseHelper::success($proposals, 'List of proposals by freelancer');
+        } catch (Exception $e) {
+            return ResponseHelper::error([], "Failed to fetch proposals: " . $e->getMessage(), 500);
+        }
+    }
 
     /**
      * @OA\Post(
@@ -496,7 +612,7 @@ class ProposalController extends Controller
      *         )
      *     ),
      *
-    *     @OA\Response(
+     *     @OA\Response(
      *         response=401,
      *         description="Unauthorized",
      *         @OA\JsonContent(

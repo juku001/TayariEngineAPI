@@ -6482,7 +6482,7 @@
             }
         },
         "/freelancers/{id}/status": {
-            "put": {
+            "patch": {
                 "tags": [
                     "Freelancer"
                 ],
@@ -13309,6 +13309,263 @@
                     },
                     "500": {
                         "$ref": "#/components/responses/500"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/projects/proposals/freelancer/{id}": {
+            "get": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Get list of proposals submitted by the given freelancer",
+                "operationId": "d1ddc05efd397fa3baf7120fe58b59c3",
+                "parameters": [
+                    {
+                        "name": "proposalId",
+                        "in": "path",
+                        "description": "ID of the freelancer",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of proposals retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "List of proposals by freelancer"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "project_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "freelancer_id": {
+                                                        "type": "integer",
+                                                        "example": 7
+                                                    },
+                                                    "amount": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 500
+                                                    },
+                                                    "experience": {
+                                                        "type": "integer",
+                                                        "example": 2
+                                                    },
+                                                    "experience_unit": {
+                                                        "type": "string",
+                                                        "example": "years"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "pending"
+                                                    },
+                                                    "message": {
+                                                        "type": "string",
+                                                        "example": "Something something"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2025-09-01T22:19:27.000000Z"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2025-09-01T22:19:27.000000Z"
+                                                    },
+                                                    "project": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "title": {
+                                                                "type": "string",
+                                                                "example": "Full Stack Developer"
+                                                            },
+                                                            "description": {
+                                                                "type": "string",
+                                                                "example": "Get a Job for free my dear."
+                                                            },
+                                                            "duration_min": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "duration_max": {
+                                                                "type": "integer",
+                                                                "example": null
+                                                            },
+                                                            "duration_unit": {
+                                                                "type": "string",
+                                                                "example": "months"
+                                                            },
+                                                            "employer_id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "company_id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "status": {
+                                                                "type": "string",
+                                                                "example": "in_review"
+                                                            },
+                                                            "salary_min": {
+                                                                "type": "number",
+                                                                "format": "float",
+                                                                "example": null
+                                                            },
+                                                            "salary_max": {
+                                                                "type": "number",
+                                                                "format": "float",
+                                                                "example": null
+                                                            },
+                                                            "currency": {
+                                                                "type": "string",
+                                                                "example": "TZS"
+                                                            },
+                                                            "deadline": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": null
+                                                            },
+                                                            "views": {
+                                                                "type": "integer",
+                                                                "example": 0
+                                                            },
+                                                            "proposal_count": {
+                                                                "type": "integer",
+                                                                "example": 0
+                                                            },
+                                                            "slug": {
+                                                                "type": "string",
+                                                                "example": null
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2025-09-01T21:28:31.000000Z"
+                                                            },
+                                                            "updated_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2025-09-01T21:28:31.000000Z"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 401
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User Not found"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 404
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Failed to fetch proposals"
+                                        },
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 500
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
