@@ -479,15 +479,25 @@ class ProposalController extends Controller
      *                 property="data",
      *                 type="array",
      *                 @OA\Items(
+     *                     type="object",
      *                     @OA\Property(property="id", type="integer", example=1),
      *                     @OA\Property(property="title", type="string", example="Website Redesign"),
      *                     @OA\Property(
      *                         property="project_proposals",
      *                         type="array",
      *                         @OA\Items(
+     *                             type="object",
      *                             @OA\Property(property="id", type="integer", example=10),
+     *                             @OA\Property(property="amount", type="number", format="float", example=500.00),
      *                             @OA\Property(property="status", type="string", example="shortlist"),
-     *                             @OA\Property(property="created_at", type="string", format="date-time")
+     *                             @OA\Property(property="created_at", type="string", format="date-time"),
+     *
+     *                             @OA\Property(
+     *                                 property="freelancer",
+     *                                 type="object",
+     *                                 @OA\Property(property="id", type="integer", example=3),
+     *                                 @OA\Property(property="name", type="string", example="John Doe")
+     *                             )
      *                         )
      *                     )
      *                 )
@@ -499,20 +509,21 @@ class ProposalController extends Controller
      *         response=401,
      *         description="Unauthorized",
      *         @OA\JsonContent(
-     *           type="object",
-     *           @OA\Property(property="status", type="boolean", example=false),
-     *           @OA\Property(property="message", type="string", example="Unauthorized"),
-     *           @OA\Property(property="code", type="integer", example=401),
+     *             type="object",
+     *             @OA\Property(property="status", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Unauthorized"),
+     *             @OA\Property(property="code", type="integer", example=401)
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=403,
      *         description="Forbidden: Not the employer",
      *         @OA\JsonContent(
-     *           type="object",
-     *           @OA\Property(property="status", type="boolean", example=false),
-     *           @OA\Property(property="message", type="string", example="You are not allowed to perform this action"),
-     *           @OA\Property(property="code", type="integer", example=403)
+     *             type="object",
+     *             @OA\Property(property="status", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="You are not allowed to perform this action"),
+     *             @OA\Property(property="code", type="integer", example=403)
      *         )
      *     ),
      *
@@ -520,14 +531,15 @@ class ProposalController extends Controller
      *         response=404,
      *         description="Employer Company not found",
      *         @OA\JsonContent(
-     *           type="object",
-     *           @OA\Property(property="status", type="boolean", example=false),
-     *           @OA\Property(property="message", type="string", example="Employer Company not found"),
-     *           @OA\Property(property="code", type="integer", example=404)
+     *             type="object",
+     *             @OA\Property(property="status", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Employer Company not found"),
+     *             @OA\Property(property="code", type="integer", example=404)
      *         )
      *     )
      * )
      */
+
 
 
     public function employer(Request $request)
@@ -540,11 +552,15 @@ class ProposalController extends Controller
         }
 
         $status = $request->query('status');
+
         $projects = Project::with([
             'projectProposals' => function ($query) use ($status) {
                 if ($status) {
                     $query->where('status', $status);
                 }
+
+                // 👇 load freelancer user
+                $query->with('freelancer:id,name');
             }
         ])
             ->where('company_id', $employer->company_id)

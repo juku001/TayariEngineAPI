@@ -13860,6 +13860,11 @@
                                                                     "type": "integer",
                                                                     "example": 10
                                                                 },
+                                                                "amount": {
+                                                                    "type": "number",
+                                                                    "format": "float",
+                                                                    "example": 500
+                                                                },
                                                                 "status": {
                                                                     "type": "string",
                                                                     "example": "shortlist"
@@ -13867,6 +13872,19 @@
                                                                 "created_at": {
                                                                     "type": "string",
                                                                     "format": "date-time"
+                                                                },
+                                                                "freelancer": {
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "integer",
+                                                                            "example": 3
+                                                                        },
+                                                                        "name": {
+                                                                            "type": "string",
+                                                                            "example": "John Doe"
+                                                                        }
+                                                                    },
+                                                                    "type": "object"
                                                                 }
                                                             },
                                                             "type": "object"
