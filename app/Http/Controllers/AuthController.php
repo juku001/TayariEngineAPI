@@ -294,4 +294,118 @@ class AuthController extends Controller
 
         return ResponseHelper::success($user, 'Logged in user details');
     }
+
+
+    /**
+     * @OA\Patch(
+     *     path="/me",
+     *     operationId="updateMe",
+     *     tags={"Authentication"},
+     *     summary="Update logged-in user profile",
+     *     description="Allows an authenticated user to update their profile information such as name, email, mobile, date of birth, and profile picture.",
+     *     security={{"bearerAuth":{}}},
+     *
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 @OA\Property(property="first_name", type="string", example="John"),
+     *                 @OA\Property(property="last_name", type="string", example="Doe"),
+     *                 @OA\Property(property="email", type="string", format="email", example="john.doe@example.com"),
+     *                 @OA\Property(property="mobile", type="string", example="+255712345678"),
+     *                 @OA\Property(property="date_of_birth", type="string", format="date", example="1998-05-12"),
+     *                 @OA\Property(
+     *                     property="profile_pic",
+     *                     type="string",
+     *                     format="binary",
+     *                     description="Profile picture (jpg, jpeg, png)"
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Profile updated successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Profile updated successfully"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="first_name", type="string", example="John"),
+     *                 @OA\Property(property="last_name", type="string", example="Doe"),
+     *                 @OA\Property(property="email", type="string", example="john.doe@example.com"),
+     *                 @OA\Property(property="mobile", type="string", example="+255712345678"),
+     *                 @OA\Property(property="date_of_birth", type="string", format="date"),
+     *                 @OA\Property(property="profile_pic", type="string", example="profile_pics/avatar.png"),
+     *                 @OA\Property(
+     *                     property="roles",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=1),
+     *                         @OA\Property(property="name", type="string", example="freelancer")
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Unauthorized"),
+     *             @OA\Property(property="code", type="integer", example=401)
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="The email has already been taken."),
+     *             @OA\Property(property="errors", type="object")
+     *         )
+     *     )
+     * )
+     */
+
+    public function updateMe(Request $request)
+    {
+        $authId = auth()->user()->id;
+
+        $user = User::findOrFail($authId);
+
+        $validated = $request->validate([
+            'first_name' => 'sometimes|string|max:255',
+            'last_name' => 'sometimes|string|max:255',
+            'email' => 'sometimes|email|unique:users,email,' . $authId,
+            'mobile' => 'sometimes|string|max:20',
+            'date_of_birth' => 'sometimes|date',
+            'profile_pic' => 'sometimes|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        // ✅ Handle profile picture upload
+        if ($request->hasFile('profile_pic')) {
+            $path = $request->file('profile_pic')->store('profile_pics', 'public');
+            $validated['profile_pic'] = $path;
+        }
+
+        $user->update($validated);
+
+        return ResponseHelper::success(
+            $user->fresh()->load('roles'),
+            'Profile updated successfully'
+        );
+    }
+
 }
