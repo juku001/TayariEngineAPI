@@ -196,7 +196,7 @@ class JobApplicationController extends Controller
 
                 // Compare skills
                 $userSkillNames = $user->skills->pluck('name')->toArray();
-                $jobSkillNames = $jobPost->jobskills->pluck('name')->toArray();
+                $jobSkillNames = $jobPost->jobSkills->pluck('name')->toArray();
                 $hasSkillMatch = count(array_intersect($userSkillNames, $jobSkillNames)) > 0;
 
                 // Points logic
