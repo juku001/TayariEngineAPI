@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Notifications\VerifyEmailNotification;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -66,6 +67,10 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new VerifyEmailNotification());
+    }
 
     public function roles()
     {
@@ -171,12 +176,12 @@ class User extends Authenticatable implements MustVerifyEmail
     public function quizAttempts()
     {
         return $this->hasManyThrough(
-            QuizAttempt::class,   
-            Enrollment::class,    
-            'user_id',           
-            'enrollment_id',     
-            'id',                 
-            'id'            
+            QuizAttempt::class,
+            Enrollment::class,
+            'user_id',
+            'enrollment_id',
+            'id',
+            'id'
         );
     }
 
