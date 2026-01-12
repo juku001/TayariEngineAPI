@@ -6268,6 +6268,18 @@
                                                         "type": "string",
                                                         "example": "Expert in machine learning and data analysis."
                                                     },
+                                                    "phone_number": {
+                                                        "type": "string",
+                                                        "example": "+255712345678"
+                                                    },
+                                                    "whatsapp": {
+                                                        "type": "string",
+                                                        "example": null
+                                                    },
+                                                    "phone_is_whatsapp": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
                                                     "country": {
                                                         "type": "string",
                                                         "example": "Nigeria"
@@ -6428,6 +6440,18 @@
                                         "type": "string",
                                         "example": "Expert in machine learning and data analysis."
                                     },
+                                    "phone_number": {
+                                        "type": "string",
+                                        "example": "+255712345678"
+                                    },
+                                    "whatsapp": {
+                                        "type": "string",
+                                        "example": null
+                                    },
+                                    "phone_is_whatsapp": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
                                     "country": {
                                         "type": "string",
                                         "example": "Nigeria"
@@ -6525,6 +6549,18 @@
                                                 "description": {
                                                     "type": "string",
                                                     "example": "Expert in machine learning and data analysis."
+                                                },
+                                                "phone_number": {
+                                                    "type": "string",
+                                                    "example": "+255712345678"
+                                                },
+                                                "whatsapp": {
+                                                    "type": "string",
+                                                    "example": null
+                                                },
+                                                "phone_is_whatsapp": {
+                                                    "type": "boolean",
+                                                    "example": true
                                                 },
                                                 "country": {
                                                     "type": "string",
@@ -6818,6 +6854,18 @@
                                                     "type": "string",
                                                     "example": "Expert in machine learning and data analysis."
                                                 },
+                                                "phone_number": {
+                                                    "type": "string",
+                                                    "example": "+255712345678"
+                                                },
+                                                "whatsapp": {
+                                                    "type": "string",
+                                                    "example": null
+                                                },
+                                                "phone_is_whatsapp": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
                                                 "country": {
                                                     "type": "string",
                                                     "example": "Nigeria"
@@ -7006,6 +7054,18 @@
                                         "type": "string",
                                         "example": "Expert in machine learning and statistical modeling."
                                     },
+                                    "phone_number": {
+                                        "type": "string",
+                                        "example": "+255712345678"
+                                    },
+                                    "whatsapp": {
+                                        "type": "string",
+                                        "example": null
+                                    },
+                                    "phone_is_whatsapp": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
                                     "country": {
                                         "type": "string",
                                         "example": "Nigeria"
@@ -7107,6 +7167,18 @@
                                                 "description": {
                                                     "type": "string",
                                                     "example": "Expert in machine learning and data analysis."
+                                                },
+                                                "phone_number": {
+                                                    "type": "string",
+                                                    "example": "+255712345678"
+                                                },
+                                                "whatsapp": {
+                                                    "type": "string",
+                                                    "example": null
+                                                },
+                                                "phone_is_whatsapp": {
+                                                    "type": "boolean",
+                                                    "example": true
                                                 },
                                                 "country": {
                                                     "type": "string",
