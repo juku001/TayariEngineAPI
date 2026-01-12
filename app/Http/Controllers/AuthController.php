@@ -298,7 +298,7 @@ class AuthController extends Controller
 
     /**
      * @OA\Patch(
-     *     path="/me",
+     *     path="/auth/me",
      *     operationId="updateMe",
      *     tags={"Authentication"},
      *     summary="Update logged-in user profile",

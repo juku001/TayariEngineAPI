@@ -6,7 +6,7 @@ use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerificationController;
- 
+
 
 
 
@@ -15,7 +15,9 @@ Route::get('/is_auth', [AuthController::class, 'authorized'])->middleware('auth:
 Route::post('is_verified', [AuthController::class, 'verified']);
 Route::prefix('auth')->group(function () {
 
+    Route::patch('me', [AuthController::class, 'updateMe'])->middleware('auth:sanctum');
     Route::get('me', [AuthController::class, 'me'])->middleware('auth:sanctum');
+
     Route::post('/login', [LogInController::class, 'index']);
     Route::post('/register', [RegisterController::class, 'index']);
     Route::post('/logout', [AuthController::class, 'destroy']);
@@ -25,8 +27,8 @@ Route::prefix('auth')->group(function () {
     Route::get('/google/callback', [LogInController::class, 'callback']);
 
 
-    Route::post('/forgot_password', [PasswordController::class,'index']);
-    Route::post('/verify_code', [PasswordController::class,'verify']);
+    Route::post('/forgot_password', [PasswordController::class, 'index']);
+    Route::post('/verify_code', [PasswordController::class, 'verify']);
     Route::post('/reset_password', [PasswordController::class, 'store']);
     Route::post('update_password', [PasswordController::class, 'update'])->middleware('auth:sanctum');
 

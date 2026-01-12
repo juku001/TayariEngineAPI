@@ -2209,9 +2209,7 @@
                         "bearerAuth": []
                     }
                 ]
-            }
-        },
-        "/me": {
+            },
             "patch": {
                 "tags": [
                     "Authentication"
