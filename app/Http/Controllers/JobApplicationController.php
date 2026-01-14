@@ -314,7 +314,21 @@ class JobApplicationController extends Controller
 
     public function applications()
     {
-        $applications = JobPostApplication::with(['user.certificates', 'jobPost'])->get();
+        // $applications = JobPostApplication::with(['user.certificates', 'jobPost'])->get();
+        $authId = auth()->user()->id;
+        $employer = Employer::where('user_id', $authId)->first();
+        if (!$employer) {
+            return ResponseHelper::error([], 'Employer not found.', 404);
+        }
+
+        $companyId = $employer->company_id;
+
+        $applications = JobPostApplication::with(['user.certificates', 'jobPost'])
+            ->whereHas('jobPost', function ($query) use ($companyId) {
+                $query->where('company_id', $companyId);
+            })
+            ->get();
+
 
         $data = $applications->map(function ($application) {
             $user = $application->user;
