@@ -173,6 +173,10 @@ namespace App\Http\Controllers;
  *     name="Freelancer",
  *     description="Freelancer APIs for the employer to get freelancers, and also users to create freelancer accounts. "
  * ),
+ *  @OA\Tag(
+ *     name="Saved Freelancer",
+ *     description="Freelancer APIs for the employer to save freelancers, and get list of saved freelancers. "
+ * ),
  * @OA\Tag(
  *     name="Training",
  *     description="This API si for the Employers to manage Training for their teams. View analysis, Training progress and Course Performance. "

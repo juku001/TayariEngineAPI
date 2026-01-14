@@ -64,4 +64,10 @@ class Freelancer extends Model
 
         return null;
     }
+
+
+    public function freelancerSaves()
+    {
+        return $this->hasMany(FreelancerSave::class);
+    }
 }

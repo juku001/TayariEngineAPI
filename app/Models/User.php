@@ -184,6 +184,9 @@ class User extends Authenticatable implements MustVerifyEmail
             'id'
         );
     }
-
+    public function freelancerSaves()
+    {
+        return $this->hasMany(FreelancerSave::class);
+    }
 
 }

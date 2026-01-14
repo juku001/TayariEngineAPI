@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FreelancerSaveController;
+use App\Http\Controllers\FreelancerSaverController;
 use App\Http\Controllers\FreelancerController;
 use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\JobMatchController;
@@ -131,9 +133,18 @@ Route::prefix('/freelancers')->group(function () {
         Route::patch('/{id}/status', [FreelancerController::class, 'status']);
         Route::get('/{id}', [FreelancerController::class, 'show']);
         // Route::middleware('user.type:learner')->group(function () /{
-            Route::post('/', [FreelancerController::class, 'store']);
-            Route::put('/{id}', [FreelancerController::class, 'update']);
+        Route::post('/', [FreelancerController::class, 'store']);
+        Route::put('/{id}', [FreelancerController::class, 'update']);
         // });
     });
 });
 
+
+
+//freelancer saves
+Route::middleware(['auth:sanctum,user.type:employer'])->group(function () {
+    Route::get('/freelancer/saves/employer', [FreelancerSaveController::class, 'employer']);
+    Route::get('/freelancer/saves/company', [FreelancerSaveController::class, 'company']);
+    Route::put('/freelancers/saves/{id}', [FreelancerSaveController::class, 'update']);
+    Route::get('/freelancers/saves/{id}', [FreelancerSaveController::class, 'show']);
+});
