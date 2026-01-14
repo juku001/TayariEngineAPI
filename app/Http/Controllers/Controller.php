@@ -174,7 +174,7 @@ namespace App\Http\Controllers;
  *     description="Freelancer APIs for the employer to get freelancers, and also users to create freelancer accounts. "
  * ),
  *  @OA\Tag(
- *     name="Saved Freelancer",
+ *     name="Saved Freelancers",
  *     description="Freelancer APIs for the employer to save freelancers, and get list of saved freelancers. "
  * ),
  * @OA\Tag(

@@ -18940,6 +18940,10 @@
             "description": "Freelancer APIs for the employer to get freelancers, and also users to create freelancer accounts. "
         },
         {
+            "name": "Saved Freelancers",
+            "description": "Freelancer APIs for the employer to save freelancers, and get list of saved freelancers. "
+        },
+        {
             "name": "Training",
             "description": "This API si for the Employers to manage Training for their teams. View analysis, Training progress and Course Performance. "
         },
@@ -18958,10 +18962,6 @@
         {
             "name": "Miscellaneous",
             "description": "Endpoints that don't fit into a specific module or category. This tag groups together utility, helper, and general-purpose APIs."
-        },
-        {
-            "name": "Saved Freelancers",
-            "description": "Saved Freelancers"
         }
     ]
 }
